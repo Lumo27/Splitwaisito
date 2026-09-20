@@ -1,8 +1,10 @@
-import { LogOut, Settings } from 'lucide-react'
+import { Database, LogOut, Settings } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { signOutUser } from '../../services/auth'
+import { MODO_SEEDS } from '../../services/firebase'
+import { restablecerSeeds } from '../../services/seedBackend'
 import { useAppStore } from '../../store/useAppStore'
 
 export function ConfiguracionScreen() {
@@ -18,6 +20,12 @@ export function ConfiguracionScreen() {
 
     cerrarSesion()
     navigate('/login', { replace: true })
+  }
+
+  function handleRestablecerSeeds() {
+    restablecerSeeds()
+    useAppStore.persist.clearStorage()
+    window.location.assign('/grupos')
   }
 
   return (
@@ -59,6 +67,28 @@ export function ConfiguracionScreen() {
           </Button>
         </div>
       </Card>
+
+      {MODO_SEEDS && (
+        <Card className="border-0 p-0 shadow-md shadow-slate-200/60">
+          <div className="flex items-center gap-3 border-b border-slate-100 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary-light text-secondary-dark">
+              <Database size={19} />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-text">Datos de prueba</h2>
+              <p className="text-xs text-text-muted">
+                Estás en modo demo: nada se guarda en Firebase.
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4">
+            <Button type="button" variant="secondary" className="w-full" onClick={handleRestablecerSeeds}>
+              Restablecer datos de prueba
+            </Button>
+          </div>
+        </Card>
+      )}
     </div>
   )
 }
