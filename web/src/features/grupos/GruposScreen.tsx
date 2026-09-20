@@ -18,6 +18,7 @@ import { Card } from '../../components/Card'
 import { Button } from '../../components/Button'
 import { Input } from '../../components/Input'
 import { Avatar } from '../../components/Avatar'
+import { formatearFecha } from './formatearFecha'
 import { useAppStore, type Gasto } from '../../store/useAppStore'
 import {
   crearGrupo,
@@ -517,7 +518,7 @@ export function GruposScreen() {
                         <span className="font-medium text-text">
                           {gasto.pagadoPorNombre}
                         </span>{' '}
-                        · {gasto.fecha}
+                        · {formatearFecha(gasto.fecha)}
                       </p>
                     </div>
                   </div>
