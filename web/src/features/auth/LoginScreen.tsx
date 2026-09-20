@@ -4,6 +4,7 @@ import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { Input } from '../../components/Input'
 import { signInWithGoogle } from '../../services/auth'
+import { isFirebaseAvailable } from '../../services/firebase'
 import { useAppStore } from '../../store/useAppStore'
 
 function GoogleLogo() {
@@ -59,6 +60,15 @@ export function LoginScreen() {
   async function handleGoogleLogin() {
     setGoogleError('')
 
+    if (!isFirebaseAvailable()) {
+      const fallbackUser = 'Usuario Google'
+      const fallbackEmail = 'google@usuario.com'
+      iniciarSesion(fallbackUser, fallbackEmail, 'google-user')
+      navigate('/grupos', { replace: true })
+      setGoogleError('Firebase no está configurado todavía. Usando sesión local temporal.')
+      return
+    }
+
     try {
       const result = await signInWithGoogle()
       const usuario = result.user
@@ -67,6 +77,8 @@ export function LoginScreen() {
         usuario.displayName || 'Usuario Google',
         usuario.email || 'google@usuario.com',
         usuario.displayName || 'google-user',
+        usuario.uid,
+        usuario.photoURL,
       )
       navigate('/grupos', { replace: true })
     } catch (error) {

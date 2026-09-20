@@ -3,7 +3,26 @@ import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 
-const firebaseConfig = {
+export type FirebaseConfig = {
+  apiKey?: string
+  authDomain?: string
+  projectId?: string
+  storageBucket?: string
+  messagingSenderId?: string
+  appId?: string
+}
+
+export function hasFirebaseConfig(config: FirebaseConfig) {
+  const values = Object.values(config).filter((value) => value !== undefined)
+
+  if (values.length === 0) {
+    return false
+  }
+
+  return values.length === 6 && Object.values(config).every(Boolean)
+}
+
+const firebaseConfig: FirebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
@@ -12,9 +31,13 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-const hasFirebaseConfig = Object.values(firebaseConfig).every(Boolean)
+const isConfigured = hasFirebaseConfig(firebaseConfig)
 
-export const app = hasFirebaseConfig ? initializeApp(firebaseConfig) : null
+export const app = isConfigured ? initializeApp(firebaseConfig as Required<FirebaseConfig>) : null
 export const auth = app ? getAuth(app) : null
 export const db = app ? getFirestore(app) : null
 export const storage = app ? getStorage(app) : null
+
+export function isFirebaseAvailable() {
+  return Boolean(app && auth && db && storage)
+}

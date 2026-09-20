@@ -6,6 +6,8 @@ export interface Usuario {
   nombre: string
   email: string
   alias: string
+  descripcion?: string
+  fotoUrl?: string | null
 }
 
 export interface Gasto {
@@ -22,8 +24,17 @@ interface AppState {
   usuarioActual: Usuario | null
   amigos: Usuario[]
   gastos: Gasto[]
-  iniciarSesion: (nombre: string, email: string, alias?: string) => void
+  iniciarSesion: (
+    nombre: string,
+    email: string,
+    alias?: string,
+    id?: string,
+    fotoUrl?: string | null,
+    descripcion?: string,
+  ) => void
   cerrarSesion: () => void
+  actualizarDescripcion: (descripcion: string) => void
+  reemplazarAmigos: (amigos: Usuario[]) => void
   agregarAmigo: (nombre: string, email: string, alias?: string) => void
   actualizarAlias: (id: string, alias: string) => void
   eliminarAmigo: (id: string) => void
@@ -33,6 +44,7 @@ interface AppState {
     categoria: Gasto['categoria'],
     pagadoPorId: string,
   ) => void
+  reemplazarGastos: (gastos: Gasto[]) => void
   eliminarGasto: (id: string) => void
 }
 
@@ -43,17 +55,36 @@ export const useAppStore = create<AppState>()(
       amigos: [],
       gastos: [],
 
-      iniciarSesion: (nombre, email, alias) =>
-        set({
+      iniciarSesion: (nombre, email, alias, id = 'user-me', fotoUrl, descripcion) =>
+        set((state) => ({
           usuarioActual: {
-            id: 'user-me',
+            id,
             nombre: nombre.trim() || 'Mi Usuario',
             email: email.trim(),
             alias: (alias ?? nombre).trim() || 'Mi alias',
+            descripcion:
+              descripcion ??
+              (state.usuarioActual?.id === id
+                ? state.usuarioActual.descripcion
+                : ''),
+            fotoUrl:
+              fotoUrl ??
+              (state.usuarioActual?.id === id
+                ? state.usuarioActual.fotoUrl
+                : null),
           },
-        }),
+        })),
 
       cerrarSesion: () => set({ usuarioActual: null }),
+
+      actualizarDescripcion: (descripcion) =>
+        set((state) => ({
+          usuarioActual: state.usuarioActual
+            ? { ...state.usuarioActual, descripcion: descripcion.trim() }
+            : null,
+        })),
+
+      reemplazarAmigos: (amigos) => set({ amigos }),
 
       agregarAmigo: (nombre, email, alias) => {
         const nuevo: Usuario = {
@@ -113,6 +144,8 @@ export const useAppStore = create<AppState>()(
 
         set((state) => ({ gastos: [nuevoGasto, ...state.gastos] }))
       },
+
+      reemplazarGastos: (gastos) => set({ gastos }),
 
       eliminarGasto: (id) =>
         set((state) => ({

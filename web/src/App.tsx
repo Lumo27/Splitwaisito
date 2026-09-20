@@ -1,10 +1,69 @@
+import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { TabsLayout } from './components/TabsLayout'
 import { LoginScreen } from './features/auth/LoginScreen'
 import { GruposScreen } from './features/grupos/GruposScreen'
 import { ActividadScreen } from './features/actividad/ActividadScreen'
 import { PerfilScreen } from './features/perfil/PerfilScreen'
+import { ConfiguracionScreen } from './features/configuracion/ConfiguracionScreen'
+import { subscribeToAuthChanges } from './services/auth'
+import { isFirebaseAvailable } from './services/firebase'
+import { getUsuarioPerfil, guardarAmigosDelUsuario } from './services/firestore'
 import { useAppStore } from './store/useAppStore'
+
+function AuthBootstrap({ children }: { children: React.ReactNode }) {
+  const [authReady, setAuthReady] = useState(!isFirebaseAvailable())
+  const { iniciarSesion, cerrarSesion, reemplazarAmigos } = useAppStore()
+
+  useEffect(() => {
+    if (!isFirebaseAvailable()) return
+
+    return subscribeToAuthChanges((firebaseUser) => {
+      if (firebaseUser) {
+        iniciarSesion(
+          firebaseUser.displayName || 'Usuario Google',
+          firebaseUser.email || 'google@usuario.com',
+          firebaseUser.displayName || 'google-user',
+          firebaseUser.uid,
+          firebaseUser.photoURL,
+        )
+
+        void getUsuarioPerfil(firebaseUser.uid).then((perfil) => {
+          const amigosLocales = useAppStore.getState().amigos
+          const amigosGuardados = perfil?.amigos ?? amigosLocales
+
+          iniciarSesion(
+            firebaseUser.displayName || 'Usuario Google',
+            firebaseUser.email || 'google@usuario.com',
+            firebaseUser.displayName || 'google-user',
+            firebaseUser.uid,
+            perfil?.fotoUrl ?? firebaseUser.photoURL,
+            perfil?.descripcion,
+          )
+          reemplazarAmigos(amigosGuardados)
+
+          if (!perfil?.amigos && amigosLocales.length > 0) {
+            void guardarAmigosDelUsuario(firebaseUser.uid, amigosLocales)
+          }
+        })
+      } else {
+        cerrarSesion()
+      }
+
+      setAuthReady(true)
+    })
+  }, [cerrarSesion, iniciarSesion, reemplazarAmigos])
+
+  if (!authReady) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-4 text-sm text-text-muted">
+        Restaurando tu sesión...
+      </div>
+    )
+  }
+
+  return children
+}
 
 function ProtectedLayout() {
   const usuarioActual = useAppStore((state) => state.usuarioActual)
@@ -24,17 +83,20 @@ function RootRedirect() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginScreen />} />
-      <Route path="/" element={<RootRedirect />} />
+    <AuthBootstrap>
+      <Routes>
+        <Route path="/login" element={<LoginScreen />} />
+        <Route path="/" element={<RootRedirect />} />
 
-      <Route element={<ProtectedLayout />}>
-        <Route path="/grupos" element={<GruposScreen />} />
-        <Route path="/actividad" element={<ActividadScreen />} />
-        <Route path="/perfil" element={<PerfilScreen />} />
-      </Route>
+        <Route element={<ProtectedLayout />}>
+          <Route path="/grupos" element={<GruposScreen />} />
+          <Route path="/actividad" element={<ActividadScreen />} />
+          <Route path="/perfil" element={<PerfilScreen />} />
+          <Route path="/configuracion" element={<ConfiguracionScreen />} />
+        </Route>
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </AuthBootstrap>
   )
 }

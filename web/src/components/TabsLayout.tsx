@@ -1,6 +1,5 @@
-import { Receipt, UserPlus, User, LogOut } from 'lucide-react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useAppStore } from '../store/useAppStore'
+import { Receipt, UserPlus, User, Settings } from 'lucide-react'
+import { NavLink, Outlet } from 'react-router-dom'
 
 const tabs = [
   { to: '/grupos', label: 'Gastos', Icon: Receipt },
@@ -17,18 +16,10 @@ function tabClasses(isActive: boolean) {
 }
 
 export function TabsLayout() {
-  const navigate = useNavigate()
-  const { cerrarSesion } = useAppStore()
-
-  function handleLogout() {
-    cerrarSesion()
-    navigate('/login')
-  }
-
   return (
     <div className="flex min-h-screen flex-col bg-background md:flex-row">
       {/* Sidebar Desktop */}
-      <nav className="hidden w-56 shrink-0 flex-col justify-between border-r border-primary-light bg-surface p-4 md:flex">
+      <nav className="hidden w-56 shrink-0 flex-col border-r border-primary-light bg-surface p-4 md:flex">
         <div className="space-y-4">
           <div className="flex items-center gap-2 px-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-bold text-white">
@@ -47,16 +38,15 @@ export function TabsLayout() {
                 {label}
               </NavLink>
             ))}
+            <NavLink
+              to="/configuracion"
+              className={({ isActive }) => tabClasses(isActive)}
+            >
+              <Settings size={18} />
+              Configuración
+            </NavLink>
           </div>
         </div>
-
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-text-muted transition hover:bg-red-50 hover:text-danger"
-        >
-          <LogOut size={18} />
-          Cerrar sesión
-        </button>
       </nav>
 
       {/* Contenido Principal */}
@@ -80,6 +70,17 @@ export function TabsLayout() {
             {label}
           </NavLink>
         ))}
+        <NavLink
+          to="/configuracion"
+          className={({ isActive }) =>
+            `flex flex-col items-center gap-0.5 rounded-lg px-3 py-1 text-xs font-medium ${
+              isActive ? 'font-bold text-primary-dark' : 'text-text-muted'
+            }`
+          }
+        >
+          <Settings size={22} />
+          Config.
+        </NavLink>
       </nav>
     </div>
   )
