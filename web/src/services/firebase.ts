@@ -31,7 +31,9 @@ const firebaseConfig: FirebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-const isConfigured = hasFirebaseConfig(firebaseConfig)
+export const MODO_SEEDS = import.meta.env.MODE === 'seeds'
+
+const isConfigured = !MODO_SEEDS && hasFirebaseConfig(firebaseConfig)
 
 export const app = isConfigured ? initializeApp(firebaseConfig as Required<FirebaseConfig>) : null
 export const auth = app ? getAuth(app) : null
@@ -39,5 +41,5 @@ export const db = app ? getFirestore(app) : null
 export const storage = app ? getStorage(app) : null
 
 export function isFirebaseAvailable() {
-  return Boolean(app && auth && db && storage)
+  return MODO_SEEDS || Boolean(app && auth && db && storage)
 }
