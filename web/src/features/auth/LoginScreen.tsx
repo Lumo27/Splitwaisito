@@ -61,11 +61,9 @@ export function LoginScreen() {
     setGoogleError('')
 
     if (!isFirebaseAvailable()) {
-      const fallbackUser = 'Usuario Google'
-      const fallbackEmail = 'google@usuario.com'
-      iniciarSesion(fallbackUser, fallbackEmail, 'google-user')
-      navigate('/grupos', { replace: true })
-      setGoogleError('Firebase no está configurado todavía. Usando sesión local temporal.')
+      setGoogleError(
+        'Firebase no está configurado. Copiá web/.env.example a web/.env.local y pedile las credenciales a Lucas.',
+      )
       return
     }
 
@@ -88,8 +86,6 @@ export function LoginScreen() {
           : 'No se pudo completar el login con Google todavía.'
 
       setGoogleError(message)
-      iniciarSesion('Usuario Google', 'google@usuario.com', 'google-user')
-      navigate('/grupos', { replace: true })
     }
   }
 

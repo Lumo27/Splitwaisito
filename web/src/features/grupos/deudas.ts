@@ -1,3 +1,5 @@
+const CENTAVO = 0.01
+
 export interface Participante {
   id: string
   nombre: string
@@ -27,7 +29,6 @@ export function calcularBalances(
     return balances
   }
 
-  const cuota = gastos.reduce((total, gasto) => total + gasto.monto, 0)
   const totalParticipantes = participantes.length
 
   for (const gasto of gastos) {
@@ -43,12 +44,6 @@ export function calcularBalances(
     }
   }
 
-  if (cuota === 0) {
-    for (const participante of participantes) {
-      balances[participante.id] = 0
-    }
-  }
-
   return balances
 }
 
@@ -60,7 +55,7 @@ export function simplificarDeudas(
 
   for (const [id, saldo] of Object.entries(balances)) {
     const valor = Number(saldo)
-    if (!Number.isFinite(valor) || valor === 0) continue
+    if (!Number.isFinite(valor) || Math.abs(valor) < CENTAVO) continue
 
     if (valor < 0) {
       deudores.set(id, Math.abs(valor))
@@ -91,8 +86,8 @@ export function simplificarDeudas(
     deudores.delete(deudorId)
     acreedores.delete(acreedorId)
 
-    if (nuevaDeuda > 0) deudores.set(deudorId, nuevaDeuda)
-    if (nuevoCredito > 0) acreedores.set(acreedorId, nuevoCredito)
+    if (nuevaDeuda >= CENTAVO) deudores.set(deudorId, nuevaDeuda)
+    if (nuevoCredito >= CENTAVO) acreedores.set(acreedorId, nuevoCredito)
   }
 
   return result

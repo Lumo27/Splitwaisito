@@ -40,6 +40,12 @@ describe('simplificarDeudas', () => {
     expect(simplificarDeudas({ yo: 0, a: 0 })).toEqual([])
   })
 
+  it('ignora saldos menores a un centavo (residuos de punto flotante)', () => {
+    expect(simplificarDeudas({ a: -1e-9, b: 1e-9, c: -50, d: 50 })).toEqual([
+      { de: 'c', a: 'd', monto: 50 },
+    ])
+  })
+
   it('resuelve varios deudores y acreedores con transferencias mínimas', () => {
     expect(
       simplificarDeudas({

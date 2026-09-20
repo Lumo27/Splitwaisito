@@ -45,7 +45,7 @@ function AuthBootstrap({ children }: { children: React.ReactNode }) {
           if (!perfil?.amigos && amigosLocales.length > 0) {
             void guardarAmigosDelUsuario(firebaseUser.uid, amigosLocales)
           }
-        })
+        }).catch(() => undefined)
       } else {
         cerrarSesion()
       }
