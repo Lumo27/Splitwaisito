@@ -39,6 +39,12 @@ const iconoCategoria: Record<Gasto['categoria'], typeof Utensils> = {
   Otro: Receipt,
 }
 
+interface Transferencia {
+  destinatarioId: string
+  destinatarioNombre: string
+  monto: number
+}
+
 export function GruposScreen() {
   const {
     usuarioActual,
@@ -50,7 +56,7 @@ export function GruposScreen() {
   } = useAppStore()
 
   const [modalGastoAbierto, setModalGastoAbierto] = useState(false)
-  const [modalTransferir, setModalTransferir] = useState<Gasto | null>(null)
+  const [modalTransferir, setModalTransferir] = useState<Transferencia | null>(null)
   const [modalGrupoAbierto, setModalGrupoAbierto] = useState(false)
   const [copiado, setCopiado] = useState(false)
   const [grupos, setGrupos] = useState<GrupoFirestore[]>([])
@@ -264,17 +270,17 @@ export function GruposScreen() {
     setTimeout(() => setCopiado(false), 3000)
   }
 
-  function handleAbrirTransferencia(gasto: Gasto) {
+  function handleAbrirTransferencia(transferencia: Transferencia) {
     const acreedor =
-      amigos.find((a) => a.id === gasto.pagadoPorId) ??
-      (gasto.pagadoPorId === usuarioActual?.id ? usuarioActual : null)
+      amigos.find((a) => a.id === transferencia.destinatarioId) ??
+      (transferencia.destinatarioId === usuarioActual?.id ? usuarioActual : null)
 
     const aliasDestino = acreedor?.alias?.trim() || ''
     const emailDestino = acreedor?.email?.trim() || ''
     const textoParaCopiar = aliasDestino || emailDestino
 
     handleCopiar(textoParaCopiar)
-    setModalTransferir(gasto)
+    setModalTransferir(transferencia)
   }
 
   function abrirMercadoPago() {
@@ -477,9 +483,27 @@ export function GruposScreen() {
                     <span className="mx-1 text-text-muted">→</span>
                     <span className="font-bold text-text">{acreedorNombre}</span>
                   </div>
-                  <span className="font-black text-primary-dark">
-                    ${deuda.monto.toLocaleString('es-AR')}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-primary-dark">
+                      ${deuda.monto.toLocaleString('es-AR')}
+                    </span>
+                    {deuda.de === usuarioActual?.id && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleAbrirTransferencia({
+                            destinatarioId: deuda.a,
+                            destinatarioNombre: acreedorNombre,
+                            monto: deuda.monto,
+                          })
+                        }
+                        className="flex items-center gap-1 rounded-lg bg-secondary-light px-2.5 py-1.5 text-xs font-semibold text-secondary-dark transition hover:bg-secondary hover:text-white"
+                      >
+                        <Send size={13} />
+                        Saldar
+                      </button>
+                    )}
+                  </div>
                 </div>
               )
             })}
@@ -499,8 +523,6 @@ export function GruposScreen() {
         <div className="space-y-3">
           {gastos.map((gasto) => {
             const Icon = iconoCategoria[gasto.categoria]
-            const loPagueYo =
-              gasto.pagadoPorId === (usuarioActual?.id || 'user-me')
 
             return (
               <Card key={gasto.id} className="p-3.5 shadow-sm">
@@ -533,15 +555,6 @@ export function GruposScreen() {
                 </div>
 
                 <div className="flex items-center justify-end gap-2 border-t border-slate-100 pt-2">
-                  {!loPagueYo && (
-                    <button
-                      onClick={() => handleAbrirTransferencia(gasto)}
-                      className="flex items-center gap-1.5 rounded-lg bg-secondary-light px-3 py-1.5 text-xs font-semibold text-secondary-dark transition hover:bg-secondary hover:text-white"
-                    >
-                      <Send size={14} />
-                      Saldar / Transferir
-                    </button>
-                  )}
                   <button
                     onClick={() => void handleEliminarGasto(gasto.id)}
                     className="p-1.5 text-text-muted transition hover:text-danger"
@@ -686,8 +699,8 @@ export function GruposScreen() {
       {/* Modal: Transferir con Mercado Pago */}
       {modalTransferir && (() => {
         const destinatario =
-          amigos.find((a) => a.id === modalTransferir.pagadoPorId) ??
-          (modalTransferir.pagadoPorId === usuarioActual?.id ? usuarioActual : null)
+          amigos.find((a) => a.id === modalTransferir.destinatarioId) ??
+          (modalTransferir.destinatarioId === usuarioActual?.id ? usuarioActual : null)
 
         const aliasDestino = destinatario?.alias?.trim() || ''
         const emailDestino = destinatario?.email?.trim() || ''
@@ -708,7 +721,7 @@ export function GruposScreen() {
 
               <p className="mb-1 text-sm text-text-muted">Destinatario:</p>
               <p className="text-base font-bold text-text">
-                {modalTransferir.pagadoPorNombre}
+                {modalTransferir.destinatarioNombre}
               </p>
 
               <div className="my-3 rounded-lg bg-slate-100 p-3 text-left text-xs text-text">
