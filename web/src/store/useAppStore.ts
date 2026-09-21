@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { MODO_SEEDS } from '../services/firebase'
 
 export interface Usuario {
   id: string
@@ -153,7 +154,7 @@ export const useAppStore = create<AppState>()(
         })),
     }),
     {
-      name: 'splitwaisito-storage',
+      name: MODO_SEEDS ? 'splitwaisito-storage-seeds' : 'splitwaisito-storage',
     },
   ),
 )

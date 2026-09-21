@@ -153,8 +153,8 @@ export function LoginScreen() {
 
             <Button
               type="button"
-              variant="secondary"
-              className="flex w-full items-center justify-center gap-2 border-2 border-slate-300 bg-white text-text shadow-sm hover:border-primary hover:bg-slate-50"
+              variant="ghost"
+              className="flex w-full items-center justify-center gap-2 border-2 border-slate-300 shadow-sm hover:border-primary"
               onClick={handleGoogleLogin}
             >
               <GoogleLogo />

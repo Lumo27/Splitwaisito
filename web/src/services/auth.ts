@@ -5,12 +5,23 @@ import {
   signOut,
   type User,
 } from 'firebase/auth'
-import { auth } from './firebase'
+import { auth, MODO_SEEDS } from './firebase'
 import { upsertUsuarioPerfil } from './firestore'
+import {
+  seedCerrarSesion,
+  seedIniciarSesion,
+  seedSuscribirSesion,
+} from './seedBackend'
 
 const googleProvider = new GoogleAuthProvider()
 
-export async function signInWithGoogle() {
+export type UsuarioAuth = Pick<User, 'uid' | 'displayName' | 'email' | 'photoURL'>
+
+export async function signInWithGoogle(): Promise<{ user: UsuarioAuth }> {
+  if (MODO_SEEDS) {
+    return { user: seedIniciarSesion() }
+  }
+
   if (!auth) {
     throw new Error('Firebase no configurado aún.')
   }
@@ -30,8 +41,12 @@ export async function signInWithGoogle() {
 }
 
 export function subscribeToAuthChanges(
-  onUser: (usuario: User | null) => void,
+  onUser: (usuario: UsuarioAuth | null) => void,
 ) {
+  if (MODO_SEEDS) {
+    return seedSuscribirSesion(onUser)
+  }
+
   if (!auth) {
     onUser(null)
     return () => undefined
@@ -41,6 +56,11 @@ export function subscribeToAuthChanges(
 }
 
 export function signOutUser() {
+  if (MODO_SEEDS) {
+    seedCerrarSesion()
+    return Promise.resolve()
+  }
+
   if (!auth) {
     return Promise.resolve()
   }

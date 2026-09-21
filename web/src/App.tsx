@@ -35,7 +35,7 @@ function AuthBootstrap({ children }: { children: React.ReactNode }) {
           iniciarSesion(
             firebaseUser.displayName || 'Usuario Google',
             firebaseUser.email || 'google@usuario.com',
-            firebaseUser.displayName || 'google-user',
+            perfil?.alias || firebaseUser.displayName || 'google-user',
             firebaseUser.uid,
             perfil?.fotoUrl ?? firebaseUser.photoURL,
             perfil?.descripcion,
