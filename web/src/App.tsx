@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { TabsLayout } from './components/TabsLayout'
 import { LoginScreen } from './features/auth/LoginScreen'
 import { GruposScreen } from './features/grupos/GruposScreen'
+import { SaldarDeudaScreen } from './features/grupos/SaldarDeudaScreen'
 import { ActividadScreen } from './features/actividad/ActividadScreen'
 import { PerfilScreen } from './features/perfil/PerfilScreen'
 import { ConfiguracionScreen } from './features/configuracion/ConfiguracionScreen'
@@ -90,6 +91,7 @@ export default function App() {
 
         <Route element={<ProtectedLayout />}>
           <Route path="/grupos" element={<GruposScreen />} />
+          <Route path="/saldar/:grupoId/:index" element={<SaldarDeudaScreen />} />
           <Route path="/actividad" element={<ActividadScreen />} />
           <Route path="/perfil" element={<PerfilScreen />} />
           <Route path="/configuracion" element={<ConfiguracionScreen />} />
