@@ -11,6 +11,7 @@ import { subscribeToAuthChanges } from './services/auth'
 import { isFirebaseAvailable } from './services/firebase'
 import { getUsuarioPerfil, guardarAmigosDelUsuario } from './services/firestore'
 import { useAppStore } from './store/useAppStore'
+import { CargarGastoScreen } from './features/gastos/CargarGastoScreen'
 
 function AuthBootstrap({ children }: { children: React.ReactNode }) {
   const [authReady, setAuthReady] = useState(!isFirebaseAvailable())
@@ -91,6 +92,8 @@ export default function App() {
 
         <Route element={<ProtectedLayout />}>
           <Route path="/grupos" element={<GruposScreen />} />
+          <Route path="/grupos/:id/cargar" element={<CargarGastoScreen />} />
+          <Route path="/gastos/nuevo" element={<CargarGastoScreen />} />
           <Route path="/saldar/:grupoId/:index" element={<SaldarDeudaScreen />} />
           <Route path="/actividad" element={<ActividadScreen />} />
           <Route path="/perfil" element={<PerfilScreen />} />
