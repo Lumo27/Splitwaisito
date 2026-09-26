@@ -5,6 +5,35 @@ export interface Participante {
   nombre: string
 }
 
+/**
+ * Arma la lista de participantes de un grupo. Se usa igual en GruposScreen y en
+ * SaldarDeudaScreen para que ambas calculen los mismos balances y, por lo tanto,
+ * las deudas simplificadas en el mismo orden.
+ */
+export function participantesDelGrupo(
+  miembros: string[] | undefined,
+  usuarioActual: { id: string; nombre: string } | null,
+  amigos: Array<{ id: string; nombre: string }>,
+): Participante[] {
+  const usuariosConocidos: Participante[] = [
+    {
+      id: usuarioActual?.id || 'user-me',
+      nombre: usuarioActual?.nombre || 'Yo',
+    },
+    ...amigos.map((amigo) => ({ id: amigo.id, nombre: amigo.nombre })),
+  ]
+
+  if (!miembros) return usuariosConocidos
+
+  return miembros.map(
+    (miembroId) =>
+      usuariosConocidos.find((usuario) => usuario.id === miembroId) ?? {
+        id: miembroId,
+        nombre: 'Usuario',
+      },
+  )
+}
+
 export interface GastoBase {
   id: string
   monto: number

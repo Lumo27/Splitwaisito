@@ -19,6 +19,9 @@ export interface Gasto {
   pagadoPorId: string
   pagadoPorNombre: string
   fecha: string
+  fotoUrl?: string | null
+  ubicacion?: { lat: number; lng: number } | null
+  participantes?: string[]
 }
 
 interface AppState {
@@ -44,6 +47,7 @@ interface AppState {
     monto: number,
     categoria: Gasto['categoria'],
     pagadoPorId: string,
+    extras?: { fotoUrl?: string | null; ubicacion?: { lat: number; lng: number } | null; participantes?: string[] }
   ) => void
   reemplazarGastos: (gastos: Gasto[]) => void
   eliminarGasto: (id: string) => void
@@ -117,7 +121,7 @@ export const useAppStore = create<AppState>()(
           amigos: state.amigos.filter((a) => a.id !== id),
         })),
 
-      agregarGasto: (descripcion, monto, categoria, pagadoPorId) => {
+      agregarGasto: (descripcion, monto, categoria, pagadoPorId , extras)=> {
         const { usuarioActual, amigos } = get()
         let pagadoPorNombre = 'Desconocido'
 
@@ -141,6 +145,9 @@ export const useAppStore = create<AppState>()(
             hour: '2-digit',
             minute: '2-digit',
           }),
+          fotoUrl: extras?.fotoUrl ?? null,
+          ubicacion: extras?.ubicacion ?? null,
+          participantes: extras?.participantes ?? [],
         }
 
         set((state) => ({ gastos: [nuevoGasto, ...state.gastos] }))

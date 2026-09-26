@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Plus,
   Utensils,
@@ -8,8 +9,6 @@ import {
   X,
   Trash2,
   Send,
-  Copy,
-  Check,
   ArrowRightLeft,
   Users,
   UserPlus,
@@ -30,19 +29,13 @@ import {
   obtenerGruposDelUsuario,
   type GrupoFirestore,
 } from '../../services/firestore'
-import { calcularBalances, simplificarDeudas } from './deudas'
+import { calcularBalances, participantesDelGrupo, simplificarDeudas } from './deudas'
 
 const iconoCategoria: Record<Gasto['categoria'], typeof Utensils> = {
   Comida: Utensils,
   Transporte: Car,
   Alojamiento: Home,
   Otro: Receipt,
-}
-
-interface Transferencia {
-  destinatarioId: string
-  destinatarioNombre: string
-  monto: number
 }
 
 export function GruposScreen() {
@@ -54,11 +47,10 @@ export function GruposScreen() {
     reemplazarGastos,
     eliminarGasto,
   } = useAppStore()
+  const navigate = useNavigate()
 
   const [modalGastoAbierto, setModalGastoAbierto] = useState(false)
-  const [modalTransferir, setModalTransferir] = useState<Transferencia | null>(null)
   const [modalGrupoAbierto, setModalGrupoAbierto] = useState(false)
-  const [copiado, setCopiado] = useState(false)
   const [grupos, setGrupos] = useState<GrupoFirestore[]>([])
   const [grupoSeleccionadoId, setGrupoSeleccionadoId] = useState<string | null>(
     null,
@@ -115,28 +107,12 @@ export function GruposScreen() {
   )
 
   const participantes = useMemo(
-    () => {
-      const usuariosConocidos = [
-      {
-        id: usuarioActual?.id || 'user-me',
-        nombre: usuarioActual?.nombre || 'Yo',
-      },
-      ...amigos.map((amigo) => ({
-        id: amigo.id,
-        nombre: amigo.nombre,
-      })),
-      ]
-
-      if (!grupoSeleccionado) return usuariosConocidos
-
-      return grupoSeleccionado.miembros.map(
-        (miembroId) =>
-          usuariosConocidos.find((usuario) => usuario.id === miembroId) ?? {
-            id: miembroId,
-            nombre: 'Usuario',
-          },
-      )
-    },
+    () =>
+      participantesDelGrupo(
+        grupoSeleccionado?.miembros,
+        usuarioActual,
+        amigos,
+      ),
     [amigos, grupoSeleccionado, usuarioActual],
   )
 
@@ -260,31 +236,6 @@ export function GruposScreen() {
     } catch {
       setErrorGrupo('No se pudo eliminar el grupo.')
     }
-  }
-
-  function handleCopiar(texto: string) {
-    if (!texto) return
-
-    navigator.clipboard.writeText(texto)
-    setCopiado(true)
-    setTimeout(() => setCopiado(false), 3000)
-  }
-
-  function handleAbrirTransferencia(transferencia: Transferencia) {
-    const acreedor =
-      amigos.find((a) => a.id === transferencia.destinatarioId) ??
-      (transferencia.destinatarioId === usuarioActual?.id ? usuarioActual : null)
-
-    const aliasDestino = acreedor?.alias?.trim() || ''
-    const emailDestino = acreedor?.email?.trim() || ''
-    const textoParaCopiar = aliasDestino || emailDestino
-
-    handleCopiar(textoParaCopiar)
-    setModalTransferir(transferencia)
-  }
-
-  function abrirMercadoPago() {
-    window.open('https://www.mercadopago.com.ar/money-transfer', '_blank')
   }
 
   return (
@@ -487,15 +438,11 @@ export function GruposScreen() {
                     <span className="font-black text-primary-dark">
                       ${deuda.monto.toLocaleString('es-AR')}
                     </span>
-                    {deuda.de === usuarioActual?.id && (
+                    {deuda.de === usuarioActual?.id && grupoSeleccionadoId && (
                       <button
                         type="button"
                         onClick={() =>
-                          handleAbrirTransferencia({
-                            destinatarioId: deuda.a,
-                            destinatarioNombre: acreedorNombre,
-                            monto: deuda.monto,
-                          })
+                          navigate(`/saldar/${grupoSeleccionadoId}/${index}`)
                         }
                         className="flex items-center gap-1 rounded-lg bg-secondary-light px-2.5 py-1.5 text-xs font-semibold text-secondary-dark transition hover:bg-secondary hover:text-white"
                       >
@@ -695,105 +642,6 @@ export function GruposScreen() {
           </Card>
         </div>
       )}
-
-      {/* Modal: Transferir con Mercado Pago */}
-      {modalTransferir && (() => {
-        const destinatario =
-          amigos.find((a) => a.id === modalTransferir.destinatarioId) ??
-          (modalTransferir.destinatarioId === usuarioActual?.id ? usuarioActual : null)
-
-        const aliasDestino = destinatario?.alias?.trim() || ''
-        const emailDestino = destinatario?.email?.trim() || ''
-        const labelCopia = aliasDestino ? 'Alias' : 'Email'
-
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <Card className="w-full max-w-sm text-center">
-              <div className="mb-4 flex items-center justify-between text-left">
-                <h2 className="text-lg font-bold text-text">Saldar Deuda</h2>
-                <button
-                  onClick={() => setModalTransferir(null)}
-                  className="text-text-muted hover:text-text"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <p className="mb-1 text-sm text-text-muted">Destinatario:</p>
-              <p className="text-base font-bold text-text">
-                {modalTransferir.destinatarioNombre}
-              </p>
-
-              <div className="my-3 rounded-lg bg-slate-100 p-3 text-left text-xs text-text">
-                <p className="mb-2 text-text-muted">Alias / email</p>
-                <div className="flex flex-wrap items-center gap-2 rounded-lg border border-primary-light bg-white px-3 py-2">
-                  <span className="font-semibold text-text">
-                    {aliasDestino || 'Sin alias'}
-                  </span>
-                  <span className="text-text-muted">/</span>
-                  <span className="text-text-muted">{emailDestino || 'Sin e-mail'}</span>
-                </div>
-
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleCopiar(aliasDestino || emailDestino)}
-                    className="inline-flex items-center justify-center gap-1 rounded-lg border border-primary-light bg-white px-2 py-2 font-semibold text-primary-dark"
-                  >
-                    <Copy size={12} />
-                    {copiado && labelCopia === 'Alias' ? 'Alias copiado' : 'Copiar alias'}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleCopiar(emailDestino)}
-                    disabled={!emailDestino}
-                    className="inline-flex items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-2 font-semibold text-text disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <Copy size={12} />
-                    {copiado && labelCopia === 'Email' ? 'Email copiado' : 'Copiar email'}
-                  </button>
-                </div>
-
-                {copiado ? (
-                  <p className="mt-2 flex items-center gap-1 font-bold text-success">
-                    <Check size={14} /> ¡{labelCopia} copiado!
-                  </p>
-                ) : (
-                  <p className="mt-2 flex items-center gap-1 text-text-muted">
-                    <Copy size={14} /> Se copia automáticamente al abrir.
-                  </p>
-                )}
-              </div>
-
-              <div className="my-4">
-              <span className="text-xs uppercase tracking-wider text-text-muted">
-                Monto a enviar
-              </span>
-              <p className="text-3xl font-black text-primary-dark">
-                ${modalTransferir.monto.toLocaleString('es-AR')}
-              </p>
-            </div>
-
-                <div className="space-y-2">
-                  <Button
-                    onClick={abrirMercadoPago}
-                    className="w-full bg-[#009EE3] text-white hover:bg-[#0081B8]"
-                  >
-                    Abrir Mercado Pago
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setModalTransferir(null)}
-                    className="w-full"
-                  >
-                    Cerrar
-                  </Button>
-                </div>
-              </Card>
-            </div>
-        )
-      })()}
     </div>
   )
 }
