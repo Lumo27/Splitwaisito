@@ -43,6 +43,9 @@ export interface GastoFirestore {
   pagadoPorId: string
   pagadoPorNombre: string
   fecha: string
+  fotoUrl?: string
+  ubicacion?: { lat: number; lng: number; direccion?: string }
+  participantes?: string[]
 }
 
 export const usuariosRef = db
@@ -205,6 +208,21 @@ export async function guardarGasto(
     ...gasto,
   } as GastoFirestore
 }
+
+// guardaGasto REAL -> guarda en Firebase en /grupos/{grupoId}/gastos
+// Decision: hay 2 formas, la del store (mock) y esta. Dejo esta real para que el modal viejo y la pantalla nueva (/gastos/nuevo) hagan lo mismo.
+// Paso 3: agregué fotoUrl?, ubicacion?, participantes? como opcionales (?), asi no rompe los gastos viejos.
+// FIX del error de abajo: fotoUrl tiene que ser string, no File.
+
+export async function actualizarGasto(grupoId: string, gastoId: string, data: Partial<Omit<GastoFirestore, 'id'>>) {
+  if (MODO_SEEDS) return;
+  if (!db) throw new Error('Firebase no configurado aún.');
+  const { updateDoc, doc } = await import('firebase/firestore');
+  const ref = doc(db, 'grupos', grupoId, 'gastos', gastoId);
+  await updateDoc(ref, data as any);
+}
+
+
 
 export async function obtenerGastosDelGrupo(grupoId: string) {
   if (MODO_SEEDS) return seed.seedGastosDelGrupo(grupoId)
