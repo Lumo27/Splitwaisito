@@ -24,7 +24,7 @@ PWA gratuita para organizar gastos compartidos en grupo (viajes, convivencia, et
 **Todavía no está:**
 - Selector de moneda preferida ARS/USD/BRL en el perfil (tarjeta #11). Hoy todo se muestra en pesos.
 - Crear grupo con tipo (Viaje/Convivencia/Pareja/Otro) y selección múltiple de integrantes (#13).
-- Cargar gasto con división personalizada, foto del ticket y ubicación (#15, #16, #17). Hay un formulario avanzado en el PR #3, sin mergear.
+- Cargar gasto con división personalizada, foto del ticket y ubicación (#15, #16, #17). Con el PR #3 ya existe la pantalla `CargarGastoScreen` (reparto entre integrantes, foto y ubicación del dispositivo), pero el mapa es un placeholder y no hay geocodificación inversa.
 - Botón "Recordar deuda" por WhatsApp (#19) y README ampliado (#20).
 - Registro con e-mail: el formulario de la pantalla de login abre una sesión local, no crea una cuenta real.
 - Cloud Function de deudas desplegada y Firebase Storage: requieren el plan Blaze de Firebase (#9, #28).
@@ -135,7 +135,7 @@ Fuente: historial de git, Pull Requests y tablero de Trello.
 |---|---|---|
 | **Lucas Tomas Motta** (GitHub `Lumo27`) | Migración del proyecto a Vite + React + TypeScript + Tailwind, con sistema de diseño, navegación y PWA (#1, #3, #4, #5). Proyecto de Firebase y conexión del front (#2). CI y branch protection (#6). Configuración de Vitest. Modo demo y correcciones de pantallas (PR #5, #27). Revisión de PRs, organización de Trello y esta documentación. | #7 modelo de datos, #8 reglas, #9 función de deudas, #21 planilla de IA |
 | **German Morales** (GitHub `Sherman-cdm`) | Estructura y tema visual iniciales (PR #1). Login con Google, sesión, grupos, gastos, deudas, Cloud Function, amistades y reglas de Firestore (PR #2: #10, #14, #26). | #12 lista de grupos con balance |
-| **Candela** (GitHub `Candela-Sandoval`) | PR #3 abierto con el formulario de carga de gastos y otras pantallas; pendiente de correcciones y de resolver conflictos. | #15 cargar gasto, #18 saldar deuda |
+| **Candela** (GitHub `Candela-Sandoval`) | Pantallas de cargar gasto y saldar deuda separadas de `GruposScreen`, con los campos de foto, ubicación y participantes en el gasto (PR #3: #15, #18). | #15 cargar gasto, #18 saldar deuda |
 | **Vladimir Viale** (GitHub `Vladi1221`) | Creó el repositorio. | #19 recordatorio por WhatsApp (todavía sin subir), #20 README |
 | **Nahu** (GitHub `Nahu2300`) | — | #11 perfil (asignada, sin código subido) |
 
@@ -152,8 +152,8 @@ Fuente: historial de git, Pull Requests y tablero de Trello.
 
 ## 11. Pendientes y decisiones abiertas
 
-- Publicar y desplegar en Vercel desde `main`: requiere una entrega de `develop` a `main` (hoy `main` está 16 commits atrás), las claves en Vercel, el dominio agregado en los dominios autorizados de Firebase y un `vercel.json` para las rutas.
-- Resolver el PR #3 (conflictos con `develop`): conviene reducirlo al formulario de cargar gasto, porque el detalle de grupo y el saldar ya existen en `GruposScreen`.
+- Publicar y desplegar en Vercel desde `main`: requiere una entrega de `develop` a `main` (hoy `main` quedó en el setup de CI del 16/09), las claves en Vercel, el dominio agregado en los dominios autorizados de Firebase y un `vercel.json` para las rutas.
+- Migración a Expo/React Native pedida por el docente el 23/09: seguir [`GUIA-MIGRACION-REACT-NATIVE.md`](./GUIA-MIGRACION-REACT-NATIVE.md).
 - Decidir si se pasa Firebase al plan Blaze para habilitar Storage (foto del ticket) y desplegar la Cloud Function.
 - Dejar un único origen del algoritmo de deudas (hoy está en `deudas.ts` y en `functions/src/index.ts`) y cubrir `functions/` con tests y con el CI.
 - Documentar los campos del modelo de datos en `src/types/` (tarjeta #7).

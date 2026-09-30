@@ -6,6 +6,7 @@ Todo lo que armamos antes de escribir código: la idea, el diseño y cómo labur
 
 - **[DOCUMENTACION.md](./DOCUMENTACION.md)** — qué hay hoy en el repositorio: estado, cómo correrlo, estructura, pantallas, modelo de datos, cálculo de deudas, flujo de trabajo, quién hizo qué y pendientes.
 - **[INFORME-USO-IA.md](./INFORME-USO-IA.md)** — informe de uso de IA por sesión y por tarea.
+- **[GUIA-MIGRACION-REACT-NATIVE.md](./GUIA-MIGRACION-REACT-NATIVE.md)** — runbook paso a paso para migrar `/web` a Expo/React Native, con ramas y PRs por paso.
 
 ## Material de diseño y consigna
 
