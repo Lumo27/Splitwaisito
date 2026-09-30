@@ -3,13 +3,14 @@ import '../global.css'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 
+import { AuthBootstrap } from '@/features/auth/AuthBootstrap'
 import { colores } from '@/theme/colores'
 
 export { ErrorBoundary } from 'expo-router'
 
 export default function RootLayout() {
   return (
-    <>
+    <AuthBootstrap>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -35,6 +36,6 @@ export default function RootLayout() {
           options={{ title: 'Saldar deuda', presentation: 'modal' }}
         />
       </Stack>
-    </>
+    </AuthBootstrap>
   )
 }
