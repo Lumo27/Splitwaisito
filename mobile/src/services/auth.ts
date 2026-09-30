@@ -6,8 +6,9 @@ import {
   type User,
 } from 'firebase/auth'
 
-import { auth } from './firebase'
+import { auth, MODO_SEEDS } from './firebase'
 import { upsertUsuarioPerfil } from './firestore'
+import { seedCerrarSesion, seedIniciarSesion, seedSuscribirSesion } from './seedBackend'
 
 export type UsuarioAuth = Pick<User, 'uid' | 'displayName' | 'email' | 'photoURL'>
 
@@ -33,7 +34,16 @@ export async function signInWithGoogleIdToken(idToken: string): Promise<{ user: 
   return result
 }
 
+// Modo demo: entra con el usuario de ejemplo, sin Google ni Firebase.
+export function signInDemo(): { user: UsuarioAuth } {
+  return { user: seedIniciarSesion() }
+}
+
 export function subscribeToAuthChanges(onUser: (usuario: UsuarioAuth | null) => void) {
+  if (MODO_SEEDS) {
+    return seedSuscribirSesion(onUser)
+  }
+
   if (!auth) {
     onUser(null)
     return () => undefined
@@ -43,6 +53,11 @@ export function subscribeToAuthChanges(onUser: (usuario: UsuarioAuth | null) => 
 }
 
 export function signOutUser() {
+  if (MODO_SEEDS) {
+    seedCerrarSesion()
+    return Promise.resolve()
+  }
+
   if (!auth) {
     return Promise.resolve()
   }
