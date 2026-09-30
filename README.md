@@ -21,8 +21,8 @@ Instalable desde el navegador en cualquier dispositivo, sin pasar por ninguna st
 /web            → frontend (Vite + React + TS)
   /src
     /components → sistema de diseño base (Botón, Tarjeta, Avatar, Input) + reutilizables
-    /features   → una carpeta por feature (grupos, gastos, deudas, perfil, auth)
-    /services   → integración con Firebase (auth.ts, firestore.ts, storage.ts)
+    /features   → una carpeta por feature (auth, grupos, actividad, perfil, configuracion)
+    /services   → integración con Firebase (auth.ts, firestore.ts, amistades.ts, storage.ts) y modo demo
 /functions      → Cloud Functions (simplificación de deudas)
 ```
 
@@ -45,7 +45,9 @@ Tablero Trello: [trello.com/b/KnB9B2kP/splitwaisito](https://trello.com/b/KnB9B2
 
 ## Documentación del proceso
 
-- `ficha-tecnica-splitwaisito.docx` — justificación de decisiones técnicas y de diseño.
+- [`docs/DOCUMENTACION.md`](./docs/DOCUMENTACION.md) — estado del proyecto, cómo correrlo, estructura, modelo de datos, flujo de trabajo y quién hizo qué.
+- [`docs/INFORME-USO-IA.md`](./docs/INFORME-USO-IA.md) — informe de uso de IA por sesión y por tarea.
+- [`docs/ficha-tecnica-splitwaisito.pdf`](./docs/ficha-tecnica-splitwaisito.pdf) — justificación de decisiones técnicas y de diseño.
 - `planilla-uso-ia.xlsx` — registro de todo uso de IA (herramienta, finalidad, prompt clave, qué se usó).
 
 Más contexto y decisiones cerradas del proyecto en [`CLAUDE.md`](./CLAUDE.md).
