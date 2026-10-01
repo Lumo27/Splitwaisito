@@ -12,7 +12,8 @@ import {
   where,
   writeBatch,
 } from 'firebase/firestore'
-import { db } from './firebase'
+import { db, MODO_SEEDS } from './firebase'
+import * as seed from './seedBackend'
 
 export interface UsuarioFirestore {
   id: string
@@ -63,6 +64,7 @@ export async function upsertUsuarioPerfil(usuario: {
   fotoUrl?: string | null
   descripcion?: string
 }) {
+  if (MODO_SEEDS) return seed.seedUpsertUsuario(usuario)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }
@@ -83,6 +85,7 @@ export async function upsertUsuarioPerfil(usuario: {
 }
 
 export async function getUsuarioPerfil(id: string) {
+  if (MODO_SEEDS) return seed.seedGetUsuario(id)
   if (!db) {
     return null
   }
@@ -95,6 +98,7 @@ export async function guardarAmigosDelUsuario(
   usuarioId: string,
   amigos: Array<Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>>,
 ) {
+  if (MODO_SEEDS) return seed.seedGuardarAmigos(usuarioId, amigos)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }
@@ -107,6 +111,7 @@ export async function guardarAmigosDelUsuario(
 }
 
 export async function crearGrupo(nombre: string, creadorId: string) {
+  if (MODO_SEEDS) return seed.seedCrearGrupo(nombre, creadorId)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }
@@ -128,6 +133,7 @@ export async function crearGrupo(nombre: string, creadorId: string) {
 }
 
 export async function obtenerGrupoPorId(grupoId: string) {
+  if (MODO_SEEDS) return seed.seedGetGrupo(grupoId)
   if (!db) {
     return null
   }
@@ -137,6 +143,7 @@ export async function obtenerGrupoPorId(grupoId: string) {
 }
 
 export async function obtenerGruposDelUsuario(uid: string) {
+  if (MODO_SEEDS) return seed.seedGruposDelUsuario(uid)
   if (!db) {
     return []
   }
@@ -155,6 +162,7 @@ export async function obtenerGruposDelUsuario(uid: string) {
 }
 
 export async function agregarMiembroAlGrupo(grupoId: string, uid: string) {
+  if (MODO_SEEDS) return seed.seedAgregarMiembro(grupoId, uid)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }
@@ -166,6 +174,7 @@ export async function agregarMiembroAlGrupo(grupoId: string, uid: string) {
 }
 
 export async function eliminarGrupo(grupoId: string) {
+  if (MODO_SEEDS) return seed.seedEliminarGrupo(grupoId)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }
@@ -184,6 +193,7 @@ export async function guardarGasto(
   grupoId: string,
   gasto: Omit<GastoFirestore, 'id'>,
 ) {
+  if (MODO_SEEDS) return seed.seedGuardarGasto(grupoId, gasto)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }
@@ -204,12 +214,14 @@ export async function actualizarGasto(
   gastoId: string,
   data: Partial<Omit<GastoFirestore, 'id'>>,
 ) {
+  if (MODO_SEEDS) return seed.seedActualizarGasto(grupoId, gastoId, data)
   if (!db) throw new Error('Firebase no configurado aún.')
 
   await updateDoc(doc(db, 'grupos', grupoId, 'gastos', gastoId), data)
 }
 
 export async function obtenerGastosDelGrupo(grupoId: string) {
+  if (MODO_SEEDS) return seed.seedGastosDelGrupo(grupoId)
   if (!db) {
     return []
   }
@@ -223,6 +235,7 @@ export async function obtenerGastosDelGrupo(grupoId: string) {
 }
 
 export async function eliminarGasto(grupoId: string, gastoId: string) {
+  if (MODO_SEEDS) return seed.seedEliminarGasto(grupoId, gastoId)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }

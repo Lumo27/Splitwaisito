@@ -9,7 +9,8 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore'
-import { db } from './firebase'
+import { db, MODO_SEEDS } from './firebase'
+import * as seed from './seedBackend'
 
 export interface PerfilAmistad {
   id: string
@@ -32,13 +33,14 @@ export async function crearSolicitudAmistad(
   emisor: PerfilAmistad,
   destinatarioEmail: string,
 ) {
-  if (!db) throw new Error('Firebase no configurado aún.')
-
   const email = destinatarioEmail.trim().toLowerCase()
   if (!email || email === emisor.email.toLowerCase()) {
     throw new Error('Ingresá el email de otra persona.')
   }
 
+  // En web el chequeo de Firebase va antes y rompe el modo demo, donde db es null.
+  if (MODO_SEEDS) return seed.seedCrearSolicitud(emisor, email)
+  if (!db) throw new Error('Firebase no configurado aún.')
 
   await addDoc(collection(db, 'solicitudesAmistad'), {
     emisor,
@@ -50,6 +52,7 @@ export async function crearSolicitudAmistad(
 }
 
 export async function obtenerSolicitudesAmistad(email: string) {
+  if (MODO_SEEDS) return seed.seedSolicitudesPendientes(email)
   if (!db) return []
 
   const solicitudesQuery = query(
@@ -70,6 +73,7 @@ export async function responderSolicitudAmistad(
   aceptar: boolean,
   receptor: PerfilAmistad,
 ) {
+  if (MODO_SEEDS) return seed.seedResponderSolicitud(solicitud, aceptar, receptor)
   if (!db) throw new Error('Firebase no configurado aún.')
 
   await updateDoc(doc(db, 'solicitudesAmistad', solicitud.id), {
@@ -91,6 +95,7 @@ export async function responderSolicitudAmistad(
 }
 
 export async function obtenerAmigosAceptados(uid: string) {
+  if (MODO_SEEDS) return seed.seedAmigosAceptados(uid)
   if (!db) return []
 
   const amistadesQuery = query(
@@ -106,6 +111,7 @@ export async function obtenerAmigosAceptados(uid: string) {
 }
 
 export async function eliminarAmistad(uid: string, amigoId: string) {
+  if (MODO_SEEDS) return seed.seedEliminarAmistad(uid, amigoId)
   if (!db) throw new Error('Firebase no configurado aún.')
 
   const amistadesQuery = query(

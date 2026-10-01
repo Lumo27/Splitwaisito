@@ -2,8 +2,9 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Text, View } from 'react-native'
 
 import { subscribeToAuthChanges } from '@/services/auth'
-import { isFirebaseAvailable } from '@/services/firebase'
+import { isFirebaseAvailable, MODO_SEEDS } from '@/services/firebase'
 import { getUsuarioPerfil, guardarAmigosDelUsuario } from '@/services/firestore'
+import { inicializarSeeds } from '@/services/seedBackend'
 import { useAppStore } from '@/store/useAppStore'
 
 // Igual que AuthBootstrap de web/src/App.tsx, con una diferencia: en React
@@ -28,42 +29,60 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isFirebaseAvailable()) return
 
-    return subscribeToAuthChanges((firebaseUser) => {
-      if (firebaseUser) {
-        iniciarSesion(
-          firebaseUser.displayName || 'Usuario Google',
-          firebaseUser.email || 'google@usuario.com',
-          firebaseUser.displayName || 'google-user',
-          firebaseUser.uid,
-          firebaseUser.photoURL,
-        )
+    let desuscribir: (() => void) | undefined
+    let vigente = true
 
-        void getUsuarioPerfil(firebaseUser.uid)
-          .then((perfil) => {
-            const amigosLocales = useAppStore.getState().amigos
-            const amigosGuardados = perfil?.amigos ?? amigosLocales
+    const suscribir = () =>
+      subscribeToAuthChanges((firebaseUser) => {
+        if (firebaseUser) {
+          iniciarSesion(
+            firebaseUser.displayName || 'Usuario Google',
+            firebaseUser.email || 'google@usuario.com',
+            firebaseUser.displayName || 'google-user',
+            firebaseUser.uid,
+            firebaseUser.photoURL,
+          )
 
-            iniciarSesion(
-              firebaseUser.displayName || 'Usuario Google',
-              firebaseUser.email || 'google@usuario.com',
-              perfil?.alias || firebaseUser.displayName || 'google-user',
-              firebaseUser.uid,
-              perfil?.fotoUrl ?? firebaseUser.photoURL,
-              perfil?.descripcion,
-            )
-            reemplazarAmigos(amigosGuardados)
+          void getUsuarioPerfil(firebaseUser.uid)
+            .then((perfil) => {
+              const amigosLocales = useAppStore.getState().amigos
+              const amigosGuardados = perfil?.amigos ?? amigosLocales
 
-            if (!perfil?.amigos && amigosLocales.length > 0) {
-              void guardarAmigosDelUsuario(firebaseUser.uid, amigosLocales)
-            }
-          })
-          .catch(() => undefined)
-      } else {
-        cerrarSesion()
-      }
+              iniciarSesion(
+                firebaseUser.displayName || 'Usuario Google',
+                firebaseUser.email || 'google@usuario.com',
+                perfil?.alias || firebaseUser.displayName || 'google-user',
+                firebaseUser.uid,
+                perfil?.fotoUrl ?? firebaseUser.photoURL,
+                perfil?.descripcion,
+              )
+              reemplazarAmigos(amigosGuardados)
 
-      setAuthReady(true)
-    })
+              if (!perfil?.amigos && amigosLocales.length > 0) {
+                void guardarAmigosDelUsuario(firebaseUser.uid, amigosLocales)
+              }
+            })
+            .catch(() => undefined)
+        } else {
+          cerrarSesion()
+        }
+
+        setAuthReady(true)
+      })
+
+    // En modo demo, primero se cargan los datos de ejemplo desde AsyncStorage.
+    if (MODO_SEEDS) {
+      void inicializarSeeds().then(() => {
+        if (vigente) desuscribir = suscribir()
+      })
+    } else {
+      desuscribir = suscribir()
+    }
+
+    return () => {
+      vigente = false
+      desuscribir?.()
+    }
   }, [cerrarSesion, iniciarSesion, reemplazarAmigos])
 
   if (!authReady || !storeHidratado) {
