@@ -91,3 +91,6 @@ Codex migró solicitudes por e-mail, aceptación/rechazo, lista y eliminación c
 
 ### Perfil — German, 06/10/2026
 Codex migró foto/iniciales, nombre, e-mail, alias y descripción editable. Persiste primero en Firebase/demo y actualiza el store solo tras guardar; muestra confirmación y conserva el estado anterior ante errores.
+
+### Configuración — German, 06/10/2026
+Codex migró el estado de la sesión, salida y restablecimiento de demo con confirmaciones nativas. El reinicio restaura perfil, amigos y gastos coherentemente; el cierre no simula éxito si Firebase falla.
