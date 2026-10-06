@@ -110,15 +110,15 @@ export async function guardarAmigosDelUsuario(
   )
 }
 
-export async function crearGrupo(nombre: string, creadorId: string) {
-  if (MODO_SEEDS) return seed.seedCrearGrupo(nombre, creadorId)
+export async function crearGrupo(nombre: string, creadorId: string, miembros: string[] = []) {
+  if (MODO_SEEDS) return seed.seedCrearGrupo(nombre, creadorId, miembros)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }
 
   const payload: Omit<GrupoFirestore, 'id'> = {
     nombre: nombre.trim() || 'Nuevo grupo',
-    miembros: [creadorId],
+    miembros: [...new Set([creadorId, ...miembros])],
     descripcion: '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

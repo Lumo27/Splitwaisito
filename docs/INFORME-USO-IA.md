@@ -76,3 +76,6 @@ No se encontró la planilla planilla-uso-ia.xlsx en el repositorio; esta entrada
 | Herramienta | Finalidad | Prompt clave | Qué se usó |
 |---|---|---|---|
 | Codex | Migrar el detalle del grupo a Expo Go | «Sigamos con las migraciones de las demás pantallas una por una con sus commits» | Detalle nativo con integrantes, total, gastos, eliminación confirmada, alta de integrantes y deudas identificadas por deudor/acreedor. Reutiliza servicios y respeta participantes por gasto. |
+
+### Crear grupo — German, 06/10/2026
+Codex migró el formulario con validación de nombre, selección de amigos y guardado de integrantes en una sola creación; agregó componentes de formulario nativos reutilizables. Prompt: completar las migraciones con un commit por pantalla.
