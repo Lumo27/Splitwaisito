@@ -1,7 +1,14 @@
 import { useRef, useState } from 'react'
 import { Text, View } from 'react-native'
 import { Receipt } from 'lucide-react-native'
-import { Boton, Campo, Mensaje, Pantalla, Tarjeta, Titulo } from '@/components/Formulario'
+import {
+  Boton,
+  Campo,
+  Mensaje,
+  Pantalla,
+  Tarjeta,
+  Titulo,
+} from '@/components/Formulario'
 import { signInDemo, signInWithEmail } from '@/services/auth'
 import { isFirebaseAvailable, MODO_SEEDS } from '@/services/firebase'
 import { colores } from '@/theme/colores'
@@ -14,7 +21,13 @@ export function LoginScreen() {
   const operacion = useRef(false)
   async function entrar() {
     if (operacion.current) return
-    if (!MODO_SEEDS && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || !clave)) { setError('Ingresá tu e-mail y contraseña.'); return }
+    if (
+      !MODO_SEEDS &&
+      (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || !clave)
+    ) {
+      setError('Ingresá tu e-mail y contraseña.')
+      return
+    }
     operacion.current = true
     setOcupado(true)
     setError('')
@@ -23,9 +36,95 @@ export function LoginScreen() {
       else await signInWithEmail(email.trim(), clave)
       // La navegación protegida cambia de pantalla cuando se restaura el perfil.
     } catch (fallo) {
-      const codigo = fallo && typeof fallo === 'object' && 'code' in fallo ? String(fallo.code) : ''
-      setError(codigo === 'auth/network-request-failed' ? 'No pudimos conectarnos. Revisá tu conexión.' : codigo === 'auth/operation-not-allowed' ? 'El acceso por e-mail todavía no está habilitado para esta app.' : 'No pudimos iniciar sesión. Revisá tus datos y volvé a intentar.')
-    } finally { operacion.current = false; setOcupado(false) }
+      const codigo =
+        fallo && typeof fallo === 'object' && 'code' in fallo
+          ? String(fallo.code)
+          : ''
+      setError(
+        codigo === 'auth/network-request-failed'
+          ? 'No pudimos conectarnos. Revisá tu conexión.'
+          : codigo === 'auth/operation-not-allowed'
+            ? 'El acceso por e-mail todavía no está habilitado para esta app.'
+            : 'No pudimos iniciar sesión. Revisá tus datos y volvé a intentar.',
+      )
+    } finally {
+      operacion.current = false
+      setOcupado(false)
+    }
   }
-  return <Pantalla><View className="items-center gap-4 py-8"><View className="h-20 w-20 items-center justify-center rounded-3xl bg-primary-light"><Receipt size={42} color={colores.primaryDark} /></View><Titulo>Splitwaisito</Titulo><Text className="text-center text-base leading-6 text-text-muted">Compartí los planes, organizá los gastos.</Text></View><Tarjeta><Text accessibilityRole="header" className="text-xl font-bold text-text">{MODO_SEEDS ? 'Probá la app' : 'Iniciar sesión'}</Text>{MODO_SEEDS ? <><Text className="text-sm leading-6 text-text-muted">Explorá grupos, gastos y deudas con datos de ejemplo. Tus cambios se guardan en este dispositivo.</Text><Boton texto="Entrar con datos de ejemplo" cargando={ocupado} onPress={() => { void entrar() }} /></> : <><Campo label="E-mail" placeholder="tu@correo.com" value={email} onChangeText={setEmail} autoCapitalize="none" autoCorrect={false} keyboardType="email-address" autoComplete="email" editable={!ocupado} /><Campo label="Contraseña" value={clave} onChangeText={setClave} secureTextEntry autoComplete="current-password" editable={!ocupado} /><Boton texto="Iniciar sesión" cargando={ocupado} disabled={!isFirebaseAvailable()} onPress={() => { void entrar() }} />{!isFirebaseAvailable() && <Mensaje texto="El acceso a cuentas todavía no está configurado. Contactá al equipo para habilitarlo." />}<Text className="text-xs leading-5 text-text-muted">El acceso con Google requiere configurar la versión instalada de la app. En Expo Go podés usar el modo de prueba o una cuenta con e-mail y contraseña habilitada.</Text></>}<Mensaje texto={error} error /></Tarjeta></Pantalla>
+  return (
+    <Pantalla>
+      <View className="items-center gap-4 py-8">
+        <View className="h-20 w-20 items-center justify-center rounded-3xl bg-primary-light">
+          <Receipt size={42} color={colores.primaryDark} />
+        </View>
+        <Titulo>Splitwaisito</Titulo>
+        <Text className="text-center text-base leading-6 text-text-muted">
+          Compartí los planes, organizá los gastos.
+        </Text>
+      </View>
+      <Tarjeta>
+        <Text
+          accessibilityRole="header"
+          className="text-xl font-bold text-text"
+        >
+          {MODO_SEEDS ? 'Probá la app' : 'Iniciar sesión'}
+        </Text>
+        {MODO_SEEDS ? (
+          <>
+            <Text className="text-sm leading-6 text-text-muted">
+              Explorá grupos, gastos y deudas con datos de ejemplo. Tus cambios
+              se guardan en este dispositivo.
+            </Text>
+            <Boton
+              texto="Entrar con datos de ejemplo"
+              cargando={ocupado}
+              onPress={() => {
+                void entrar()
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <Campo
+              label="E-mail"
+              placeholder="tu@correo.com"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              autoComplete="email"
+              editable={!ocupado}
+            />
+            <Campo
+              label="Contraseña"
+              value={clave}
+              onChangeText={setClave}
+              secureTextEntry
+              autoComplete="current-password"
+              editable={!ocupado}
+            />
+            <Boton
+              texto="Iniciar sesión"
+              cargando={ocupado}
+              disabled={!isFirebaseAvailable()}
+              onPress={() => {
+                void entrar()
+              }}
+            />
+            {!isFirebaseAvailable() && (
+              <Mensaje texto="El acceso a cuentas todavía no está configurado. Contactá al equipo para habilitarlo." />
+            )}
+            <Text className="text-xs leading-5 text-text-muted">
+              El acceso con Google requiere configurar la versión instalada de
+              la app. En Expo Go podés usar el modo de prueba o una cuenta con
+              e-mail y contraseña habilitada.
+            </Text>
+          </>
+        )}
+        <Mensaje texto={error} error />
+      </Tarjeta>
+    </Pantalla>
+  )
 }

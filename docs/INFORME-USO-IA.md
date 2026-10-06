@@ -100,3 +100,9 @@ Codex migró acceso demo y login por e-mail/contraseña Firebase, retiró el acc
 
 ### Pantalla no encontrada — German, 06/10/2026
 Codex reemplazó el último placeholder por una pantalla nativa con acceso al inicio y retiró los tres componentes provisionales que ya no se usan.
+
+
+### Revisión final — German, 06/10/2026
+Codex uniformó el formato de las pantallas, actualizó las instrucciones y los límites del acceso real, y limitó Metro a dos trabajadores en Windows tras observar EMFILE. Verificó en navegador la creación/edición de gastos y sus deudas, copia del monto, aceptación de amistad y persistencia del perfil. Cámara/GPS y autenticación real requieren pruebas adicionales con dispositivos y credenciales. Cada pantalla mantiene su commit individual en feature/rn-pantallas-expo-go.
+
+Validación final: typecheck correcto, 22 pruebas aprobadas, lint sin errores (cuatro advertencias preexistentes de estilo Array<T>), expo-doctor 21/21 y exportación Android/iOS/web correcta.

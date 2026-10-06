@@ -5,33 +5,35 @@
 Requisitos: Node.js 22.13 o superior y Expo Go compatible con SDK 57.
 
 ```powershell
-cd C:\Users\German\Desktop\Splitwaisito\mobile
+cd mobile
 npm install
 npm run start:seeds -- --go
 ```
 
-Conectar el celular y la computadora a la misma red Wi-Fi. En Android, escanear el QR desde Expo Go. En iPhone, escanearlo con Cámara y abrir Expo Go. Si la red bloquea la conexión local, probar `npm run start:seeds -- --go --tunnel` (Expo puede solicitar instalar su dependencia de túnel).
+Conectar teléfono y computadora a la misma Wi-Fi. Android: escanear desde Expo Go. iPhone: escanear con Cámara y abrir Expo Go. Si la red bloquea la conexión local, usar `npm run start:seeds -- --go --tunnel`.
 
-El modo demo usa datos de ejemplo y AsyncStorage, sin credenciales ni conexiones a Firebase. Permite entrar, listar grupos y comprobar navegación. Crear grupo, cargar gasto, saldar, amigos y perfil siguen pendientes de migración: la compilación correcta no implica que esas funciones estén terminadas.
+El modo demo usa AsyncStorage sin credenciales de Firebase. Las pantallas migradas son inicio de sesión, grupos, detalle, crear grupo, cargar/editar gasto, saldar deuda, amigos, perfil, configuración y pantalla no encontrada. Foto y ubicación son opcionales. Las deudas respetan los participantes seleccionados en cada gasto. Saldar copia los datos y abre Mercado Pago; la app no transfiere dinero ni registra una transferencia como pagada automáticamente.
 
-## Login real
+## Acceso real
 
-Google OAuth necesita una compilación de desarrollo con un esquema propio; Expo Go no admite ese flujo. Ver https://docs.expo.dev/guides/authentication/. Firebase y su persistencia están preparados, pero la pantalla de login real sigue pendiente. No usar el acceso temporal como prueba de autenticación.
+Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso por e-mail/contraseña requiere habilitar ese proveedor en Firebase y un usuario existente. Las reglas de Firestore y Storage deben permitir las operaciones autorizadas. No se verificó el flujo real con credenciales en esta migración.
+
+Google OAuth sigue pendiente de implementación y configuración y requiere una compilación de desarrollo con esquema propio: https://docs.expo.dev/guides/authentication/.
 
 ## Verificaciones
 
 ```powershell
 npm run typecheck
 npm test
-npx expo lint
+npm run lint
 npx expo-doctor
 ```
 
-Para comprobar los paquetes móviles sin un teléfono:
-
 ```powershell
 $env:EXPO_PUBLIC_MODO_SEEDS = 'true'
-npx expo export --platform android --platform ios
+npx expo export --platform android --platform ios --platform web --max-workers 2
 ```
 
-La prueba final requiere abrir la app en dispositivos Android e iOS, entrar con datos de ejemplo, navegar por los grupos y cerrar/reabrir para verificar persistencia.
+Se verificó en navegador el recorrido demo: crear grupo, cargar y editar gasto, calcular deuda, copiar monto, aceptar amistad y guardar perfil con persistencia tras recargar. Las pruebas automáticas cubren importes y reparto de gastos. Exportar los paquetes no sustituye las pruebas en dispositivos: comprobar en Android e iOS cámara, galería, permisos/GPS, regreso desde Mercado Pago, teclado, cierre de sesión y persistencia tras reabrir.
+
+En Windows Metro limita sus trabajadores a dos para reducir los errores de archivos abiertos durante desarrollo.

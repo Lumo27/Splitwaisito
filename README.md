@@ -1,3 +1,4 @@
+> Actualización 06/10/2026: el frontend móvil actual está en `mobile/`, con Expo SDK 57, React Native y Expo Router. Todas las pantallas principales están migradas para Expo Go; ver [instrucciones y alcance verificado](mobile/README.md) y [plan de migración](docs/GUIA-MIGRACION-REACT-NATIVE.md). El frontend `web/` conserva la implementación PWA anterior. El login móvil ofrece demo y e-mail/contraseña; Google móvil sigue pendiente. La información PWA debajo se conserva como antecedente.
 # Splitwaisito
 
 PWA gratuita para organizar gastos compartidos en grupo (viajes, convivencia, etc.): cargar gastos, dividirlos, simplificar deudas entre integrantes y saldarlas. Trabajo práctico integrador de Aplicaciones Móviles — equipo de 6 personas.

@@ -26,20 +26,43 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
     let vigente = true
     let versionSesion = 0
     let cancelar: (() => void) | undefined
-    const aplicarSesion: Parameters<typeof subscribeToAuthChanges>[0] = (usuario) => {
+    const aplicarSesion: Parameters<typeof subscribeToAuthChanges>[0] = (
+      usuario,
+    ) => {
       const version = ++versionSesion
       void (async () => {
         const store = useAppStore.getState()
         if (!usuario) {
-          if (vigente) { store.cerrarSesion(); setAuthReady(true) }
+          if (vigente) {
+            store.cerrarSesion()
+            setAuthReady(true)
+          }
           return
         }
-        const [perfilResultado, amigosResultado] = await Promise.allSettled([getUsuarioPerfil(usuario.uid), obtenerAmigosAceptados(usuario.uid)])
+        const [perfilResultado, amigosResultado] = await Promise.allSettled([
+          getUsuarioPerfil(usuario.uid),
+          obtenerAmigosAceptados(usuario.uid),
+        ])
         if (!vigente || version !== versionSesion) return
-        const perfil = perfilResultado.status === 'fulfilled' ? perfilResultado.value : null
-        const amigos = amigosResultado.status === 'fulfilled' ? amigosResultado.value : perfil?.amigos ?? []
-        const nombre = perfil?.nombre || usuario.displayName || usuario.email?.split('@')[0] || 'Usuario'
-        store.iniciarSesion(nombre, usuario.email || '', perfil?.alias || nombre, usuario.uid, perfil?.fotoUrl ?? usuario.photoURL, perfil?.descripcion)
+        const perfil =
+          perfilResultado.status === 'fulfilled' ? perfilResultado.value : null
+        const amigos =
+          amigosResultado.status === 'fulfilled'
+            ? amigosResultado.value
+            : (perfil?.amigos ?? [])
+        const nombre =
+          perfil?.nombre ||
+          usuario.displayName ||
+          usuario.email?.split('@')[0] ||
+          'Usuario'
+        store.iniciarSesion(
+          nombre,
+          usuario.email || '',
+          perfil?.alias || nombre,
+          usuario.uid,
+          perfil?.fotoUrl ?? usuario.photoURL,
+          perfil?.descripcion,
+        )
         store.reemplazarAmigos(amigos)
         setAuthReady(true)
       })()
@@ -49,9 +72,26 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
       if (!vigente) return
       if (!isFirebaseAvailable()) aplicarSesion(null)
       else cancelar = subscribeToAuthChanges(aplicarSesion)
-    })().catch(() => { if (vigente) { useAppStore.getState().cerrarSesion(); setAuthReady(true) } })
-    return () => { vigente = false; versionSesion += 1; cancelar?.() }
+    })().catch(() => {
+      if (vigente) {
+        useAppStore.getState().cerrarSesion()
+        setAuthReady(true)
+      }
+    })
+    return () => {
+      vigente = false
+      versionSesion += 1
+      cancelar?.()
+    }
   }, [hidratado])
-  if (!authReady || !hidratado) return <View className="flex-1 items-center justify-center gap-3 bg-background p-6"><ActivityIndicator color={colores.primary} /><Text className="text-sm text-text-muted">Restaurando tu sesión...</Text></View>
+  if (!authReady || !hidratado)
+    return (
+      <View className="flex-1 items-center justify-center gap-3 bg-background p-6">
+        <ActivityIndicator color={colores.primary} />
+        <Text className="text-sm text-text-muted">
+          Restaurando tu sesión...
+        </Text>
+      </View>
+    )
   return children
 }

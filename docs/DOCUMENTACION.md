@@ -1,3 +1,4 @@
+> Actualización 06/10/2026: el frontend móvil actual está en `mobile/`, con Expo SDK 57, React Native y Expo Router. Todas las pantallas principales están migradas para Expo Go; ver [instrucciones y alcance verificado](../mobile/README.md) y [plan de migración](GUIA-MIGRACION-REACT-NATIVE.md). El frontend `web/` conserva la implementación PWA anterior. El login móvil ofrece demo y e-mail/contraseña; Google móvil sigue pendiente. La información PWA debajo se conserva como antecedente.
 # Documentación del proyecto — Splitwaisito
 
 Estado al **21/09/2026**, sobre la rama `develop` (commit `864381b`). Este documento describe lo que hay hoy en el repositorio; las decisiones de stack siguen en [`CLAUDE.md`](../CLAUDE.md) y el estado de las tareas, en el [tablero de Trello](https://trello.com/b/KnB9B2kP/splitwaisito).
