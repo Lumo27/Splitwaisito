@@ -64,3 +64,9 @@ Cada integrante suma sus propias filas a `planilla-uso-ia.xlsx` (herramienta, fi
 | Codex | Revisar el plan y preparar la base móvil para Expo Go en Android e iOS | «Leíste el plan de esta app? Tenemos que hacer que ande en Expo Go» | Actualización local de develop, diagnóstico de dependencias SDK 57, ajustes de compatibilidad y guía mobile/README.md. Se distingue el modo demo del login Google, que requiere un build de desarrollo. Las pruebas en teléfonos quedan pendientes. |
 
 No se encontró la planilla planilla-uso-ia.xlsx en el repositorio; esta entrada conserva el registro para trasladarlo a la planilla cuando esté disponible.
+
+### Migración de la lista de grupos — German, 06/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Codex | Migrar la primera pantalla móvil | «Migrar las pantallas una por una, con un commit descriptivo por pantalla en una rama para PR» | Lista de grupos nativa con FlatList, estados de carga/error/vacío, actualización al volver y al deslizar, acceso al detalle y eliminación confirmada. Conserva los servicios Firebase/demo y la paleta existente. |
