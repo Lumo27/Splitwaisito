@@ -94,3 +94,6 @@ Codex migró foto/iniciales, nombre, e-mail, alias y descripción editable. Pers
 
 ### Configuración — German, 06/10/2026
 Codex migró el estado de la sesión, salida y restablecimiento de demo con confirmaciones nativas. El reinicio restaura perfil, amigos y gastos coherentemente; el cierre no simula éxito si Firebase falla.
+
+### Inicio de sesión — German, 06/10/2026
+Codex migró acceso demo y login por e-mail/contraseña Firebase, retiró el acceso temporal sin autenticación y protegió las rutas. El arranque espera la hidratación y descarta respuestas de sesiones anteriores. Google OAuth sigue requiriendo un build de desarrollo y configuración externa; el proveedor e-mail debe estar habilitado en Firebase para el acceso real.

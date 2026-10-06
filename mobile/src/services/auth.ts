@@ -2,6 +2,7 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithCredential,
+  signInWithEmailAndPassword,
   signOut,
   type User,
 } from 'firebase/auth'
@@ -63,4 +64,9 @@ export function signOutUser() {
   }
 
   return signOut(auth)
+}
+
+export async function signInWithEmail(email: string, password: string) {
+  if (!auth || MODO_SEEDS) throw new Error('Firebase no configurado.')
+  return signInWithEmailAndPassword(auth, email.trim(), password)
 }
