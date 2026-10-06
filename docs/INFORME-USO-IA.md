@@ -82,3 +82,6 @@ Codex migró el formulario con validación de nombre, selección de amigos y gua
 
 ### Cargar gasto — German, 06/10/2026
 Codex migró alta/edición, selección del pagador y reparto, validación de importes, ticket por cámara/galería y ubicación con permisos. Foto y GPS son opcionales. Agregó pruebas de validación; el modo demo conserva la foto como data URL y Firebase la sube a Storage.
+
+### Saldar deuda — German, 06/10/2026
+Codex migró la consulta de deuda por deudor/acreedor, copia real de e-mail y monto al portapapeles, apertura de Mercado Pago y manejo de transferencias ausentes. Mantiene el flujo manual de pago aprobado; no marca pagos ficticios.
