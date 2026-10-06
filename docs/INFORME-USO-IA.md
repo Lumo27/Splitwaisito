@@ -70,3 +70,9 @@ No se encontró la planilla planilla-uso-ia.xlsx en el repositorio; esta entrada
 | Herramienta | Finalidad | Prompt clave | Qué se usó |
 |---|---|---|---|
 | Codex | Migrar la primera pantalla móvil | «Migrar las pantallas una por una, con un commit descriptivo por pantalla en una rama para PR» | Lista de grupos nativa con FlatList, estados de carga/error/vacío, actualización al volver y al deslizar, acceso al detalle y eliminación confirmada. Conserva los servicios Firebase/demo y la paleta existente. |
+
+### Migración del detalle de grupo — German, 06/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Codex | Migrar el detalle del grupo a Expo Go | «Sigamos con las migraciones de las demás pantallas una por una con sus commits» | Detalle nativo con integrantes, total, gastos, eliminación confirmada, alta de integrantes y deudas identificadas por deudor/acreedor. Reutiliza servicios y respeta participantes por gasto. |
