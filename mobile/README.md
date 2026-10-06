@@ -1,5 +1,9 @@
 # Splitwaisito en Expo Go
 
+## Inicio con doble clic en Windows
+
+Abrir **Iniciar-Expo-Go.bat** desde la raiz del repositorio. Instala las dependencias si faltan e inicia Expo Go en modo demo mostrando el QR en la consola. Requiere Node.js y npm. Mantener la ventana abierta; detener con Ctrl+C. Si otro servidor esta usando el puerto, Expo puede ofrecer uno alternativo.
+
 ## Probar en Android y iPhone
 
 Requisitos: Node.js 22.13 o superior y Expo Go compatible con SDK 57.

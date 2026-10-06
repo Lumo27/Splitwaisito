@@ -106,3 +106,7 @@ Codex reemplazó el último placeholder por una pantalla nativa con acceso al in
 Codex uniformó el formato de las pantallas, actualizó las instrucciones y los límites del acceso real, y limitó Metro a dos trabajadores en Windows tras observar EMFILE. Verificó en navegador la creación/edición de gastos y sus deudas, copia del monto, aceptación de amistad y persistencia del perfil. Cámara/GPS y autenticación real requieren pruebas adicionales con dispositivos y credenciales. Cada pantalla mantiene su commit individual en feature/rn-pantallas-expo-go.
 
 Validación final: typecheck correcto, 22 pruebas aprobadas, lint sin errores (cuatro advertencias preexistentes de estilo Array<T>), expo-doctor 21/21 y exportación Android/iOS/web correcta.
+
+
+### Arranque con BAT — German, 06/10/2026
+Pedido: iniciar el QR con doble clic. Codex agrego Iniciar-Expo-Go.bat con rutas relativas al archivo, comprobacion de Node/npm, instalacion inicial con npm ci, arranque del modo demo en Expo Go por LAN y mensajes de error. Documento su uso en mobile/README.md.
