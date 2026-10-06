@@ -79,3 +79,6 @@ No se encontró la planilla planilla-uso-ia.xlsx en el repositorio; esta entrada
 
 ### Crear grupo — German, 06/10/2026
 Codex migró el formulario con validación de nombre, selección de amigos y guardado de integrantes en una sola creación; agregó componentes de formulario nativos reutilizables. Prompt: completar las migraciones con un commit por pantalla.
+
+### Cargar gasto — German, 06/10/2026
+Codex migró alta/edición, selección del pagador y reparto, validación de importes, ticket por cámara/galería y ubicación con permisos. Foto y GPS son opcionales. Agregó pruebas de validación; el modo demo conserva la foto como data URL y Firebase la sube a Storage.

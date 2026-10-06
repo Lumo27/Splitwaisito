@@ -116,6 +116,7 @@ export function DetalleGrupoScreen() {
           <View className="flex-row items-center gap-3"><Receipt size={20} color={colores.primaryDark} /><Text className="flex-1 text-base font-bold text-text">{gasto.descripcion}</Text></View>
           <Text className="text-xl font-bold text-text">{dinero(gasto.monto)}</Text>
           <Text className="text-xs text-text-muted">{gasto.categoria} · Pagó {gasto.pagadoPorNombre} · {formatearFecha(gasto.fecha)}</Text>
+          {gasto.id && <Pressable accessibilityRole="button" accessibilityLabel={`Editar gasto ${gasto.descripcion}`} className="min-h-11 justify-center" onPress={() => router.push({ pathname: '/grupos/[id]/cargar-gasto', params: { id, gastoId: gasto.id } })}><Text className="font-semibold text-primary-dark">Editar gasto</Text></Pressable>}
           {gasto.id && <Pressable accessibilityRole="button" accessibilityLabel={`Eliminar gasto ${gasto.descripcion}`} disabled={ocupado} className="min-h-11 flex-row items-center justify-end gap-2" onPress={() => Alert.alert('Eliminar gasto', `¿Eliminar “${gasto.descripcion}”?`, [{ text: 'Cancelar', style: 'cancel' }, { text: 'Eliminar', style: 'destructive', onPress: () => { void ejecutar(() => eliminarGasto(id, gasto.id!)) } }])}><Trash2 size={17} color={colores.textMuted} /><Text className="text-xs text-text-muted">Eliminar</Text></Pressable>}
         </View>
       ))}
