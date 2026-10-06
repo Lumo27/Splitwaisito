@@ -85,3 +85,6 @@ Codex migró alta/edición, selección del pagador y reparto, validación de imp
 
 ### Saldar deuda — German, 06/10/2026
 Codex migró la consulta de deuda por deudor/acreedor, copia real de e-mail y monto al portapapeles, apertura de Mercado Pago y manejo de transferencias ausentes. Mantiene el flujo manual de pago aprobado; no marca pagos ficticios.
+
+### Amigos — German, 06/10/2026
+Codex migró solicitudes por e-mail, aceptación/rechazo, lista y eliminación confirmada. Recarga al volver, sincroniza el store y el perfil incluso si ya no quedan amigos, valida e-mails y bloquea acciones duplicadas.
