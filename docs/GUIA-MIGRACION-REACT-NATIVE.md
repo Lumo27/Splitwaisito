@@ -286,3 +286,7 @@ Sumá un job en .github/workflows/ (o un workflow separado) que corra dentro de 
 - [ ] Firestore rules siguen validando igual (no cambiaron)
 - [ ] CI en verde para `/mobile`
 - [ ] Documentación del punto anterior actualizada
+
+## Aclaración verificada el 06/10/2026: Expo Go y Google
+
+La recomendación #8 sobre Google con expo-auth-session en Expo Go queda corregida: la documentación oficial actual indica que OAuth/OpenID necesita una compilación de desarrollo con esquema propio (https://docs.expo.dev/guides/authentication/). Para probar en Expo Go se usa el modo demo, sin credenciales. Las instrucciones actuales están en mobile/README.md. La migración funcional de las pantallas continúa pendiente.

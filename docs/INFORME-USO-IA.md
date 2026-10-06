@@ -56,3 +56,11 @@ Cada integrante suma sus propias filas a `planilla-uso-ia.xlsx` (herramienta, fi
 | Candela | Pendiente. |
 | Vladimir Viale | Pendiente. |
 | Nahu | Pendiente. |
+
+## Registro de German — 06/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Codex | Revisar el plan y preparar la base móvil para Expo Go en Android e iOS | «Leíste el plan de esta app? Tenemos que hacer que ande en Expo Go» | Actualización local de develop, diagnóstico de dependencias SDK 57, ajustes de compatibilidad y guía mobile/README.md. Se distingue el modo demo del login Google, que requiere un build de desarrollo. Las pruebas en teléfonos quedan pendientes. |
+
+No se encontró la planilla planilla-uso-ia.xlsx en el repositorio; esta entrada conserva el registro para trasladarlo a la planilla cuando esté disponible.
