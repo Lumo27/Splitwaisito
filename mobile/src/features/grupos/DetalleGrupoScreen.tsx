@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from 'react-native'
-import { Plus, Receipt, Trash2, UserPlus } from 'lucide-react-native'
+import { Receipt, Trash2, UserPlus } from 'lucide-react-native'
 
 import {
   agregarMiembroAlGrupo,
@@ -20,6 +20,8 @@ import {
   type GrupoFirestore,
 } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
+import { Portada } from '@/components/Portada'
+import { Boton } from '@/components/Formulario'
 import { colores } from '@/theme/colores'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
@@ -144,7 +146,13 @@ export function DetalleGrupoScreen() {
   return (
     <ScrollView
       className="flex-1 bg-background"
-      contentContainerStyle={{ padding: 20, paddingBottom: 36 }}
+      contentContainerStyle={{
+        padding: 20,
+        paddingBottom: 36,
+        width: '100%',
+        maxWidth: 680,
+        alignSelf: 'center',
+      }}
       refreshControl={
         <RefreshControl
           refreshing={cargando}
@@ -155,42 +163,31 @@ export function DetalleGrupoScreen() {
         />
       }
     >
-      <Text className="text-xs font-bold uppercase tracking-widest text-primary-dark">
-        Espacio compartido
-      </Text>
-      <Text
-        accessibilityRole="header"
-        className="mt-2 text-3xl font-bold text-text"
-      >
-        {grupo.nombre}
-      </Text>
-      <Text className="mt-2 text-sm text-text-muted">
-        {grupo.descripcion || 'Gastos y saldos en un solo lugar'}
-      </Text>
+      <Portada
+        etiquetaValor="Total de gastos del grupo"
+        etiqueta="Espacio compartido"
+        titulo={grupo.nombre}
+        descripcion={grupo.descripcion || 'Gastos y saldos en un solo lugar'}
+        valor={dinero(gastos.reduce((total, gasto) => total + gasto.monto, 0))}
+        pie={`${gastos.length} gastos · ${grupo.miembros.length} integrantes`}
+      />
       {error ? (
         <Text accessibilityRole="alert" className="mt-3 text-red-700">
           {error}
         </Text>
       ) : null}
-      <View className="my-5 gap-1 rounded-2xl bg-primary-light p-5">
-        <Text className="text-xs font-bold uppercase text-primary-dark">
-          Total de gastos del grupo
-        </Text>
-        <Text className="text-3xl font-bold text-primary-dark">
-          {dinero(gastos.reduce((total, gasto) => total + gasto.monto, 0))}
-        </Text>
+      <View className="mt-5">
+        <Boton
+          texto="Cargar gasto"
+          onPress={() =>
+            router.push({
+              pathname: '/grupos/[id]/cargar-gasto',
+              params: { id },
+            })
+          }
+        />
       </View>
-      <Pressable
-        accessibilityRole="button"
-        onPress={() =>
-          router.push({ pathname: '/grupos/[id]/cargar-gasto', params: { id } })
-        }
-        className="min-h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary p-3"
-      >
-        <Plus color="#FFFFFF" size={20} />
-        <Text className="font-bold text-white">Cargar gasto</Text>
-      </Pressable>
-      <View className="mt-5 gap-3 rounded-2xl bg-white p-4">
+      <View className="mt-5 gap-3 rounded-3xl bg-white p-5">
         <Text
           accessibilityRole="header"
           className="text-lg font-bold text-text"
@@ -231,7 +228,7 @@ export function DetalleGrupoScreen() {
           ))}
         {ocupado && <ActivityIndicator color={colores.primary} />}
       </View>
-      <View className="mt-5 gap-3 rounded-2xl bg-white p-4">
+      <View className="mt-5 gap-3 rounded-3xl bg-white p-5">
         <Text
           accessibilityRole="header"
           className="text-lg font-bold text-text"
@@ -246,7 +243,7 @@ export function DetalleGrupoScreen() {
           deudas.map((deuda) => (
             <View
               key={`${deuda.de}-${deuda.a}`}
-              className="gap-2 rounded-xl bg-slate-50 p-3"
+              className="gap-2 rounded-2xl bg-secondary-light p-4"
             >
               <Text className="text-sm text-text">
                 {nombre(deuda.de)} → {nombre(deuda.a)}
@@ -288,7 +285,7 @@ export function DetalleGrupoScreen() {
       {gastos.map((gasto, index) => (
         <View
           key={gasto.id ?? String(index)}
-          className="mb-3 gap-2 rounded-2xl bg-white p-4"
+          className="mb-3 gap-2 rounded-3xl bg-white p-5"
         >
           <View className="flex-row items-center gap-3">
             <Receipt size={20} color={colores.primaryDark} />

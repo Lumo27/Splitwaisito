@@ -1,3 +1,4 @@
+import { colores } from '@/theme/colores'
 import { useCallback, useRef, useState } from 'react'
 import { useFocusEffect } from 'expo-router'
 import { Image, Text, View } from 'react-native'
@@ -78,7 +79,7 @@ export function PerfilScreen() {
   return (
     <Pantalla>
       <Titulo>Mi perfil</Titulo>
-      <Tarjeta>
+      <Tarjeta style={{ backgroundColor: colores.secondaryLight }}>
         <View className="flex-row items-center gap-4">
           {usuario.fotoUrl ? (
             <Image
