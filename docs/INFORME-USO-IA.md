@@ -56,3 +56,57 @@ Cada integrante suma sus propias filas a `planilla-uso-ia.xlsx` (herramienta, fi
 | Candela | Pendiente. |
 | Vladimir Viale | Pendiente. |
 | Nahu | Pendiente. |
+
+## Registro de German — 06/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Codex | Revisar el plan y preparar la base móvil para Expo Go en Android e iOS | «Leíste el plan de esta app? Tenemos que hacer que ande en Expo Go» | Actualización local de develop, diagnóstico de dependencias SDK 57, ajustes de compatibilidad y guía mobile/README.md. Se distingue el modo demo del login Google, que requiere un build de desarrollo. Las pruebas en teléfonos quedan pendientes. |
+
+No se encontró la planilla planilla-uso-ia.xlsx en el repositorio; esta entrada conserva el registro para trasladarlo a la planilla cuando esté disponible.
+
+### Migración de la lista de grupos — German, 06/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Codex | Migrar la primera pantalla móvil | «Migrar las pantallas una por una, con un commit descriptivo por pantalla en una rama para PR» | Lista de grupos nativa con FlatList, estados de carga/error/vacío, actualización al volver y al deslizar, acceso al detalle y eliminación confirmada. Conserva los servicios Firebase/demo y la paleta existente. |
+
+### Migración del detalle de grupo — German, 06/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Codex | Migrar el detalle del grupo a Expo Go | «Sigamos con las migraciones de las demás pantallas una por una con sus commits» | Detalle nativo con integrantes, total, gastos, eliminación confirmada, alta de integrantes y deudas identificadas por deudor/acreedor. Reutiliza servicios y respeta participantes por gasto. |
+
+### Crear grupo — German, 06/10/2026
+Codex migró el formulario con validación de nombre, selección de amigos y guardado de integrantes en una sola creación; agregó componentes de formulario nativos reutilizables. Prompt: completar las migraciones con un commit por pantalla.
+
+### Cargar gasto — German, 06/10/2026
+Codex migró alta/edición, selección del pagador y reparto, validación de importes, ticket por cámara/galería y ubicación con permisos. Foto y GPS son opcionales. Agregó pruebas de validación; el modo demo conserva la foto como data URL y Firebase la sube a Storage.
+
+### Saldar deuda — German, 06/10/2026
+Codex migró la consulta de deuda por deudor/acreedor, copia real de e-mail y monto al portapapeles, apertura de Mercado Pago y manejo de transferencias ausentes. Mantiene el flujo manual de pago aprobado; no marca pagos ficticios.
+
+### Amigos — German, 06/10/2026
+Codex migró solicitudes por e-mail, aceptación/rechazo, lista y eliminación confirmada. Recarga al volver, sincroniza el store y el perfil incluso si ya no quedan amigos, valida e-mails y bloquea acciones duplicadas.
+
+### Perfil — German, 06/10/2026
+Codex migró foto/iniciales, nombre, e-mail, alias y descripción editable. Persiste primero en Firebase/demo y actualiza el store solo tras guardar; muestra confirmación y conserva el estado anterior ante errores.
+
+### Configuración — German, 06/10/2026
+Codex migró el estado de la sesión, salida y restablecimiento de demo con confirmaciones nativas. El reinicio restaura perfil, amigos y gastos coherentemente; el cierre no simula éxito si Firebase falla.
+
+### Inicio de sesión — German, 06/10/2026
+Codex migró acceso demo y login por e-mail/contraseña Firebase, retiró el acceso temporal sin autenticación y protegió las rutas. El arranque espera la hidratación y descarta respuestas de sesiones anteriores. Google OAuth sigue requiriendo un build de desarrollo y configuración externa; el proveedor e-mail debe estar habilitado en Firebase para el acceso real.
+
+### Pantalla no encontrada — German, 06/10/2026
+Codex reemplazó el último placeholder por una pantalla nativa con acceso al inicio y retiró los tres componentes provisionales que ya no se usan.
+
+
+### Revisión final — German, 06/10/2026
+Codex uniformó el formato de las pantallas, actualizó las instrucciones y los límites del acceso real, y limitó Metro a dos trabajadores en Windows tras observar EMFILE. Verificó en navegador la creación/edición de gastos y sus deudas, copia del monto, aceptación de amistad y persistencia del perfil. Cámara/GPS y autenticación real requieren pruebas adicionales con dispositivos y credenciales. Cada pantalla mantiene su commit individual en feature/rn-pantallas-expo-go.
+
+Validación final: typecheck correcto, 22 pruebas aprobadas, lint sin errores (cuatro advertencias preexistentes de estilo Array<T>), expo-doctor 21/21 y exportación Android/iOS/web correcta.
+
+
+### Arranque con BAT — German, 06/10/2026
+Pedido: iniciar el QR con doble clic. Codex agrego Iniciar-Expo-Go.bat con rutas relativas al archivo, comprobacion de Node/npm, instalacion inicial con npm ci, arranque del modo demo en Expo Go por LAN y mensajes de error. Documento su uso en mobile/README.md.

@@ -267,13 +267,13 @@ export function seedGuardarAmigos(usuarioId: string, amigos: Perfil[]) {
   guardar(db)
 }
 
-export function seedCrearGrupo(nombre: string, creadorId: string) {
+export function seedCrearGrupo(nombre: string, creadorId: string, miembros: string[] = []) {
   const db = cargar()
   const ahora = new Date().toISOString()
   const grupo: GrupoFirestore = {
     id: idNuevo('grupo'),
     nombre: nombre.trim() || 'Nuevo grupo',
-    miembros: [creadorId],
+    miembros: [...new Set([creadorId, ...miembros])],
     descripcion: '',
     createdAt: ahora,
     updatedAt: ahora,

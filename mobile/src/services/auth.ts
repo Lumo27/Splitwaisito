@@ -2,25 +2,38 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithCredential,
+  signInWithEmailAndPassword,
   signOut,
   type User,
 } from 'firebase/auth'
 
 import { auth, MODO_SEEDS } from './firebase'
 import { upsertUsuarioPerfil } from './firestore'
-import { seedCerrarSesion, seedIniciarSesion, seedSuscribirSesion } from './seedBackend'
+import {
+  seedCerrarSesion,
+  seedIniciarSesion,
+  seedSuscribirSesion,
+} from './seedBackend'
 
-export type UsuarioAuth = Pick<User, 'uid' | 'displayName' | 'email' | 'photoURL'>
+export type UsuarioAuth = Pick<
+  User,
+  'uid' | 'displayName' | 'email' | 'photoURL'
+>
 
 // En web el login abre el popup de Google (signInWithPopup), que no existe en
 // React Native. Acá el token de Google lo consigue la pantalla de login con la
 // librería nativa de Google, y Firebase inicia sesión con esa credencial.
-export async function signInWithGoogleIdToken(idToken: string): Promise<{ user: UsuarioAuth }> {
+export async function signInWithGoogleIdToken(
+  idToken: string,
+): Promise<{ user: UsuarioAuth }> {
   if (!auth) {
     throw new Error('Firebase no configurado aún.')
   }
 
-  const result = await signInWithCredential(auth, GoogleAuthProvider.credential(idToken))
+  const result = await signInWithCredential(
+    auth,
+    GoogleAuthProvider.credential(idToken),
+  )
   const usuario = result.user
 
   await upsertUsuarioPerfil({
@@ -39,7 +52,9 @@ export function signInDemo(): { user: UsuarioAuth } {
   return { user: seedIniciarSesion() }
 }
 
-export function subscribeToAuthChanges(onUser: (usuario: UsuarioAuth | null) => void) {
+export function subscribeToAuthChanges(
+  onUser: (usuario: UsuarioAuth | null) => void,
+) {
   if (MODO_SEEDS) {
     return seedSuscribirSesion(onUser)
   }
@@ -63,4 +78,9 @@ export function signOutUser() {
   }
 
   return signOut(auth)
+}
+
+export async function signInWithEmail(email: string, password: string) {
+  if (!auth || MODO_SEEDS) throw new Error('Firebase no configurado.')
+  return signInWithEmailAndPassword(auth, email.trim(), password)
 }
