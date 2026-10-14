@@ -1,9 +1,10 @@
-import { Users, Activity, User } from 'lucide-react'
+import { Users, Activity, User, ChartPie } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 const tabs = [
   { to: '/grupos', label: 'Grupos', Icon: Users },
   { to: '/actividad', label: 'Actividad', Icon: Activity },
+  { to: '/gastos', label: 'Gastos', Icon: ChartPie },
   { to: '/perfil', label: 'Perfil', Icon: User },
 ]
 
