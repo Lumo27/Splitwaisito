@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import type { GastoFirestore, GrupoFirestore, UsuarioFirestore } from './firestore'
 import type { PerfilAmistad, SolicitudAmistad } from './amistades'
+import type { MonedaCodigo } from '@/theme/moneda'
 
 const CLAVE_DB = 'splitwaisito-seeds-db-v1'
 const CLAVE_SESION = 'splitwaisito-seeds-sesion-v1'
@@ -237,6 +238,7 @@ export function seedUpsertUsuario(usuario: {
   alias?: string
   fotoUrl?: string | null
   descripcion?: string
+  moneda?: MonedaCodigo
 }) {
   const db = cargar()
   const previo = db.usuarios[usuario.id]
@@ -248,6 +250,7 @@ export function seedUpsertUsuario(usuario: {
     alias: (usuario.alias ?? usuario.nombre).trim() || 'usuario',
     fotoUrl: usuario.fotoUrl ?? null,
     descripcion: usuario.descripcion?.trim() ?? '',
+    moneda: usuario.moneda ?? previo?.moneda ?? 'ARS',
     updatedAt: new Date().toISOString(),
   }
   db.usuarios[usuario.id] = payload

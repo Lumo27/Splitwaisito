@@ -25,6 +25,7 @@ import { MODO_SEEDS } from '@/services/firebase'
 import { useAppStore } from '@/store/useAppStore'
 import { participantesDelGrupo } from '@/features/grupos/deudas'
 import { colores } from '@/theme/colores'
+import { formatearMoneda } from '@/theme/moneda'
 import { categorias, validarGasto } from './validarGasto'
 
 export function CargarGastoScreen() {
@@ -40,9 +41,11 @@ export function CargarGastoScreen() {
   const [categoria, setCategoria] =
     useState<GastoFirestore['categoria']>('Comida')
   const [pagador, setPagador] = useState('')
+  const moneda = usuario?.moneda ?? 'ARS'
   const [seleccion, setSeleccion] = useState<string[]>([])
   const [foto, setFoto] = useState<string | null>(null)
   const [ubicacion, setUbicacion] = useState<GastoFirestore['ubicacion']>()
+  const [direccionTexto, setDireccionTexto] = useState('')
   const [cargando, setCargando] = useState(true)
   const [ocupado, setOcupado] = useState(false)
   const [error, setError] = useState('')
@@ -80,6 +83,7 @@ export function CargarGastoScreen() {
         setCategoria(existente?.categoria ?? 'Comida')
         setFoto(existente?.fotoUrl ?? null)
         setUbicacion(existente?.ubicacion)
+        setDireccionTexto(existente?.ubicacion?.direccion ?? '')
         fechaOriginal.current = existente?.fecha ?? null
       } catch (fallo) {
         if (vigente)
@@ -103,25 +107,37 @@ export function CargarGastoScreen() {
     setOcupado(true)
     setError('')
     try {
-      if (
-        camara &&
-        !(await ImagePicker.requestCameraPermissionsAsync()).granted
-      )
-        throw new Error('Permití el acceso a la cámara para tomar la foto.')
+      if (camara) {
+        const { granted } = await ImagePicker.requestCameraPermissionsAsync()
+        if (!granted) {
+          throw new Error('Permití el acceso a la cámara para tomar la foto.')
+        }
+      } else {
+        const { granted } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync()
+        if (!granted) {
+          throw new Error(
+            'Permití el acceso a tus fotos para elegir una imagen.',
+          )
+        }
+      }
       const opciones: ImagePicker.ImagePickerOptions = {
         mediaTypes: ['images'],
-        quality: 0.5,
+        quality: 0.6,
         base64: true,
       }
       const resultado = camara
         ? await ImagePicker.launchCameraAsync(opciones)
         : await ImagePicker.launchImageLibraryAsync(opciones)
-      if (resultado.canceled) return
+      if (resultado.canceled || !resultado.assets?.[0]) return
       const imagen = resultado.assets[0]
-      if (!imagen.base64) throw new Error('No pudimos leer la imagen.')
-      if (imagen.base64.length * 0.75 > 2 * 1024 * 1024)
-        throw new Error('Elegí una imagen de menos de 2 MB.')
-      setFoto(`data:image/jpeg;base64,${imagen.base64}`)
+      if (imagen.base64 && imagen.base64.length * 0.75 > 5 * 1024 * 1024) {
+        throw new Error('Elegí una imagen de menos de 5 MB.')
+      }
+      const uri = imagen.base64
+        ? `data:image/jpeg;base64,${imagen.base64}`
+        : imagen.uri
+      setFoto(uri)
     } catch (fallo) {
       setError(
         fallo instanceof Error
@@ -139,10 +155,12 @@ export function CargarGastoScreen() {
     setOcupado(true)
     setError('')
     try {
-      if (!(await Location.requestForegroundPermissionsAsync()).granted)
+      const permiso = await Location.requestForegroundPermissionsAsync()
+      if (!permiso.granted) {
         throw new Error(
-          'Permití el acceso a la ubicación o continuá sin agregarla.',
+          'Permití el acceso a la ubicación para detectar tu posición actual.',
         )
+      }
       const resultado = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       })
@@ -155,12 +173,16 @@ export function CargarGastoScreen() {
         longitude: punto.lng,
       }).catch(() => [])
       const lugar = direcciones[0]
-      const direccion = lugar
-        ? [lugar.street, lugar.streetNumber, lugar.city]
+      const direccionCalculada = lugar
+        ? [lugar.name, lugar.street, lugar.streetNumber, lugar.city]
             .filter(Boolean)
             .join(' ')
         : ''
-      setUbicacion(direccion ? { ...punto, direccion } : punto)
+      setUbicacion(punto)
+      setDireccionTexto(
+        direccionCalculada ||
+          `${punto.lat.toFixed(5)}, ${punto.lng.toFixed(5)}`,
+      )
     } catch (fallo) {
       setError(
         fallo instanceof Error
@@ -205,6 +227,15 @@ export function CargarGastoScreen() {
         const archivo = await (await fetch(foto)).blob()
         fotoUrl = await subirFotoTicket(`${id}-${Date.now()}`, archivo)
       }
+      const ubicacionAGuardar =
+        ubicacion || direccionTexto.trim()
+          ? {
+              lat: ubicacion?.lat ?? 0,
+              lng: ubicacion?.lng ?? 0,
+              direccion: direccionTexto.trim(),
+            }
+          : undefined
+
       const datos: Omit<GastoFirestore, 'id'> = {
         descripcion: descripcion.trim(),
         monto: Number(monto.trim().replace(',', '.')),
@@ -216,7 +247,7 @@ export function CargarGastoScreen() {
         participantes: [...new Set(seleccion)],
         fecha: fechaOriginal.current ?? new Date().toISOString(),
         ...(fotoUrl ? { fotoUrl } : {}),
-        ...(ubicacion ? { ubicacion } : {}),
+        ...(ubicacionAGuardar ? { ubicacion: ubicacionAGuardar } : {}),
       }
       if (gastoId) {
         await actualizarGasto(id, gastoId, datos)
@@ -269,7 +300,7 @@ export function CargarGastoScreen() {
           editable={!ocupado}
         />
         <Campo
-          label="Monto total (ARS)"
+          label={`Monto total (${moneda})`}
           value={monto}
           onChangeText={setMonto}
           placeholder="0,00"
@@ -316,7 +347,7 @@ export function CargarGastoScreen() {
         ))}
         <Text className="text-sm text-text-muted">
           {seleccion.length
-            ? `Cada participante: $${(Number(monto.replace(',', '.')) / seleccion.length || 0).toLocaleString('es-AR', { maximumFractionDigits: 2 })}`
+            ? `Cada participante: ${formatearMoneda((Number(monto.replace(',', '.')) / seleccion.length) || 0, moneda)}`
             : 'Elegí al menos un participante.'}
         </Text>
       </Tarjeta>
@@ -325,30 +356,38 @@ export function CargarGastoScreen() {
           Ticket y ubicación (opcionales)
         </Text>
         {foto && (
-          <Image
-            source={{ uri: foto }}
-            accessibilityLabel="Foto del ticket"
-            style={{ width: '100%', height: 180, borderRadius: 12 }}
-            resizeMode="contain"
-          />
+          <View className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+            <Image
+              source={{ uri: foto }}
+              accessibilityLabel="Foto del ticket"
+              style={{ width: '100%', height: 180 }}
+              resizeMode="contain"
+            />
+          </View>
         )}
-        <Boton
-          texto="Tomar foto"
-          secundario
-          disabled={ocupado}
-          onPress={() => {
-            void elegirFoto(true)
-          }}
-        />
-        <Boton
-          texto="Elegir foto"
-          secundario
-          disabled={ocupado}
-          onPress={() => {
-            void elegirFoto(false)
-          }}
-        />
-        {foto && !gastoId && (
+        <View className="flex-row gap-2">
+          <View className="flex-1">
+            <Boton
+              texto="Tomar foto"
+              secundario
+              disabled={ocupado}
+              onPress={() => {
+                void elegirFoto(true)
+              }}
+            />
+          </View>
+          <View className="flex-1">
+            <Boton
+              texto="Elegir foto"
+              secundario
+              disabled={ocupado}
+              onPress={() => {
+                void elegirFoto(false)
+              }}
+            />
+          </View>
+        </View>
+        {foto && (
           <Boton
             texto="Quitar foto"
             secundario
@@ -356,28 +395,33 @@ export function CargarGastoScreen() {
             onPress={() => setFoto(null)}
           />
         )}
+        <Campo
+          label="Lugar o dirección (opcional)"
+          placeholder="Ej: Bar Central o Palermo"
+          value={direccionTexto}
+          onChangeText={setDireccionTexto}
+          maxLength={120}
+          editable={!ocupado}
+        />
         <Boton
-          texto="Usar mi ubicación"
+          texto="Detectar mi ubicación GPS"
           secundario
           disabled={ocupado}
           onPress={() => {
             void localizar()
           }}
         />
-        {ubicacion && (
-          <Text className="text-sm text-text-muted">
-            {ubicacion.direccion ||
-              `${ubicacion.lat.toFixed(5)}, ${ubicacion.lng.toFixed(5)}`}
-          </Text>
-        )}
-        {ubicacion && !gastoId && (
+        {direccionTexto ? (
           <Boton
             texto="Quitar ubicación"
             secundario
             disabled={ocupado}
-            onPress={() => setUbicacion(undefined)}
+            onPress={() => {
+              setUbicacion(undefined)
+              setDireccionTexto('')
+            }}
           />
-        )}
+        ) : null}
       </Tarjeta>
       <Mensaje texto={error} error />
       <Boton

@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore'
 import { db, MODO_SEEDS } from './firebase'
 import * as seed from './seedBackend'
+import type { MonedaCodigo } from '@/theme/moneda'
 
 export interface UsuarioFirestore {
   id: string
@@ -22,6 +23,7 @@ export interface UsuarioFirestore {
   alias: string
   fotoUrl?: string | null
   descripcion?: string
+  moneda?: MonedaCodigo
   amigos?: Array<Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>>
   updatedAt?: string
 }
@@ -63,6 +65,7 @@ export async function upsertUsuarioPerfil(usuario: {
   alias?: string
   fotoUrl?: string | null
   descripcion?: string
+  moneda?: MonedaCodigo
 }) {
   if (MODO_SEEDS) return seed.seedUpsertUsuario(usuario)
   if (!db) {
@@ -77,6 +80,7 @@ export async function upsertUsuarioPerfil(usuario: {
     alias: (usuario.alias ?? usuario.nombre).trim() || 'usuario',
     fotoUrl: usuario.fotoUrl ?? null,
     descripcion: usuario.descripcion?.trim() ?? '',
+    moneda: usuario.moneda ?? 'ARS',
     updatedAt: new Date().toISOString(),
   }
 

@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { MODO_SEEDS } from '@/services/firebase'
+import type { MonedaCodigo } from '@/theme/moneda'
 
 export interface Usuario {
   id: string
@@ -10,6 +11,7 @@ export interface Usuario {
   alias: string
   descripcion?: string
   fotoUrl?: string | null
+  moneda?: MonedaCodigo
 }
 
 export interface Gasto {
@@ -36,9 +38,11 @@ interface AppState {
     id?: string,
     fotoUrl?: string | null,
     descripcion?: string,
+    moneda?: MonedaCodigo,
   ) => void
   cerrarSesion: () => void
   actualizarDescripcion: (descripcion: string) => void
+  actualizarMoneda: (moneda: MonedaCodigo) => void
   reemplazarAmigos: (amigos: Usuario[]) => void
   agregarAmigo: (nombre: string, email: string, alias?: string) => void
   actualizarAlias: (id: string, alias: string) => void
@@ -61,7 +65,7 @@ export const useAppStore = create<AppState>()(
       amigos: [],
       gastos: [],
 
-      iniciarSesion: (nombre, email, alias, id = 'user-me', fotoUrl, descripcion) =>
+      iniciarSesion: (nombre, email, alias, id = 'user-me', fotoUrl, descripcion, moneda) =>
         set((state) => ({
           usuarioActual: {
             id,
@@ -78,6 +82,12 @@ export const useAppStore = create<AppState>()(
               (state.usuarioActual?.id === id
                 ? state.usuarioActual.fotoUrl
                 : null),
+            moneda:
+              moneda ??
+              (state.usuarioActual?.id === id
+                ? state.usuarioActual.moneda
+                : 'ARS') ??
+              'ARS',
           },
         })),
 
@@ -87,6 +97,13 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           usuarioActual: state.usuarioActual
             ? { ...state.usuarioActual, descripcion: descripcion.trim() }
+            : null,
+        })),
+
+      actualizarMoneda: (moneda) =>
+        set((state) => ({
+          usuarioActual: state.usuarioActual
+            ? { ...state.usuarioActual, moneda }
             : null,
         })),
 

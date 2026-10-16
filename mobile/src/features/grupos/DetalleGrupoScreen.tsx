@@ -3,6 +3,7 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -21,12 +22,10 @@ import {
 } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
+import { formatearMoneda } from '@/theme/moneda'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
-
-const dinero = (monto: number) =>
-  `$${monto.toLocaleString('es-AR', { maximumFractionDigits: 2 })}`
 
 export function DetalleGrupoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -91,6 +90,24 @@ export function DetalleGrupoScreen() {
   const nombre = (personaId: string) =>
     participantes.find((persona) => persona.id === personaId)?.nombre ??
     'Usuario'
+
+  const moneda = usuario?.moneda ?? 'ARS'
+  const dinero = (monto: number) => formatearMoneda(monto, moneda)
+
+  function recordarPorWhatsApp(deudorId: string, monto: number) {
+    const deudorNombre = nombre(deudorId)
+    const montoTexto = dinero(monto)
+    const aliasUsuario = usuario?.alias ? `al alias ${usuario.alias}` : 'a mi cuenta'
+    const grupoNombre = grupo?.nombre ?? 'el grupo'
+    const texto = `¡Hola ${deudorNombre}! Te recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}". Podés transferirme ${aliasUsuario}. ¡Muchas gracias!`
+    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
+    void Linking.openURL(url).catch(() => {
+      Alert.alert(
+        'WhatsApp no disponible',
+        'No pudimos abrir WhatsApp. Verificá que esté instalado en tu dispositivo.',
+      )
+    })
+  }
 
   async function ejecutar(accion: () => Promise<unknown>) {
     if (
@@ -267,6 +284,17 @@ export function DetalleGrupoScreen() {
                 >
                   <Text className="font-bold text-primary-dark">
                     Saldar deuda
+                  </Text>
+                </Pressable>
+              )}
+              {deuda.a === usuarioId && (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => recordarPorWhatsApp(deuda.de, deuda.monto)}
+                  className="min-h-11 justify-center"
+                >
+                  <Text className="font-bold text-primary-dark">
+                    Recordar por WhatsApp
                   </Text>
                 </Pressable>
               )}
