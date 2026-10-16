@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
-import { Text, View } from 'react-native'
-import { Receipt } from 'lucide-react-native'
+import { Image, Text, View } from 'react-native'
 import {
   Boton,
   Campo,
@@ -55,9 +54,11 @@ export function LoginScreen() {
   return (
     <Pantalla>
       <View className="items-center gap-4 py-8">
-        <View className="h-20 w-20 items-center justify-center rounded-3xl bg-primary-light">
-          <Receipt size={42} color={colores.primaryDark} />
-        </View>
+        <Image
+          source={require('../../../assets/images/icon.png')}
+          style={{ width: 84, height: 84, borderRadius: 20 }}
+          accessibilityLabel="Logotipo de Splitwaisito"
+        />
         <Titulo>Splitwaisito</Titulo>
         <Text className="text-center text-base leading-6 text-text-muted">
           Compartí los planes, organizá los gastos.
