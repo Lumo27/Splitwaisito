@@ -30,9 +30,11 @@ export function LoginScreen() {
   const operacion = useRef(false)
 
   const webClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
+  const androidClientId = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     clientId: webClientId,
     webClientId: webClientId,
+    androidClientId: androidClientId,
   })
 
   useEffect(() => {

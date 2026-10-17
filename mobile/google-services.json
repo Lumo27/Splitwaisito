@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "539310123497-b77fpum6d1qfe1dbdtasq04eiqqru0nj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.splitwaisito.app",
+            "certificate_hash": "24b1fda9821167ef967b412a9f39cf6a57b71238"
+          }
+        },
+        {
           "client_id": "539310123497-orpll86q3shgunbo3pc2ua5h1aol62vr.apps.googleusercontent.com",
           "client_type": 3
         }
