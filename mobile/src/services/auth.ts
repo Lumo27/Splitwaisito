@@ -1,4 +1,5 @@
 import {
+  createUserWithEmailAndPassword,
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithCredential,
@@ -83,4 +84,27 @@ export function signOutUser() {
 export async function signInWithEmail(email: string, password: string) {
   if (!auth || MODO_SEEDS) throw new Error('Firebase no configurado.')
   return signInWithEmailAndPassword(auth, email.trim(), password)
+}
+
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  nombre?: string,
+) {
+  if (!auth || MODO_SEEDS) throw new Error('Firebase no configurado.')
+  const cred = await createUserWithEmailAndPassword(
+    auth,
+    email.trim(),
+    password,
+  )
+  const usuario = cred.user
+  const nombreFinal = nombre?.trim() || email.split('@')[0]
+  await upsertUsuarioPerfil({
+    id: usuario.uid,
+    nombre: nombreFinal,
+    email: usuario.email || email.trim(),
+    alias: nombreFinal,
+    fotoUrl: null,
+  })
+  return cred
 }
