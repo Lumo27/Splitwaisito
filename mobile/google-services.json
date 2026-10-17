@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "539310123497",
+    "project_id": "splitwaisito-a5879",
+    "storage_bucket": "splitwaisito-a5879.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539310123497:android:a17bfc8ecb743accf28378",
+        "android_client_info": {
+          "package_name": "com.splitwaisito.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "539310123497-orpll86q3shgunbo3pc2ua5h1aol62vr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyvytMuoTSv2N5S1BtPDB_9wwW5RETemc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "539310123497-orpll86q3shgunbo3pc2ua5h1aol62vr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
