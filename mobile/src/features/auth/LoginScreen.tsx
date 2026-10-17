@@ -1,7 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Image, Pressable, Text, View } from 'react-native'
-import * as WebBrowser from 'expo-web-browser'
-import * as Google from 'expo-auth-session/providers/google'
 import {
   Boton,
   Campo,
@@ -13,12 +11,9 @@ import {
 import {
   signInDemo,
   signInWithEmail,
-  signInWithGoogleIdToken,
   signUpWithEmail,
 } from '@/services/auth'
 import { isFirebaseAvailable, MODO_SEEDS } from '@/services/firebase'
-
-WebBrowser.maybeCompleteAuthSession()
 
 export function LoginScreen() {
   const [esRegistro, setEsRegistro] = useState(false)
@@ -28,56 +23,6 @@ export function LoginScreen() {
   const [error, setError] = useState('')
   const [ocupado, setOcupado] = useState(false)
   const operacion = useRef(false)
-
-  const webClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
-  const androidClientId = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    clientId: webClientId,
-    webClientId: webClientId,
-    androidClientId: androidClientId,
-  })
-
-  useEffect(() => {
-    let vigente = true
-
-    if (response?.type === 'success') {
-      const idToken =
-        response.params?.id_token || response.authentication?.idToken
-      if (idToken) {
-        void (async () => {
-          await Promise.resolve()
-          if (!vigente) return
-
-          setOcupado(true)
-          setError('')
-          try {
-            await signInWithGoogleIdToken(idToken)
-          } catch (fallo) {
-            if (!vigente) return
-            const mensaje =
-              fallo && typeof fallo === 'object' && 'message' in fallo
-                ? String(fallo.message)
-                : 'No pudimos autenticarte con Google.'
-            setError(mensaje)
-          } finally {
-            if (vigente) {
-              setOcupado(false)
-            }
-          }
-        })()
-      }
-    } else if (response?.type === 'error') {
-      void Promise.resolve().then(() => {
-        if (vigente) {
-          setError('No se pudo conectar con Google. Intentá nuevamente.')
-        }
-      })
-    }
-
-    return () => {
-      vigente = false
-    }
-  }, [response])
 
   async function entrar() {
     if (operacion.current) return
@@ -169,31 +114,6 @@ export function LoginScreen() {
           </>
         ) : (
           <>
-            <Pressable
-              accessibilityRole="button"
-              disabled={ocupado || !request}
-              onPress={() => {
-                setError('')
-                void promptAsync()
-              }}
-              className="flex-row items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm active:bg-slate-50"
-            >
-              <View className="h-6 w-6 items-center justify-center rounded-full bg-slate-100">
-                <Text className="text-sm font-extrabold text-[#4285F4]">G</Text>
-              </View>
-              <Text className="text-base font-semibold text-slate-700">
-                Continuar con Google
-              </Text>
-            </Pressable>
-
-            <View className="my-1 flex-row items-center gap-3">
-              <View className="h-px flex-1 bg-slate-200" />
-              <Text className="text-xs font-medium uppercase text-slate-400">
-                o con correo y contraseña
-              </Text>
-              <View className="h-px flex-1 bg-slate-200" />
-            </View>
-
             {esRegistro && (
               <Campo
                 label="Tu nombre"
