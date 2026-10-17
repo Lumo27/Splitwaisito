@@ -36,26 +36,44 @@ export function LoginScreen() {
   })
 
   useEffect(() => {
+    let vigente = true
+
     if (response?.type === 'success') {
       const idToken =
         response.params?.id_token || response.authentication?.idToken
       if (idToken) {
-        setOcupado(true)
-        setError('')
-        void signInWithGoogleIdToken(idToken)
-          .catch((fallo) => {
+        void (async () => {
+          await Promise.resolve()
+          if (!vigente) return
+
+          setOcupado(true)
+          setError('')
+          try {
+            await signInWithGoogleIdToken(idToken)
+          } catch (fallo) {
+            if (!vigente) return
             const mensaje =
               fallo && typeof fallo === 'object' && 'message' in fallo
                 ? String(fallo.message)
                 : 'No pudimos autenticarte con Google.'
             setError(mensaje)
-          })
-          .finally(() => {
-            setOcupado(false)
-          })
+          } finally {
+            if (vigente) {
+              setOcupado(false)
+            }
+          }
+        })()
       }
     } else if (response?.type === 'error') {
-      setError('No se pudo conectar con Google. Intentá nuevamente.')
+      void Promise.resolve().then(() => {
+        if (vigente) {
+          setError('No se pudo conectar con Google. Intentá nuevamente.')
+        }
+      })
+    }
+
+    return () => {
+      vigente = false
     }
   }, [response])
 
