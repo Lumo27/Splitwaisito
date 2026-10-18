@@ -110,3 +110,12 @@ Validación final: typecheck correcto, 22 pruebas aprobadas, lint sin errores (c
 
 ### Arranque con BAT — German, 06/10/2026
 Pedido: iniciar el QR con doble clic. Codex agrego Iniciar-Expo-Go.bat con rutas relativas al archivo, comprobacion de Node/npm, instalacion inicial con npm ci, arranque del modo demo en Expo Go por LAN y mensajes de error. Documento su uso en mobile/README.md.
+
+### Integración de Cámara, GPS, Moneda, WhatsApp, Branding y APK — German, 17–18/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Antigravity | Completar funcionalidades móviles nativas, identidad visual, empaquetado de APK y distribución | «Implementá cámara, GPS, WhatsApp y moneda; hacé el APK y dejá el BAT con QR» | Se integraron `expo-image-picker` y `expo-location` con geocodificación inversa editable (#16, #17); selector de moneda ARS/USD (#11); enlace a WhatsApp con mensaje preformateado (#19); nuevo isotipo oficial (#29); compilación de APK en EAS Build con SHA-1 (#30); autenticación por email/password en Firebase (#31); y `Descargar-APK.bat` con QR en consola y navegador (#32). |
+
+Validación: typecheck en 0 errores, 25 pruebas unitarias en verde con Vitest, expo-doctor 21/21 checks aprobados y APK compilado e instalado en Android.
+
