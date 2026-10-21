@@ -20,6 +20,7 @@ import {
   type GrupoFirestore,
 } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
+import { FondoCategoria, COLOR_CATEGORIAS } from '@/components/FondoCategoria'
 import { colores } from '@/theme/colores'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
@@ -285,70 +286,120 @@ export function DetalleGrupoScreen() {
           Todavía no hay gastos. Cargá el primero para empezar.
         </Text>
       )}
-      {gastos.map((gasto, index) => (
-        <View
-          key={gasto.id ?? String(index)}
-          className="mb-3 gap-2 rounded-2xl bg-white p-4"
-        >
-          <View className="flex-row items-center gap-3">
-            <Receipt size={20} color={colores.primaryDark} />
-            <Text className="flex-1 text-base font-bold text-text">
-              {gasto.descripcion}
-            </Text>
-          </View>
-          <Text className="text-xl font-bold text-text">
-            {dinero(gasto.monto)}
-          </Text>
-          <Text className="text-xs text-text-muted">
-            {gasto.categoria} · Pagó {gasto.pagadoPorNombre} ·{' '}
-            {formatearFecha(gasto.fecha)}
-          </Text>
-          {gasto.id && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Editar gasto ${gasto.descripcion}`}
-              className="min-h-11 justify-center"
-              onPress={() =>
-                router.push({
-                  pathname: '/grupos/[id]/cargar-gasto',
-                  params: { id, gastoId: gasto.id },
-                })
-              }
+      {gastos.map((gasto, index) => {
+        const paleta = COLOR_CATEGORIAS[gasto.categoria] ?? COLOR_CATEGORIAS.Otro
+        return (
+          <View
+            key={gasto.id ?? String(index)}
+            className="mb-3 rounded-3xl bg-white shadow-sm"
+            style={{
+              borderWidth: 1.5,
+              borderColor: paleta ? `${paleta.primary}33` : '#E2E8F0',
+              overflow: 'hidden',
+            }}
+          >
+            <FondoCategoria
+              categoria={gasto.categoria}
+              overlayOpacity={0.88}
+              overlayColor="#FFFFFF"
+              style={{ padding: 20 }}
             >
-              <Text className="font-semibold text-primary-dark">
-                Editar gasto
+              <View className="flex-row items-center gap-3">
+                <View
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 10,
+                    backgroundColor: paleta?.light ?? '#F1F5F9',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Receipt size={18} color={paleta?.dark ?? colores.primaryDark} />
+                </View>
+                <Text className="flex-1 text-base font-bold text-text">
+                  {gasto.descripcion}
+                </Text>
+                <View
+                  style={{
+                    paddingHorizontal: 10,
+                    paddingVertical: 4,
+                    borderRadius: 12,
+                    backgroundColor: paleta?.light ?? '#F1F5F9',
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: '700',
+                      color: paleta?.dark ?? colores.primaryDark,
+                    }}
+                  >
+                    {gasto.categoria}
+                  </Text>
+                </View>
+              </View>
+
+              <Text className="mt-2 text-xl font-bold text-text">
+                {dinero(gasto.monto)}
               </Text>
-            </Pressable>
-          )}
-          {gasto.id && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Eliminar gasto ${gasto.descripcion}`}
-              disabled={ocupado}
-              className="min-h-11 flex-row items-center justify-end gap-2"
-              onPress={() =>
-                Alert.alert(
-                  'Eliminar gasto',
-                  `¿Eliminar “${gasto.descripcion}”?`,
-                  [
-                    { text: 'Cancelar', style: 'cancel' },
-                    {
-                      text: 'Eliminar',
-                      style: 'destructive',
-                      onPress: () => {
-                        void ejecutar(() => eliminarGasto(id, gasto.id!))
-                      },
-                    },
-                  ],
-                )
-              }
-            >
-              <Trash2 size={17} color={colores.textMuted} />
-              <Text className="text-xs text-text-muted">Eliminar</Text>
-            </Pressable>
-          )}
-        </View>
-      ))}
+
+              <Text className="mt-0.5 text-xs text-text-muted">
+                Pagó {gasto.pagadoPorNombre} · {formatearFecha(gasto.fecha)}
+              </Text>
+
+              <View className="mt-3 flex-row items-center justify-between border-t border-slate-200/60 pt-2">
+                {gasto.id ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Editar gasto ${gasto.descripcion}`}
+                    className="min-h-11 justify-center py-1"
+                    onPress={() =>
+                      router.push({
+                        pathname: '/grupos/[id]/cargar-gasto',
+                        params: { id, gastoId: gasto.id },
+                      })
+                    }
+                  >
+                    <Text className="font-semibold text-primary-dark">
+                      Editar gasto
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <View />
+                )}
+                {gasto.id ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Eliminar gasto ${gasto.descripcion}`}
+                    disabled={ocupado}
+                    className="min-h-11 flex-row items-center justify-end gap-1.5 py-1"
+                    onPress={() =>
+                      Alert.alert(
+                        'Eliminar gasto',
+                        `¿Eliminar “${gasto.descripcion}”?`,
+                        [
+                          { text: 'Cancelar', style: 'cancel' },
+                          {
+                            text: 'Eliminar',
+                            style: 'destructive',
+                            onPress: () => {
+                              void ejecutar(() => eliminarGasto(id, gasto.id!))
+                            },
+                          },
+                        ],
+                      )
+                    }
+                  >
+                    <Trash2 size={16} color="#B42318" />
+                    <Text className="font-semibold text-red-700">Eliminar</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            </FondoCategoria>
+          </View>
+        )
+      })}
     </ScrollView>
   )
 }
