@@ -120,19 +120,16 @@ export function SaldarDeudaScreen() {
   }
   async function compartirPorWhatsApp() {
     if (!deuda) return
-    const montoTexto = formatearMoneda(deuda.monto, usuario?.moneda ?? 'ARS')
+    const montoTexto = formatearMoneda(deuda.monto, grupo?.moneda ?? 'ARS')
     const grupoNombre = grupo?.nombre ?? 'el grupo'
-    const esDeudor = de === usuarioId
     const destinatarioNombre = acreedor?.nombre ?? 'compañero'
-    const aliasDestino = acreedor?.alias
-      ? `al alias ${acreedor.alias}`
+    const aliasDestino = acreedor?.alias?.trim()
+      ? ` al alias ${acreedor.alias.trim()}`
       : email
-        ? `al e-mail ${email}`
+        ? ` al e-mail ${email}`
         : ''
 
-    const mensaje = esDeudor
-      ? `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo "${grupoNombre}" en Splitwaisito ${aliasDestino}. ¡Avisame cuando te llegue!`
-      : `¡Hola! Te recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}". Podés transferirme al alias: ${usuario?.alias ?? 'mi alias'}. ¡Muchas gracias!`
+    const mensaje = `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo "${grupoNombre}" en Splitwaisito${aliasDestino}. ¡Avisame cuando te llegue!`
 
     try {
       await Linking.openURL(`https://wa.me/?text=${encodeURIComponent(mensaje)}`)
@@ -178,7 +175,7 @@ export function SaldarDeudaScreen() {
           Le debés a {acreedor?.nombre ?? 'otro integrante'}
         </Text>
         <Text className="text-4xl font-bold text-primary-dark">
-          {formatearMoneda(deuda.monto, usuario?.moneda ?? 'ARS')}
+          {formatearMoneda(deuda.monto, grupo?.moneda ?? 'ARS')}
         </Text>
         <Text className="text-sm text-text-muted">
           {grupo?.nombre} · {gastos.length} gasto

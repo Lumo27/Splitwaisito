@@ -59,7 +59,7 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
         store.iniciarSesion(
           nombre,
           usuario.email || '',
-          perfil?.alias || nombre,
+          perfil?.alias?.trim() ?? '',
           usuario.uid,
           perfil?.fotoUrl ?? usuario.photoURL,
           perfil?.descripcion,

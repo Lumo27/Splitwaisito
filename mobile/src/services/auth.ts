@@ -41,7 +41,7 @@ export async function signInWithGoogleIdToken(
     id: usuario.uid,
     nombre: usuario.displayName || 'Usuario Google',
     email: usuario.email || 'google@usuario.com',
-    alias: usuario.displayName || 'google-user',
+    alias: '',
     fotoUrl: usuario.photoURL || null,
   })
 
@@ -103,7 +103,7 @@ export async function signUpWithEmail(
     id: usuario.uid,
     nombre: nombreFinal,
     email: usuario.email || email.trim(),
-    alias: nombreFinal,
+    alias: '',
     fotoUrl: null,
   })
   return cred

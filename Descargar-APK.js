@@ -76,12 +76,13 @@ function buildNewApk() {
   console.log('\n🚀 Iniciando compilación de nuevo APK en EAS Build...');
   const dateStr = new Date().toLocaleString('es-AR');
   
-  // Guardar cambios locales si existen
+  // Verificar cambios locales sin commitear
   const status = run('git status --porcelain mobile', ROOT_DIR);
   if (status) {
-    console.log('📦 Guardando cambios en el commit local de la rama APK...');
-    spawnSync('git', ['add', 'mobile'], { cwd: ROOT_DIR, stdio: 'inherit' });
-    spawnSync('git', ['commit', '-m', `chore(build): actualizar APK [${dateStr}]`], { cwd: ROOT_DIR, stdio: 'inherit' });
+    console.log('⚠️ Se detectaron cambios locales sin commitear en /mobile.');
+    console.log('Por seguridad, ningún script modifica el historial git.');
+    console.log('Por favor, realizá commit de tus cambios antes de compilar un nuevo APK en EAS.');
+    return null;
   }
 
   console.log('⏳ Compilando APK en la nube (esto demora ~10-15 minutos)...');

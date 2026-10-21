@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { router } from 'expo-router'
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 import {
   Boton,
   Campo,
@@ -12,11 +12,13 @@ import {
 } from '@/components/Formulario'
 import { crearGrupo } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
+import { LISTA_MONEDAS, type MonedaCodigo } from '@/theme/moneda'
 
 export function CrearGrupoScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
   const [nombre, setNombre] = useState('')
+  const [moneda, setMoneda] = useState<MonedaCodigo>('ARS')
   const [elegidos, setElegidos] = useState<string[]>([])
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
@@ -38,7 +40,7 @@ export function CrearGrupoScreen() {
       const miembros = elegidos.filter((id) =>
         amigos.some((amigo) => amigo.id === id),
       )
-      const grupo = await crearGrupo(nombre.trim(), usuario.id, miembros)
+      const grupo = await crearGrupo(nombre.trim(), usuario.id, miembros, moneda)
       router.replace({ pathname: '/grupos/[id]', params: { id: grupo.id } })
     } catch {
       setError(
@@ -65,6 +67,21 @@ export function CrearGrupoScreen() {
           editable={!guardando}
           autoCapitalize="sentences"
         />
+        <Text className="text-sm font-semibold text-text">Moneda del grupo</Text>
+        <Text className="text-sm text-text-muted">
+          Todos los gastos y saldos se expresarán en esta moneda.
+        </Text>
+        <View className="gap-2">
+          {LISTA_MONEDAS.map((item) => (
+            <Opcion
+              key={item.codigo}
+              texto={`${item.nombre} (${item.simbolo})`}
+              elegida={moneda === item.codigo}
+              disabled={guardando}
+              onPress={() => setMoneda(item.codigo)}
+            />
+          ))}
+        </View>
         <Text className="text-sm font-semibold text-text">Integrantes</Text>
         <Text className="text-sm text-text-muted">Vos ya estás incluido.</Text>
         {amigos.map((amigo) => (

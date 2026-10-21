@@ -91,15 +91,17 @@ export function DetalleGrupoScreen() {
     participantes.find((persona) => persona.id === personaId)?.nombre ??
     'Usuario'
 
-  const moneda = usuario?.moneda ?? 'ARS'
+  const moneda = grupo?.moneda ?? 'ARS'
   const dinero = (monto: number) => formatearMoneda(monto, moneda)
 
   function recordarPorWhatsApp(deudorId: string, monto: number) {
     const deudorNombre = nombre(deudorId)
     const montoTexto = dinero(monto)
-    const aliasUsuario = usuario?.alias ? `al alias ${usuario.alias}` : 'a mi cuenta'
+    const aliasUsuario = usuario?.alias?.trim()
+      ? ` al alias ${usuario.alias.trim()}`
+      : ' a mi cuenta'
     const grupoNombre = grupo?.nombre ?? 'el grupo'
-    const texto = `¡Hola ${deudorNombre}! Te recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}". Podés transferirme ${aliasUsuario}. ¡Muchas gracias!`
+    const texto = `¡Hola ${deudorNombre}! Te recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}". Podés transferirme${aliasUsuario}. ¡Muchas gracias!`
     const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
     void Linking.openURL(url).catch(() => {
       Alert.alert(
@@ -107,6 +109,55 @@ export function DetalleGrupoScreen() {
         'No pudimos abrir WhatsApp. Verificá que esté instalado en tu dispositivo.',
       )
     })
+  }
+
+  function recordarPorEmail(deudorId: string, monto: number) {
+    const deudor = participantes.find((persona) => persona.id === deudorId)
+    const deudorNombre = deudor?.nombre ?? 'Usuario'
+    const deudorEmail = deudor?.email?.trim()
+    if (!deudorEmail) {
+      Alert.alert(
+        'E-mail no disponible',
+        `No tenemos registrado el e-mail de ${deudorNombre}.`,
+      )
+      return
+    }
+    const montoTexto = dinero(monto)
+    const aliasUsuario = usuario?.alias?.trim()
+      ? ` al alias ${usuario.alias.trim()}`
+      : ' a mi cuenta'
+    const grupoNombre = grupo?.nombre ?? 'el grupo'
+    const asunto = `Saldo pendiente en Splitwaisito - ${grupoNombre}`
+    const texto = `¡Hola ${deudorNombre}!\n\nTe recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}".\n\nPodés transferirme${aliasUsuario}.\n\n¡Muchas gracias!`
+    const url = `mailto:${deudorEmail}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`
+    void Linking.openURL(url).catch(() => {
+      Alert.alert(
+        'Correo no disponible',
+        'No pudimos abrir tu aplicación de correo.',
+      )
+    })
+  }
+
+  function abrirRecordatorio(deudorId: string, monto: number) {
+    const deudorNombre = nombre(deudorId)
+    Alert.alert(
+      `Recordar a ${deudorNombre}`,
+      'Elegí el medio para enviar el recordatorio del saldo pendiente:',
+      [
+        {
+          text: 'WhatsApp',
+          onPress: () => recordarPorWhatsApp(deudorId, monto),
+        },
+        {
+          text: 'E-mail',
+          onPress: () => recordarPorEmail(deudorId, monto),
+        },
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+      ],
+    )
   }
 
   async function ejecutar(accion: () => Promise<unknown>) {
@@ -290,11 +341,11 @@ export function DetalleGrupoScreen() {
               {deuda.a === usuarioId && (
                 <Pressable
                   accessibilityRole="button"
-                  onPress={() => recordarPorWhatsApp(deuda.de, deuda.monto)}
+                  onPress={() => abrirRecordatorio(deuda.de, deuda.monto)}
                   className="min-h-11 justify-center"
                 >
                   <Text className="font-bold text-primary-dark">
-                    Recordar por WhatsApp
+                    Recordar a {nombre(deuda.de)}
                   </Text>
                 </Pressable>
               )}

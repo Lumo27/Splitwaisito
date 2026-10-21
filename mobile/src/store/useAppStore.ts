@@ -71,7 +71,7 @@ export const useAppStore = create<AppState>()(
             id,
             nombre: nombre.trim() || 'Mi Usuario',
             email: email.trim(),
-            alias: (alias ?? nombre).trim() || 'Mi alias',
+            alias: alias?.trim() ?? '',
             descripcion:
               descripcion ??
               (state.usuarioActual?.id === id

@@ -5,14 +5,12 @@ import {
   Boton,
   Campo,
   Mensaje,
-  Opcion,
   Pantalla,
   Tarjeta,
   Titulo,
 } from '@/components/Formulario'
 import { upsertUsuarioPerfil } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
-import { LISTA_MONEDAS, type MonedaCodigo } from '@/theme/moneda'
 
 export function PerfilScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
@@ -20,10 +18,8 @@ export function PerfilScreen() {
   const actualizarDescripcion = useAppStore(
     (state) => state.actualizarDescripcion,
   )
-  const actualizarMoneda = useAppStore((state) => state.actualizarMoneda)
   const [alias, setAlias] = useState(usuario?.alias ?? '')
   const [descripcion, setDescripcion] = useState(usuario?.descripcion ?? '')
-  const [moneda, setMoneda] = useState<MonedaCodigo>(usuario?.moneda ?? 'ARS')
   const [mensaje, setMensaje] = useState('')
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
@@ -31,20 +27,14 @@ export function PerfilScreen() {
   const uid = usuario?.id
   const aliasGuardado = usuario?.alias ?? ''
   const descripcionGuardada = usuario?.descripcion ?? ''
-  const monedaGuardada = usuario?.moneda ?? 'ARS'
   useFocusEffect(
     useCallback(() => {
       setAlias(uid ? aliasGuardado : '')
       setDescripcion(uid ? descripcionGuardada : '')
-      setMoneda(uid ? monedaGuardada : 'ARS')
-    }, [uid, aliasGuardado, descripcionGuardada, monedaGuardada]),
+    }, [uid, aliasGuardado, descripcionGuardada]),
   )
   async function guardar() {
     if (!usuario || enviando.current) return
-    if (!alias.trim()) {
-      setError('Ingresá tu alias para transferencias.')
-      return
-    }
     enviando.current = true
     setGuardando(true)
     setMensaje('')
@@ -54,12 +44,10 @@ export function PerfilScreen() {
         ...usuario,
         alias: alias.trim(),
         descripcion: descripcion.trim(),
-        moneda,
       })
       if (useAppStore.getState().usuarioActual?.id !== usuario.id) return
       actualizarAlias(usuario.id, alias.trim())
       actualizarDescripcion(descripcion.trim())
-      actualizarMoneda(moneda)
       setMensaje('Perfil guardado.')
     } catch {
       setError(
@@ -140,26 +128,6 @@ export function PerfilScreen() {
         <Text className="text-right text-xs text-text-muted">
           {descripcion.length}/160
         </Text>
-      </Tarjeta>
-      <Tarjeta>
-        <Text className="font-semibold text-text">Moneda preferida</Text>
-        <Text className="text-xs text-text-muted">
-          Elegí la moneda para visualizar tus balances y deudas.
-        </Text>
-        <View className="gap-2 pt-2">
-          {LISTA_MONEDAS.map((item) => (
-            <Opcion
-              key={item.codigo}
-              texto={`${item.nombre} (${item.simbolo})`}
-              elegida={moneda === item.codigo}
-              disabled={guardando}
-              onPress={() => {
-                setMoneda(item.codigo)
-                setMensaje('')
-              }}
-            />
-          ))}
-        </View>
       </Tarjeta>
       <Mensaje texto={mensaje} />
       <Mensaje texto={error} error />
