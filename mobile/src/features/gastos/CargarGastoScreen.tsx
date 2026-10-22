@@ -17,6 +17,7 @@ import { MapaSelector } from '@/components/MapaSelector'
 import {
   actualizarGasto,
   eliminarFotoGasto,
+  eliminarGasto,
   guardarFotoGasto,
   guardarGasto,
   obtenerFotoGasto,
@@ -29,13 +30,23 @@ import { useAppStore } from '@/store/useAppStore'
 import { participantesDelGrupo } from '@/features/grupos/deudas'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
+import { confirmar } from '@/utils/alerta'
 import { categorias, validarGasto } from './validarGasto'
 
 export function CargarGastoScreen() {
-  const { id, gastoId } = useLocalSearchParams<{
+  const { id: rawId, gastoId: rawGastoId } = useLocalSearchParams<{
     id: string
     gastoId?: string
   }>()
+  const id =
+    typeof rawId === 'string' ? rawId : Array.isArray(rawId) ? rawId[0] : ''
+  const gastoId =
+    typeof rawGastoId === 'string'
+      ? rawGastoId
+      : Array.isArray(rawGastoId)
+        ? rawGastoId[0]
+        : undefined
+
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
   const [grupo, setGrupo] = useState<GrupoFirestore | null>(null)
@@ -164,6 +175,7 @@ export function CargarGastoScreen() {
       setOcupado(false)
     }
   }
+
   async function localizar() {
     if (operacion.current) return
     operacion.current = true
@@ -209,6 +221,7 @@ export function CargarGastoScreen() {
       setOcupado(false)
     }
   }
+
   async function guardar() {
     if (operacion.current || !grupo || !usuarioId) return
     const problema = validarGasto(
@@ -289,6 +302,37 @@ export function CargarGastoScreen() {
       setOcupado(false)
     }
   }
+
+  function confirmarEliminar() {
+    if (!id || !gastoId) return
+    confirmar({
+      titulo: 'Eliminar gasto',
+      mensaje: `¿Seguro que querés eliminar “${descripcion.trim() || 'este gasto'}”? Esta acción no se puede deshacer.`,
+      textoConfirmar: 'Eliminar',
+      textoCancelar: 'Cancelar',
+      destructivo: true,
+      alConfirmar: async () => {
+        if (operacion.current) return
+        operacion.current = true
+        setOcupado(true)
+        setError('')
+        try {
+          await eliminarGasto(id, gastoId)
+          router.back()
+        } catch (fallo) {
+          setError(
+            fallo instanceof Error
+              ? fallo.message
+              : 'No pudimos eliminar el gasto. Volvé a intentar.',
+          )
+        } finally {
+          operacion.current = false
+          setOcupado(false)
+        }
+      },
+    })
+  }
+
   if (cargando)
     return (
       <Pantalla>
@@ -456,7 +500,8 @@ export function CargarGastoScreen() {
         visible={mostrarMapa}
         onCerrar={() => setMostrarMapa(false)}
         coordenadasIniciales={
-          typeof ubicacion?.lat === 'number' && typeof ubicacion?.lng === 'number'
+          typeof ubicacion?.lat === 'number' &&
+          typeof ubicacion?.lng === 'number'
             ? { lat: ubicacion.lat, lng: ubicacion.lng }
             : undefined
         }
@@ -477,6 +522,14 @@ export function CargarGastoScreen() {
           void guardar()
         }}
       />
+      {gastoId && (
+        <Boton
+          texto="Eliminar este gasto"
+          peligro
+          disabled={ocupado}
+          onPress={confirmarEliminar}
+        />
+      )}
     </Pantalla>
   )
 }

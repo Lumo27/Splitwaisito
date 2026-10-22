@@ -50,6 +50,10 @@ service cloud.firestore {
 
       match /gastos/{gastoId} {
         allow read, create, update, delete: if isGroupMember(groupId);
+
+        match /fotos/{fotoId} {
+          allow read, create, update, delete: if isGroupMember(groupId);
+        }
       }
     }
   }

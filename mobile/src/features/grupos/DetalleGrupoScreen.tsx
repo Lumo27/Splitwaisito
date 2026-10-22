@@ -2,8 +2,8 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import {
   ActivityIndicator,
-  Alert,
   Linking,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -23,12 +23,14 @@ import {
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
+import { avisar, confirmar } from '@/utils/alerta'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
 
 export function DetalleGrupoScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>()
+  const { id: rawId } = useLocalSearchParams<{ id: string }>()
+  const id = typeof rawId === 'string' ? rawId : Array.isArray(rawId) ? rawId[0] : ''
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
   const [grupo, setGrupo] = useState<GrupoFirestore | null>(null)
@@ -104,7 +106,7 @@ export function DetalleGrupoScreen() {
     const texto = `¡Hola ${deudorNombre}! Te recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}". Podés transferirme${aliasUsuario}. ¡Muchas gracias!`
     const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
     void Linking.openURL(url).catch(() => {
-      Alert.alert(
+      avisar(
         'WhatsApp no disponible',
         'No pudimos abrir WhatsApp. Verificá que esté instalado en tu dispositivo.',
       )
@@ -116,7 +118,7 @@ export function DetalleGrupoScreen() {
     const deudorNombre = deudor?.nombre ?? 'Usuario'
     const deudorEmail = deudor?.email?.trim()
     if (!deudorEmail) {
-      Alert.alert(
+      avisar(
         'E-mail no disponible',
         `No tenemos registrado el e-mail de ${deudorNombre}.`,
       )
@@ -131,7 +133,7 @@ export function DetalleGrupoScreen() {
     const texto = `¡Hola ${deudorNombre}!\n\nTe recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}".\n\nPodés transferirme${aliasUsuario}.\n\n¡Muchas gracias!`
     const url = `mailto:${deudorEmail}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`
     void Linking.openURL(url).catch(() => {
-      Alert.alert(
+      avisar(
         'Correo no disponible',
         'No pudimos abrir tu aplicación de correo.',
       )
@@ -140,39 +142,40 @@ export function DetalleGrupoScreen() {
 
   function abrirRecordatorio(deudorId: string, monto: number) {
     const deudorNombre = nombre(deudorId)
-    Alert.alert(
-      `Recordar a ${deudorNombre}`,
-      'Elegí el medio para enviar el recordatorio del saldo pendiente:',
-      [
-        {
-          text: 'WhatsApp',
-          onPress: () => recordarPorWhatsApp(deudorId, monto),
-        },
-        {
-          text: 'E-mail',
-          onPress: () => recordarPorEmail(deudorId, monto),
-        },
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-      ],
-    )
+    if (Platform.OS === 'web') {
+      const elegirWhatsApp = typeof window !== 'undefined'
+        ? window.confirm(
+            `Recordar saldo a ${deudorNombre}\n\nPresioná Aceptar para enviar por WhatsApp o Cancelar para enviar por E-mail.`,
+          )
+        : true
+      if (elegirWhatsApp) {
+        recordarPorWhatsApp(deudorId, monto)
+      } else {
+        recordarPorEmail(deudorId, monto)
+      }
+      return
+    }
+
+    confirmar({
+      titulo: `Recordar a ${deudorNombre}`,
+      mensaje: '¿Deseás abrir WhatsApp para enviar el recordatorio del saldo pendiente?',
+      textoConfirmar: 'Abrir WhatsApp',
+      textoCancelar: 'Por E-mail',
+      destructivo: false,
+      alConfirmar: () => recordarPorWhatsApp(deudorId, monto),
+      alCancelar: () => recordarPorEmail(deudorId, monto),
+    })
   }
 
   async function ejecutar(accion: () => Promise<unknown>) {
-    if (
-      mutacion.current ||
-      useAppStore.getState().usuarioActual?.id !== usuarioId
-    )
-      return
+    if (mutacion.current) return
     mutacion.current = true
     setOcupado(true)
     try {
       await accion()
       await cargar()
     } catch {
-      Alert.alert(
+      avisar(
         'No se pudo guardar',
         'Revisá la conexión y volvé a intentar.',
       )
@@ -405,22 +408,23 @@ export function DetalleGrupoScreen() {
               accessibilityLabel={`Eliminar gasto ${gasto.descripcion}`}
               disabled={ocupado}
               className="min-h-11 flex-row items-center justify-end gap-2"
-              onPress={() =>
-                Alert.alert(
-                  'Eliminar gasto',
-                  `¿Eliminar “${gasto.descripcion}”?`,
-                  [
-                    { text: 'Cancelar', style: 'cancel' },
-                    {
-                      text: 'Eliminar',
-                      style: 'destructive',
-                      onPress: () => {
-                        void ejecutar(() => eliminarGasto(id, gasto.id!))
-                      },
-                    },
-                  ],
-                )
-              }
+              onPress={() => {
+                const gastoIdAEliminar = gasto.id!
+                confirmar({
+                  titulo: 'Eliminar gasto',
+                  mensaje: `¿Eliminar “${gasto.descripcion}”? Esta acción no se puede deshacer.`,
+                  textoConfirmar: 'Eliminar',
+                  textoCancelar: 'Cancelar',
+                  destructivo: true,
+                  alConfirmar: async () => {
+                    // Actualización optimista inmediata
+                    setGastos((prev) =>
+                      prev.filter((item) => item.id !== gastoIdAEliminar),
+                    )
+                    await ejecutar(() => eliminarGasto(id, gastoIdAEliminar))
+                  },
+                })
+              }}
             >
               <Trash2 size={17} color={colores.textMuted} />
               <Text className="text-xs text-text-muted">Eliminar</Text>
