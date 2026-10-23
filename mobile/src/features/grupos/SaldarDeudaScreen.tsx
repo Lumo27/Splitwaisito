@@ -17,6 +17,7 @@ import {
 } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
+import { formatearMoneda } from '@/theme/moneda'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 
@@ -117,6 +118,25 @@ export function SaldarDeudaScreen() {
       )
     }
   }
+  async function compartirPorWhatsApp() {
+    if (!deuda) return
+    const montoTexto = formatearMoneda(deuda.monto, grupo?.moneda ?? 'ARS')
+    const grupoNombre = grupo?.nombre ?? 'el grupo'
+    const destinatarioNombre = acreedor?.nombre ?? 'compañero'
+    const aliasDestino = acreedor?.alias?.trim()
+      ? ` al alias ${acreedor.alias.trim()}`
+      : email
+        ? ` al e-mail ${email}`
+        : ''
+
+    const mensaje = `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo "${grupoNombre}" en Splitwaisito${aliasDestino}. ¡Avisame cuando te llegue!`
+
+    try {
+      await Linking.openURL(`https://wa.me/?text=${encodeURIComponent(mensaje)}`)
+    } catch {
+      setError('No pudimos abrir WhatsApp. Verificá que esté instalado.')
+    }
+  }
   function volver() {
     router.replace({ pathname: '/grupos/[id]', params: { id } })
   }
@@ -155,7 +175,7 @@ export function SaldarDeudaScreen() {
           Le debés a {acreedor?.nombre ?? 'otro integrante'}
         </Text>
         <Text className="text-4xl font-bold text-primary-dark">
-          ${deuda.monto.toLocaleString('es-AR', { maximumFractionDigits: 2 })}
+          {formatearMoneda(deuda.monto, grupo?.moneda ?? 'ARS')}
         </Text>
         <Text className="text-sm text-text-muted">
           {grupo?.nombre} · {gastos.length} gasto
@@ -177,6 +197,13 @@ export function SaldarDeudaScreen() {
         texto="Abrir Enviar dinero en Mercado Pago"
         onPress={() => {
           void abrirMercadoPago()
+        }}
+      />
+      <Boton
+        texto="Avisar por WhatsApp"
+        secundario
+        onPress={() => {
+          void compartirPorWhatsApp()
         }}
       />
       <Boton

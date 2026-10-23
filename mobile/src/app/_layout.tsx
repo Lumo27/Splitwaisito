@@ -2,12 +2,17 @@ import '../global.css'
 
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
+import * as SplashScreen from 'expo-splash-screen'
 
 import { AuthBootstrap } from '@/features/auth/AuthBootstrap'
 import { colores } from '@/theme/colores'
 import { useAppStore } from '@/store/useAppStore'
 
 export { ErrorBoundary } from 'expo-router'
+
+void SplashScreen.preventAutoHideAsync().catch(() => {
+  // Ignorar en entornos sin soporte nativo de splash (p. ej. Web)
+})
 
 export default function RootLayout() {
   const usuario = useAppStore((state) => state.usuarioActual)
