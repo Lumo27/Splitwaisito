@@ -119,3 +119,11 @@ Pedido: iniciar el QR con doble clic. Codex agrego Iniciar-Expo-Go.bat con rutas
 
 Validación: typecheck en 0 errores, 25 pruebas unitarias en verde con Vitest, expo-doctor 21/21 checks aprobados y APK compilado e instalado en Android.
 
+### Correcciones de Re-Review del PR #16 — German, 22–23/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Antigravity | Resolver observaciones del review de PR #16: permisos de fotos en Firestore, versiones compatibles con Expo SDK 57, 3 monedas fijas y limpieza de archivos locales | «Fotos con Firebase real: firestore.rules... Versiones expo-image-manipulator y react-native-webview... BRL 3 monedas fijas... Sacar Descargar-APK...» | Se agregaron y desplegaron a Firebase las reglas de seguridad para la subcolección `gastos/{id}/fotos` con verificación defensiva en `isGroupMember`; se alinearon `expo-image-manipulator` (`~57.0.21`) y `react-native-webview` (`13.16.1`) para Expo SDK 57 eliminando advertencias de `expo-doctor`; se restauró `BRL` como parte de las 3 monedas fijas (`ARS`, `USD`, `BRL`) con tests unitarios en verde; y se removieron los scripts locales de APK sumándolos a `.gitignore`. |
+
+Validación: typecheck en 0 errores (`tsc --noEmit`), 34 pruebas unitarias aprobadas en verde con Vitest (`npm test`), y linter pasando sin errores (`expo lint`).
+
