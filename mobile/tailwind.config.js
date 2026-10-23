@@ -4,24 +4,23 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
-      // Misma paleta y mismos nombres de clase que web/tailwind.config.js,
-      // para portar las pantallas sin traducir clases.
+      // Paleta móvil compartida con src/theme/colores.ts.
       colors: {
         primary: {
-          light: '#DCF3E6',
-          DEFAULT: '#3FA772',
-          dark: '#2E7D57',
+          light: '#DDF8EC',
+          DEFAULT: '#087F63',
+          dark: '#065F4B',
         },
         secondary: {
-          light: '#E0F5FE',
-          DEFAULT: '#38BDF8',
-          dark: '#0EA5E9',
+          light: '#E0F2FE',
+          DEFAULT: '#0284C7',
+          dark: '#0369A1',
         },
-        background: '#F8FAFC',
+        background: '#F3F7F6',
         surface: '#FFFFFF',
         text: {
-          DEFAULT: '#152238',
-          muted: '#64748B',
+          DEFAULT: '#142D2A',
+          muted: '#586D69',
         },
         danger: '#EF4444',
         success: '#22C55E',

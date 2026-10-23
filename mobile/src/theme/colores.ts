@@ -1,12 +1,14 @@
-// Paleta de la app. Es la misma de web/tailwind.config.js; se usa donde
-// no llegan las clases de Tailwind (por ejemplo, las opciones de navegación).
+// Identidad móvil: esmeralda, cielo y coral con texto de alto contraste.
 export const colores = {
-  primary: '#3FA772',
-  primaryLight: '#DCF3E6',
-  primaryDark: '#2E7D57',
-  secondary: '#38BDF8',
-  background: '#F8FAFC',
+  primary: '#087F63',
+  primaryLight: '#DDF8EC',
+  primaryDark: '#065F4B',
+  secondary: '#0284C7',
+  secondaryLight: '#E0F2FE',
+  coral: '#FF795D',
+  coralLight: '#FFF0E8',
+  background: '#F3F7F6',
   surface: '#FFFFFF',
-  text: '#152238',
-  textMuted: '#64748B',
+  text: '#142D2A',
+  textMuted: '#586D69',
 } as const

@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from 'react-native'
-import { ChevronRight, Plus, Trash2, Users } from 'lucide-react-native'
+import { ChevronRight, Trash2, Users } from 'lucide-react-native'
 
 import {
   eliminarGrupo,
@@ -16,9 +16,16 @@ import {
   type GrupoFirestore,
 } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
+import { Portada } from '@/components/Portada'
+import { Boton } from '@/components/Formulario'
+import { Entrada, useMovimientoReducido } from '@/components/Movimiento'
 import { colores } from '@/theme/colores'
 
 export function GruposScreen() {
+  const reducido = useMovimientoReducido()
+  const nombreUsuario = useAppStore(
+    (state) => state.usuarioActual?.nombre.split(' ')[0] ?? '',
+  )
   const usuarioId = useAppStore((state) => state.usuarioActual?.id)
   const [grupos, setGrupos] = useState<GrupoFirestore[]>([])
   const [cargando, setCargando] = useState(true)
@@ -107,7 +114,14 @@ export function GruposScreen() {
   return (
     <FlatList
       className="flex-1 bg-background"
-      contentContainerStyle={{ padding: 20, paddingBottom: 32, flexGrow: 1 }}
+      contentContainerStyle={{
+        padding: 20,
+        paddingBottom: 32,
+        flexGrow: 1,
+        width: '100%',
+        maxWidth: 680,
+        alignSelf: 'center',
+      }}
       data={grupos}
       keyExtractor={(grupo) => grupo.id}
       refreshing={cargando}
@@ -117,29 +131,16 @@ export function GruposScreen() {
       ItemSeparatorComponent={() => <View className="h-3" />}
       ListHeaderComponent={
         <View className="mb-6 gap-4">
-          <View>
-            <Text className="mb-1 text-xs font-bold uppercase tracking-widest text-primary-dark">
-              Espacio compartido
-            </Text>
-            <Text
-              accessibilityRole="header"
-              className="text-3xl font-bold text-text"
-            >
-              Mis grupos
-            </Text>
-            <Text className="mt-2 text-sm text-text-muted">
-              Organizá los gastos y saldos con tu gente.
-            </Text>
-          </View>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Crear un nuevo grupo"
+          <Portada
+            etiqueta="Tus planes, en equipo"
+            titulo={`Hola, ${nombreUsuario || 'bienvenido'} 👋`}
+            descripcion="Compartí buenos momentos. Las cuentas, claras."
+            pie={`${grupos.length} ${grupos.length === 1 ? 'grupo' : 'grupos'} para compartir`}
+          />
+          <Boton
+            texto="Crear grupo"
             onPress={() => router.push('/grupos/nuevo')}
-            className="min-h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3"
-          >
-            <Plus size={20} color="#FFFFFF" />
-            <Text className="font-bold text-white">Crear grupo</Text>
-          </Pressable>
+          />
           {error ? (
             <View
               accessibilityRole="alert"
@@ -160,7 +161,7 @@ export function GruposScreen() {
             </View>
           ) : null}
           <Text className="text-sm font-semibold text-text-muted">
-            {grupos.length} grupo{grupos.length === 1 ? '' : 's'}
+            Mis grupos
           </Text>
         </View>
       }
@@ -183,53 +184,74 @@ export function GruposScreen() {
           </View>
         ) : null
       }
-      renderItem={({ item: grupo }) => (
-        <View className="flex-row items-center rounded-2xl border border-slate-100 bg-white p-2">
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Abrir ${grupo.nombre}, ${grupo.miembros.length} integrantes`}
-            className="min-h-24 flex-1 flex-row items-center gap-3 p-3"
-            onPress={() =>
-              router.push({
-                pathname: '/grupos/[id]',
-                params: { id: grupo.id },
-              })
-            }
+      renderItem={({ item: grupo, index }) => (
+        <Entrada reducido={reducido}>
+          <View
+            className="flex-row items-center rounded-3xl border border-white bg-white p-2"
+            style={{ boxShadow: '0px 5px 20px rgba(20,45,42,0.05)' }}
           >
-            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary-light">
-              <Users size={23} color={colores.primaryDark} />
-            </View>
-            <View className="flex-1 gap-1">
-              <Text className="text-base font-bold text-text">
-                {grupo.nombre}
-              </Text>
-              <Text className="text-xs text-text-muted">
-                {grupo.miembros.length} integrante
-                {grupo.miembros.length === 1 ? '' : 's'}
-              </Text>
-              {grupo.descripcion ? (
-                <Text numberOfLines={2} className="text-xs text-text-muted">
-                  {grupo.descripcion}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Abrir ${grupo.nombre}, ${grupo.miembros.length} integrantes`}
+              className="min-h-24 flex-1 flex-row items-center gap-3 p-3"
+              onPress={() =>
+                router.push({
+                  pathname: '/grupos/[id]',
+                  params: { id: grupo.id },
+                })
+              }
+            >
+              <View
+                className="h-14 w-14 items-center justify-center rounded-2xl"
+                style={{
+                  backgroundColor: [
+                    colores.primaryLight,
+                    colores.secondaryLight,
+                    colores.coralLight,
+                  ][index % 3],
+                }}
+              >
+                <Users
+                  size={23}
+                  color={
+                    [colores.primaryDark, colores.secondary, '#AD462C'][
+                      index % 3
+                    ]
+                  }
+                />
+              </View>
+              <View className="flex-1 gap-1">
+                <Text className="text-base font-bold text-text">
+                  {grupo.nombre}
                 </Text>
-              ) : null}
-            </View>
-            <ChevronRight size={18} color={colores.textMuted} />
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Eliminar ${grupo.nombre}`}
-            accessibilityState={{ disabled: eliminando !== null }}
-            disabled={eliminando !== null}
-            className="min-h-12 min-w-12 items-center justify-center rounded-xl"
-            onPress={() => confirmarEliminar(grupo)}
-          >
-            {eliminando === grupo.id ? (
-              <ActivityIndicator color={colores.primary} />
-            ) : (
-              <Trash2 size={19} color={colores.textMuted} />
-            )}
-          </Pressable>
-        </View>
+                <Text className="text-xs text-text-muted">
+                  {grupo.miembros.length} integrante
+                  {grupo.miembros.length === 1 ? '' : 's'}
+                </Text>
+                {grupo.descripcion ? (
+                  <Text numberOfLines={2} className="text-xs text-text-muted">
+                    {grupo.descripcion}
+                  </Text>
+                ) : null}
+              </View>
+              <ChevronRight size={18} color={colores.textMuted} />
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Eliminar ${grupo.nombre}`}
+              accessibilityState={{ disabled: eliminando !== null }}
+              disabled={eliminando !== null}
+              className="min-h-12 min-w-12 items-center justify-center rounded-xl"
+              onPress={() => confirmarEliminar(grupo)}
+            >
+              {eliminando === grupo.id ? (
+                <ActivityIndicator color={colores.primary} />
+              ) : (
+                <Trash2 size={19} color={colores.textMuted} />
+              )}
+            </Pressable>
+          </View>
+        </Entrada>
       )}
     />
   )

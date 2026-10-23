@@ -1,17 +1,15 @@
 import { useRef, useState } from 'react'
 import { Text, View } from 'react-native'
-import { Receipt } from 'lucide-react-native'
+import { Portada } from '@/components/Portada'
 import {
   Boton,
   Campo,
   Mensaje,
   Pantalla,
   Tarjeta,
-  Titulo,
 } from '@/components/Formulario'
 import { signInDemo, signInWithEmail } from '@/services/auth'
 import { isFirebaseAvailable, MODO_SEEDS } from '@/services/firebase'
-import { colores } from '@/theme/colores'
 
 export function LoginScreen() {
   const [email, setEmail] = useState('')
@@ -54,15 +52,25 @@ export function LoginScreen() {
   }
   return (
     <Pantalla>
-      <View className="items-center gap-4 py-8">
-        <View className="h-20 w-20 items-center justify-center rounded-3xl bg-primary-light">
-          <Receipt size={42} color={colores.primaryDark} />
-        </View>
-        <Titulo>Splitwaisito</Titulo>
-        <Text className="text-center text-base leading-6 text-text-muted">
-          Compartí los planes, organizá los gastos.
-        </Text>
-      </View>
+      <Portada
+        etiqueta="Menos cuentas. Más planes."
+        titulo="Splitwaisito"
+        descripcion="Compartí los planes, organizá los gastos."
+        pie="Tu gente. Tus planes. Todo claro."
+      />
+      <View className="flex-row flex-wrap gap-2">
+        {['Grupos', 'Tickets', 'Saldos claros'].map((texto, index) => (
+          <View
+            key={texto}
+            className="rounded-full px-4 py-2"
+            style={{
+              backgroundColor: ['#DDF8EC', '#E0F2FE', '#FFF0E8'][index],
+            }}
+          >
+            <Text className="text-xs font-semibold text-text">{texto}</Text>
+          </View>
+        ))}
+      </View>{' '}
       <Tarjeta>
         <Text
           accessibilityRole="header"

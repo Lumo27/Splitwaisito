@@ -110,3 +110,6 @@ Validación final: typecheck correcto, 22 pruebas aprobadas, lint sin errores (c
 
 ### Arranque con BAT — German, 06/10/2026
 Pedido: iniciar el QR con doble clic. Codex agrego Iniciar-Expo-Go.bat con rutas relativas al archivo, comprobacion de Node/npm, instalacion inicial con npm ci, arranque del modo demo en Expo Go por LAN y mensajes de error. Documento su uso en mobile/README.md.
+
+### Diseño y movimiento — German, 07/10/2026
+Pedido: mejorar frontend, colores y movimiento y usar Figma para revisar propuestas. Codex creó feature/ui-expo-go desde la rama migrada y actualizó paleta, formularios, navegación, login, grupos, detalle y perfil. Implementó Animated con un observador compartido que respeta reducir movimiento. Generó tres propuestas editables en Figma con componentes, variables y estilos y verificó su captura. Sin dependencias nuevas. Typecheck correcto, 22 pruebas aprobadas y lint sin errores con cuatro advertencias previas. Revisión web a tamaño móvil; pruebas físicas pendientes. Detalle: docs/UI-EXPO-GO.md.
