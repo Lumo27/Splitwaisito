@@ -1,4 +1,4 @@
-export type MonedaCodigo = 'ARS' | 'USD'
+export type MonedaCodigo = 'ARS' | 'USD' | 'BRL'
 
 export interface MonedaConfig {
   codigo: MonedaCodigo
@@ -9,11 +9,13 @@ export interface MonedaConfig {
 export const MONEDAS: Record<MonedaCodigo, MonedaConfig> = {
   ARS: { codigo: 'ARS', simbolo: '$', nombre: 'Pesos argentinos (ARS)' },
   USD: { codigo: 'USD', simbolo: 'US$', nombre: 'Dólares (USD)' },
+  BRL: { codigo: 'BRL', simbolo: 'R$', nombre: 'Reales brasileños (BRL)' },
 }
 
 export const LISTA_MONEDAS: MonedaConfig[] = [
   MONEDAS.ARS,
   MONEDAS.USD,
+  MONEDAS.BRL,
 ]
 
 export function formatearMoneda(

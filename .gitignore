@@ -43,3 +43,6 @@ yarn-error.*
 
 # generated apk download page
 Descargar-APK.html
+
+Descargar-APK.bat
+Descargar-APK.js

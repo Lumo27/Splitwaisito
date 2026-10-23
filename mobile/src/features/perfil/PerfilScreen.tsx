@@ -39,7 +39,7 @@ export function PerfilScreen() {
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
   const [cotizaciones, setCotizaciones] = useState<CotizacionDolar[]>([])
-  const [cargandoDolar, setCargandoDolar] = useState(false)
+  const [cargandoDolar, setCargandoDolar] = useState(true)
   const [errorDolar, setErrorDolar] = useState('')
   const enviando = useRef(false)
   const uid = usuario?.id
@@ -60,8 +60,24 @@ export function PerfilScreen() {
   }, [])
 
   useEffect(() => {
-    void cargarCotizaciones()
-  }, [cargarCotizaciones])
+    let activo = true
+    obtenerCotizacionesDolar()
+      .then((datos) => {
+        if (!activo) return
+        setCotizaciones(datos)
+      })
+      .catch(() => {
+        if (!activo) return
+        setErrorDolar('No pudimos actualizar la cotización.')
+      })
+      .finally(() => {
+        if (!activo) return
+        setCargandoDolar(false)
+      })
+    return () => {
+      activo = false
+    }
+  }, [])
 
   useFocusEffect(
     useCallback(() => {

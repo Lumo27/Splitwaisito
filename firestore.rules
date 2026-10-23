@@ -8,6 +8,7 @@ service cloud.firestore {
 
     function isGroupMember(groupId) {
       return authenticated()
+        && exists(/databases/$(database)/documents/grupos/$(groupId))
         && request.auth.uid in get(/databases/$(database)/documents/grupos/$(groupId)).data.miembros;
     }
 
