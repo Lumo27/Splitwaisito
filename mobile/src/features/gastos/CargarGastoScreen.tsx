@@ -20,6 +20,7 @@ import {
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
+import { formatearDinero } from '@/services/moneda'
 import { subirFotoTicket } from '@/services/storage'
 import { MODO_SEEDS } from '@/services/firebase'
 import { useAppStore } from '@/store/useAppStore'
@@ -269,7 +270,7 @@ export function CargarGastoScreen() {
           editable={!ocupado}
         />
         <Campo
-          label="Monto total (ARS)"
+          label={`Monto total (${grupo.moneda ?? 'ARS'})`}
           value={monto}
           onChangeText={setMonto}
           placeholder="0,00"
@@ -316,7 +317,7 @@ export function CargarGastoScreen() {
         ))}
         <Text className="text-sm text-text-muted">
           {seleccion.length
-            ? `Cada participante: $${(Number(monto.replace(',', '.')) / seleccion.length || 0).toLocaleString('es-AR', { maximumFractionDigits: 2 })}`
+            ? `Cada participante: ${formatearDinero(Number(monto.replace(',', '.')) / seleccion.length || 0, grupo.moneda ?? 'ARS')}`
             : 'Elegí al menos un participante.'}
         </Text>
       </Tarjeta>

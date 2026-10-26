@@ -15,6 +15,7 @@ import {
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
+import { formatearDinero } from '@/services/moneda'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { participantesDelGrupo } from './deudas'
@@ -155,7 +156,7 @@ export function SaldarDeudaScreen() {
           Le debés a {acreedor?.nombre ?? 'otro integrante'}
         </Text>
         <Text className="text-4xl font-bold text-primary-dark">
-          ${deuda.monto.toLocaleString('es-AR', { maximumFractionDigits: 2 })}
+          {formatearDinero(deuda.monto, grupo?.moneda ?? 'ARS')}
         </Text>
         <Text className="text-sm text-text-muted">
           {grupo?.nombre} · {gastos.length} gasto

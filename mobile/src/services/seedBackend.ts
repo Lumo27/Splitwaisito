@@ -1,6 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import type { GastoFirestore, GrupoFirestore, UsuarioFirestore } from './firestore'
+import type {
+  GastoFirestore,
+  GrupoFirestore,
+  MonedaGrupo,
+  UsuarioFirestore,
+} from './firestore'
 import type { PerfilAmistad, SolicitudAmistad } from './amistades'
 
 const CLAVE_DB = 'splitwaisito-seeds-db-v1'
@@ -78,6 +83,7 @@ function crearSeed(): SeedDb {
         id: 'grupo-bariloche',
         nombre: 'Viaje a Bariloche',
         miembros: [yo, 'seed-cande', 'seed-german', 'seed-nahuel'],
+        moneda: 'ARS',
         descripcion: 'Vacaciones de invierno',
         createdAt: haceDias(12),
         updatedAt: haceDias(2),
@@ -86,6 +92,7 @@ function crearSeed(): SeedDb {
         id: 'grupo-depto',
         nombre: 'Depto Palermo',
         miembros: [yo, 'seed-german', 'seed-vladi'],
+        moneda: 'ARS',
         descripcion: 'Gastos de convivencia',
         createdAt: haceDias(40),
         updatedAt: haceDias(1),
@@ -94,6 +101,7 @@ function crearSeed(): SeedDb {
         id: 'grupo-asado',
         nombre: 'Asado del sábado',
         miembros: [yo, 'seed-cande', 'seed-vladi'],
+        moneda: 'ARS',
         descripcion: '',
         createdAt: haceDias(5),
         updatedAt: haceDias(4),
@@ -267,13 +275,19 @@ export function seedGuardarAmigos(usuarioId: string, amigos: Perfil[]) {
   guardar(db)
 }
 
-export function seedCrearGrupo(nombre: string, creadorId: string, miembros: string[] = []) {
+export function seedCrearGrupo(
+  nombre: string,
+  creadorId: string,
+  miembros: string[] = [],
+  moneda: MonedaGrupo = 'ARS',
+) {
   const db = cargar()
   const ahora = new Date().toISOString()
   const grupo: GrupoFirestore = {
     id: idNuevo('grupo'),
     nombre: nombre.trim() || 'Nuevo grupo',
     miembros: [...new Set([creadorId, ...miembros])],
+    moneda,
     descripcion: '',
     createdAt: ahora,
     updatedAt: ahora,

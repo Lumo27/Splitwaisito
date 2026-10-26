@@ -205,7 +205,8 @@ export function GruposScreen() {
               </Text>
               <Text className="text-xs text-text-muted">
                 {grupo.miembros.length} integrante
-                {grupo.miembros.length === 1 ? '' : 's'}
+                {grupo.miembros.length === 1 ? '' : 's'} ·{' '}
+                {grupo.moneda ?? 'ARS'}
               </Text>
               {grupo.descripcion ? (
                 <Text numberOfLines={2} className="text-xs text-text-muted">

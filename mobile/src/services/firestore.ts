@@ -26,10 +26,14 @@ export interface UsuarioFirestore {
   updatedAt?: string
 }
 
+export const monedasGrupo = ['ARS', 'USD', 'BRL'] as const
+export type MonedaGrupo = (typeof monedasGrupo)[number]
+
 export interface GrupoFirestore {
   id: string
   nombre: string
   miembros: string[]
+  moneda?: MonedaGrupo
   descripcion?: string
   createdAt?: string
   updatedAt?: string
@@ -110,8 +114,13 @@ export async function guardarAmigosDelUsuario(
   )
 }
 
-export async function crearGrupo(nombre: string, creadorId: string, miembros: string[] = []) {
-  if (MODO_SEEDS) return seed.seedCrearGrupo(nombre, creadorId, miembros)
+export async function crearGrupo(
+  nombre: string,
+  creadorId: string,
+  miembros: string[] = [],
+  moneda: MonedaGrupo = 'ARS',
+) {
+  if (MODO_SEEDS) return seed.seedCrearGrupo(nombre, creadorId, miembros, moneda)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }
@@ -119,6 +128,7 @@ export async function crearGrupo(nombre: string, creadorId: string, miembros: st
   const payload: Omit<GrupoFirestore, 'id'> = {
     nombre: nombre.trim() || 'Nuevo grupo',
     miembros: [...new Set([creadorId, ...miembros])],
+    moneda,
     descripcion: '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

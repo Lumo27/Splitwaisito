@@ -16,7 +16,7 @@ npm run start:seeds -- --go
 
 Conectar teléfono y computadora a la misma Wi-Fi. Android: escanear desde Expo Go. iPhone: escanear con Cámara y abrir Expo Go. Si la red bloquea la conexión local, usar `npm run start:seeds -- --go --tunnel`.
 
-El modo demo usa AsyncStorage sin credenciales de Firebase. Las pantallas migradas son inicio de sesión, grupos, detalle, crear grupo, cargar/editar gasto, saldar deuda, amigos, perfil, configuración y pantalla no encontrada. Foto y ubicación son opcionales. Las deudas respetan los participantes seleccionados en cada gasto. Saldar copia los datos y abre Mercado Pago; la app no transfiere dinero ni registra una transferencia como pagada automáticamente.
+El modo demo usa AsyncStorage sin credenciales de Firebase. Las pantallas migradas son inicio de sesión, grupos, detalle, crear grupo, cargar/editar gasto, saldar deuda, amigos, perfil, configuración y pantalla no encontrada. El detalle del grupo incluye un gráfico por categoría calculado con sus gastos guardados y muestra los importes en la moneda del grupo (ARS, USD o BRL); los grupos anteriores sin moneda se interpretan como ARS. Foto y ubicación son opcionales. Las deudas respetan los participantes seleccionados en cada gasto. Saldar copia los datos y abre Mercado Pago; la app no transfiere dinero ni registra una transferencia como pagada automáticamente.
 
 ## Acceso real
 

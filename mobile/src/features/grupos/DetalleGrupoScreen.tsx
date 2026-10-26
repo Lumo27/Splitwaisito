@@ -19,14 +19,13 @@ import {
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
+import { formatearDinero } from '@/services/moneda'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
+import { GastosPorCategoria } from './GraficoGastosPorCategoria'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
-
-const dinero = (monto: number) =>
-  `$${monto.toLocaleString('es-AR', { maximumFractionDigits: 2 })}`
 
 export function DetalleGrupoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -91,6 +90,7 @@ export function DetalleGrupoScreen() {
   const nombre = (personaId: string) =>
     participantes.find((persona) => persona.id === personaId)?.nombre ??
     'Usuario'
+  const moneda = grupo?.moneda ?? 'ARS'
 
   async function ejecutar(accion: () => Promise<unknown>) {
     if (
@@ -177,9 +177,13 @@ export function DetalleGrupoScreen() {
           Total de gastos del grupo
         </Text>
         <Text className="text-3xl font-bold text-primary-dark">
-          {dinero(gastos.reduce((total, gasto) => total + gasto.monto, 0))}
+          {formatearDinero(
+            gastos.reduce((total, gasto) => total + gasto.monto, 0),
+            moneda,
+          )}
         </Text>
       </View>
+      <GastosPorCategoria gastos={gastos} moneda={moneda} />
       <Pressable
         accessibilityRole="button"
         onPress={() =>
@@ -252,7 +256,7 @@ export function DetalleGrupoScreen() {
                 {nombre(deuda.de)} → {nombre(deuda.a)}
               </Text>
               <Text className="text-lg font-bold text-primary-dark">
-                {dinero(deuda.monto)}
+                {formatearDinero(deuda.monto, moneda)}
               </Text>
               {deuda.de === usuarioId && (
                 <Pressable
@@ -297,7 +301,7 @@ export function DetalleGrupoScreen() {
             </Text>
           </View>
           <Text className="text-xl font-bold text-text">
-            {dinero(gasto.monto)}
+            {formatearDinero(gasto.monto, moneda)}
           </Text>
           <Text className="text-xs text-text-muted">
             {gasto.categoria} · Pagó {gasto.pagadoPorNombre} ·{' '}
