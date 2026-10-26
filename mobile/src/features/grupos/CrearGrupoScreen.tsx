@@ -75,7 +75,7 @@ export function CrearGrupoScreen() {
           {LISTA_MONEDAS.map((item) => (
             <Opcion
               key={item.codigo}
-              texto={`${item.nombre} (${item.simbolo})`}
+              texto={item.nombre}
               elegida={moneda === item.codigo}
               disabled={guardando}
               onPress={() => setMoneda(item.codigo)}
