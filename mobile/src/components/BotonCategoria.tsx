@@ -2,7 +2,7 @@ import React from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Check, Circle, Home, Package, Utensils, Car } from 'lucide-react-native'
 import { FondoCategoria } from './FondoCategoria'
-import { COLOR_CATEGORIAS, type CategoriaGasto } from '../theme/svgCategorias'
+import { COLOR_CATEGORIAS, type CategoriaGasto } from '../theme/categorias'
 import { colores } from '../theme/colores'
 
 interface BotonCategoriaProps {

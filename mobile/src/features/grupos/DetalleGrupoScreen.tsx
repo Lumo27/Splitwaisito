@@ -21,7 +21,7 @@ import {
   type GrupoFirestore,
 } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
-import { FondoCategoria, COLOR_CATEGORIAS } from '@/components/FondoCategoria'
+import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
 import { avisar, confirmar } from '@/utils/alerta'
@@ -380,12 +380,9 @@ export function DetalleGrupoScreen() {
               overflow: 'hidden',
             }}
           >
-            <FondoCategoria
-              categoria={gasto.categoria}
-              overlayOpacity={0.88}
-              overlayColor="#FFFFFF"
-              style={{ padding: 20 }}
-            >
+            {/* En la lista solo va el color de la categoría: la ilustración
+                se reserva para los botones, así el scroll no dibuja imágenes. */}
+            <View style={{ padding: 20 }}>
               <View className="flex-row items-center gap-3">
                 <View
                   style={{
@@ -479,7 +476,7 @@ export function DetalleGrupoScreen() {
                   </Pressable>
                 ) : null}
               </View>
-            </FondoCategoria>
+            </View>
           </View>
         )
       })}
