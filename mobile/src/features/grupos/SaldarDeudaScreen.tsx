@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { ActivityIndicator, Linking, Text } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
@@ -20,6 +20,8 @@ import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
+import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
+import { useActualizarCotizacionPesos } from '@/hooks/useActualizarCotizacionPesos'
 
 export function SaldarDeudaScreen() {
   const { id, de, a } = useLocalSearchParams<{
@@ -85,21 +87,9 @@ export function SaldarDeudaScreen() {
   )
   const acreedor = amigos.find((amigo) => amigo.id === a)
   const email = deuda && de === usuarioId ? (acreedor?.email?.trim() ?? '') : ''
-  useEffect(() => {
-    let vigente = true
-    if (!email || cargando) return
-    void Clipboard.setStringAsync(email)
-      .then(() => {
-        if (vigente) setCopiado('E-mail copiado.')
-      })
-      .catch(() => {
-        if (vigente)
-          setError('No pudimos copiar el e-mail. Podés volver a intentarlo.')
-      })
-    return () => {
-      vigente = false
-    }
-  }, [email, cargando])
+  const moneda = grupo?.moneda ?? 'ARS'
+  useActualizarCotizacionPesos(moneda)
+
   async function copiar(valor: string, mensaje: string) {
     try {
       await Clipboard.setStringAsync(valor)
@@ -129,7 +119,7 @@ export function SaldarDeudaScreen() {
         ? ` al e-mail ${email}`
         : ''
 
-    const mensaje = `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo "${grupoNombre}" en Splitwaisito${aliasDestino}. ¡Avisame cuando te llegue!`
+    const mensaje = `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo \"${grupoNombre}\" en Splitwaisito${aliasDestino}. ¡Avisame cuando te llegue!`
 
     try {
       await Linking.openURL(`https://wa.me/?text=${encodeURIComponent(mensaje)}`)
@@ -175,8 +165,9 @@ export function SaldarDeudaScreen() {
           Le debés a {acreedor?.nombre ?? 'otro integrante'}
         </Text>
         <Text className="text-4xl font-bold text-primary-dark">
-          {formatearMoneda(deuda.monto, grupo?.moneda ?? 'ARS')}
+          {formatearMoneda(deuda.monto, moneda)}
         </Text>
+        <EquivalenciaPesos monto={deuda.monto} moneda={moneda} />
         <Text className="text-sm text-text-muted">
           {grupo?.nombre} · {gastos.length} gasto
           {gastos.length === 1 ? '' : 's'}
