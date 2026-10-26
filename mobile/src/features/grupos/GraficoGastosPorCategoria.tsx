@@ -1,18 +1,18 @@
-import { View, Text } from 'react-native'
-import type { GastoFirestore } from '@/services/firestore'
-import { COLOR_CATEGORIAS } from '@/theme/categorias'
-import { formatearMoneda, type MonedaCodigo } from '@/theme/moneda'
-import { resumirGastosPorCategoria } from './gastosPorCategoria'
+import { View, Text } from "react-native";
+import type { GastoFirestore } from "@/services/firestore";
+import { COLOR_CATEGORIAS } from "@/theme/categorias";
+import { formatearMoneda, type MonedaCodigo } from "@/theme/moneda";
+import { resumirGastosPorCategoria } from "./gastosPorCategoria";
 
 export function GastosPorCategoria({
   gastos,
   moneda,
 }: {
-  gastos: GastoFirestore[]
-  moneda: MonedaCodigo
+  gastos: GastoFirestore[];
+  moneda: MonedaCodigo;
 }) {
-  const resumen = resumirGastosPorCategoria(gastos)
-  const total = resumen.reduce((suma, item) => suma + item.monto, 0)
+  const resumen = resumirGastosPorCategoria(gastos);
+  const total = resumen.reduce((suma, item) => suma + item.monto, 0);
 
   return (
     <View className="mt-5 gap-4 rounded-2xl bg-white p-4">
@@ -34,7 +34,7 @@ export function GastosPorCategoria({
       ) : (
         <View className="gap-4">
           {resumen.map((item) => {
-            const porcentaje = Math.round(item.porcentaje)
+            const porcentaje = Math.round(item.porcentaje);
             return (
               <View
                 key={item.categoria}
@@ -63,10 +63,10 @@ export function GastosPorCategoria({
                   />
                 </View>
               </View>
-            )
+            );
           })}
         </View>
       )}
     </View>
-  )
+  );
 }
