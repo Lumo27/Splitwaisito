@@ -2,7 +2,8 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import {
   ActivityIndicator,
-  Alert,
+  Linking,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -19,16 +20,19 @@ import {
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
-import { formatearDinero } from '@/services/moneda'
 import { useAppStore } from '@/store/useAppStore'
+import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { colores } from '@/theme/colores'
+import { formatearMoneda } from '@/theme/moneda'
+import { avisar, confirmar } from '@/utils/alerta'
 import { GastosPorCategoria } from './GraficoGastosPorCategoria'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
 
 export function DetalleGrupoScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>()
+  const { id: rawId } = useLocalSearchParams<{ id: string }>()
+  const id = typeof rawId === 'string' ? rawId : Array.isArray(rawId) ? rawId[0] : ''
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
   const [grupo, setGrupo] = useState<GrupoFirestore | null>(null)
@@ -90,21 +94,90 @@ export function DetalleGrupoScreen() {
   const nombre = (personaId: string) =>
     participantes.find((persona) => persona.id === personaId)?.nombre ??
     'Usuario'
+
   const moneda = grupo?.moneda ?? 'ARS'
+  const dinero = (monto: number) => formatearMoneda(monto, moneda)
+
+  function recordarPorWhatsApp(deudorId: string, monto: number) {
+    const deudorNombre = nombre(deudorId)
+    const montoTexto = dinero(monto)
+    const aliasUsuario = usuario?.alias?.trim()
+      ? ` al alias ${usuario.alias.trim()}`
+      : ' a mi cuenta'
+    const grupoNombre = grupo?.nombre ?? 'el grupo'
+    const texto = `¡Hola ${deudorNombre}! Te recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}". Podés transferirme${aliasUsuario}. ¡Muchas gracias!`
+    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
+    void Linking.openURL(url).catch(() => {
+      avisar(
+        'WhatsApp no disponible',
+        'No pudimos abrir WhatsApp. Verificá que esté instalado en tu dispositivo.',
+      )
+    })
+  }
+
+  function recordarPorEmail(deudorId: string, monto: number) {
+    const deudor = participantes.find((persona) => persona.id === deudorId)
+    const deudorNombre = deudor?.nombre ?? 'Usuario'
+    const deudorEmail = deudor?.email?.trim()
+    if (!deudorEmail) {
+      avisar(
+        'E-mail no disponible',
+        `No tenemos registrado el e-mail de ${deudorNombre}.`,
+      )
+      return
+    }
+    const montoTexto = dinero(monto)
+    const aliasUsuario = usuario?.alias?.trim()
+      ? ` al alias ${usuario.alias.trim()}`
+      : ' a mi cuenta'
+    const grupoNombre = grupo?.nombre ?? 'el grupo'
+    const asunto = `Saldo pendiente en Splitwaisito - ${grupoNombre}`
+    const texto = `¡Hola ${deudorNombre}!\n\nTe recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}".\n\nPodés transferirme${aliasUsuario}.\n\n¡Muchas gracias!`
+    const url = `mailto:${deudorEmail}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`
+    void Linking.openURL(url).catch(() => {
+      avisar(
+        'Correo no disponible',
+        'No pudimos abrir tu aplicación de correo.',
+      )
+    })
+  }
+
+  function abrirRecordatorio(deudorId: string, monto: number) {
+    const deudorNombre = nombre(deudorId)
+    if (Platform.OS === 'web') {
+      const elegirWhatsApp = typeof window !== 'undefined'
+        ? window.confirm(
+            `Recordar saldo a ${deudorNombre}\n\nPresioná Aceptar para enviar por WhatsApp o Cancelar para enviar por E-mail.`,
+          )
+        : true
+      if (elegirWhatsApp) {
+        recordarPorWhatsApp(deudorId, monto)
+      } else {
+        recordarPorEmail(deudorId, monto)
+      }
+      return
+    }
+
+    confirmar({
+      titulo: `Recordar a ${deudorNombre}`,
+      mensaje: '¿Deseás abrir WhatsApp para enviar el recordatorio del saldo pendiente?',
+      textoConfirmar: 'Abrir WhatsApp',
+      textoCancelar: 'Por E-mail',
+      destructivo: false,
+      alConfirmar: () => recordarPorWhatsApp(deudorId, monto),
+      alCancelar: () => recordarPorEmail(deudorId, monto),
+    })
+  }
 
   async function ejecutar(accion: () => Promise<unknown>) {
-    if (
-      mutacion.current ||
-      useAppStore.getState().usuarioActual?.id !== usuarioId
-    )
-      return
+    if (mutacion.current) return
     mutacion.current = true
     setOcupado(true)
     try {
       await accion()
       await cargar()
     } catch {
-      Alert.alert(
+      avisar(
         'No se pudo guardar',
         'Revisá la conexión y volvé a intentar.',
       )
@@ -177,10 +250,7 @@ export function DetalleGrupoScreen() {
           Total de gastos del grupo
         </Text>
         <Text className="text-3xl font-bold text-primary-dark">
-          {formatearDinero(
-            gastos.reduce((total, gasto) => total + gasto.monto, 0),
-            moneda,
-          )}
+          {dinero(gastos.reduce((total, gasto) => total + gasto.monto, 0))}
         </Text>
       </View>
       <GastosPorCategoria gastos={gastos} moneda={moneda} />
@@ -256,7 +326,7 @@ export function DetalleGrupoScreen() {
                 {nombre(deuda.de)} → {nombre(deuda.a)}
               </Text>
               <Text className="text-lg font-bold text-primary-dark">
-                {formatearDinero(deuda.monto, moneda)}
+                {dinero(deuda.monto)}
               </Text>
               {deuda.de === usuarioId && (
                 <Pressable
@@ -271,6 +341,17 @@ export function DetalleGrupoScreen() {
                 >
                   <Text className="font-bold text-primary-dark">
                     Saldar deuda
+                  </Text>
+                </Pressable>
+              )}
+              {deuda.a === usuarioId && (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => abrirRecordatorio(deuda.de, deuda.monto)}
+                  className="min-h-11 justify-center"
+                >
+                  <Text className="font-bold text-primary-dark">
+                    Recordar a {nombre(deuda.de)}
                   </Text>
                 </Pressable>
               )}
@@ -289,70 +370,118 @@ export function DetalleGrupoScreen() {
           Todavía no hay gastos. Cargá el primero para empezar.
         </Text>
       )}
-      {gastos.map((gasto, index) => (
-        <View
-          key={gasto.id ?? String(index)}
-          className="mb-3 gap-2 rounded-2xl bg-white p-4"
-        >
-          <View className="flex-row items-center gap-3">
-            <Receipt size={20} color={colores.primaryDark} />
-            <Text className="flex-1 text-base font-bold text-text">
-              {gasto.descripcion}
-            </Text>
-          </View>
-          <Text className="text-xl font-bold text-text">
-            {formatearDinero(gasto.monto, moneda)}
-          </Text>
-          <Text className="text-xs text-text-muted">
-            {gasto.categoria} · Pagó {gasto.pagadoPorNombre} ·{' '}
-            {formatearFecha(gasto.fecha)}
-          </Text>
-          {gasto.id && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Editar gasto ${gasto.descripcion}`}
-              className="min-h-11 justify-center"
-              onPress={() =>
-                router.push({
-                  pathname: '/grupos/[id]/cargar-gasto',
-                  params: { id, gastoId: gasto.id },
-                })
-              }
-            >
-              <Text className="font-semibold text-primary-dark">
-                Editar gasto
+      {gastos.map((gasto, index) => {
+        const paleta = COLOR_CATEGORIAS[gasto.categoria] ?? COLOR_CATEGORIAS.Otro
+        return (
+          <View
+            key={gasto.id ?? String(index)}
+            className="mb-3 rounded-3xl bg-white shadow-sm"
+            style={{
+              borderWidth: 1.5,
+              borderColor: paleta ? `${paleta.primary}33` : '#E2E8F0',
+              overflow: 'hidden',
+            }}
+          >
+            {/* En la lista solo va el color de la categoría: la ilustración
+                se reserva para los botones, así el scroll no dibuja imágenes. */}
+            <View style={{ padding: 20 }}>
+              <View className="flex-row items-center gap-3">
+                <View
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 10,
+                    backgroundColor: paleta?.light ?? '#F1F5F9',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Receipt size={18} color={paleta?.dark ?? colores.primaryDark} />
+                </View>
+                <Text className="flex-1 text-base font-bold text-text">
+                  {gasto.descripcion}
+                </Text>
+                <View
+                  style={{
+                    paddingHorizontal: 10,
+                    paddingVertical: 4,
+                    borderRadius: 12,
+                    backgroundColor: paleta?.light ?? '#F1F5F9',
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: '700',
+                      color: paleta?.dark ?? colores.primaryDark,
+                    }}
+                  >
+                    {gasto.categoria}
+                  </Text>
+                </View>
+              </View>
+
+              <Text className="mt-2 text-xl font-bold text-text">
+                {dinero(gasto.monto)}
               </Text>
-            </Pressable>
-          )}
-          {gasto.id && (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Eliminar gasto ${gasto.descripcion}`}
-              disabled={ocupado}
-              className="min-h-11 flex-row items-center justify-end gap-2"
-              onPress={() =>
-                Alert.alert(
-                  'Eliminar gasto',
-                  `¿Eliminar “${gasto.descripcion}”?`,
-                  [
-                    { text: 'Cancelar', style: 'cancel' },
-                    {
-                      text: 'Eliminar',
-                      style: 'destructive',
-                      onPress: () => {
-                        void ejecutar(() => eliminarGasto(id, gasto.id!))
-                      },
-                    },
-                  ],
-                )
-              }
-            >
-              <Trash2 size={17} color={colores.textMuted} />
-              <Text className="text-xs text-text-muted">Eliminar</Text>
-            </Pressable>
-          )}
-        </View>
-      ))}
+
+              <Text className="mt-0.5 text-xs text-text-muted">
+                Pagó {gasto.pagadoPorNombre} · {formatearFecha(gasto.fecha)}
+              </Text>
+
+              <View className="mt-3 flex-row items-center justify-between border-t border-slate-200/60 pt-2">
+                {gasto.id ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Editar gasto ${gasto.descripcion}`}
+                    className="min-h-11 justify-center py-1"
+                    onPress={() =>
+                      router.push({
+                        pathname: '/grupos/[id]/cargar-gasto',
+                        params: { id, gastoId: gasto.id },
+                      })
+                    }
+                  >
+                    <Text className="font-semibold text-primary-dark">
+                      Editar gasto
+                    </Text>
+                  </Pressable>
+                ) : (
+                  <View />
+                )}
+                {gasto.id ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Eliminar gasto ${gasto.descripcion}`}
+                    disabled={ocupado}
+                    className="min-h-11 flex-row items-center justify-end gap-1.5 py-1"
+                    onPress={() => {
+                      const gastoIdAEliminar = gasto.id!
+                      confirmar({
+                        titulo: 'Eliminar gasto',
+                        mensaje: `¿Eliminar “${gasto.descripcion}”? Esta acción no se puede deshacer.`,
+                        textoConfirmar: 'Eliminar',
+                        textoCancelar: 'Cancelar',
+                        destructivo: true,
+                        alConfirmar: async () => {
+                          // Actualización optimista inmediata
+                          setGastos((prev) =>
+                            prev.filter((item) => item.id !== gastoIdAEliminar),
+                          )
+                          await ejecutar(() => eliminarGasto(id, gastoIdAEliminar))
+                        },
+                      })
+                    }}
+                  >
+                    <Trash2 size={16} color="#B42318" />
+                    <Text className="font-semibold text-red-700">Eliminar</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            </View>
+          </View>
+        )
+      })}
     </ScrollView>
   )
 }

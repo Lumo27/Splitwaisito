@@ -61,14 +61,32 @@ export function Boton({
   disabled = false,
   cargando = false,
   secundario = false,
+  peligro = false,
 }: {
   texto: string
   onPress: () => void
   disabled?: boolean
   cargando?: boolean
   secundario?: boolean
+  peligro?: boolean
 }) {
   const bloqueado = disabled || cargando
+  const fondo = peligro
+    ? 'border border-rose-200 bg-rose-50'
+    : secundario
+      ? 'bg-primary-light'
+      : 'bg-primary'
+  const textoColor = peligro
+    ? 'text-rose-600'
+    : secundario
+      ? 'text-primary-dark'
+      : 'text-white'
+  const colorLoader = peligro
+    ? '#E11D48'
+    : secundario
+      ? colores.primaryDark
+      : '#FFFFFF'
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -77,16 +95,10 @@ export function Boton({
       onPress={onPress}
       disabled={bloqueado}
       style={{ opacity: bloqueado ? 0.5 : 1 }}
-      className={`min-h-12 flex-row items-center justify-center gap-2 rounded-xl px-4 py-3 ${secundario ? 'bg-primary-light' : 'bg-primary'}`}
+      className={`min-h-12 flex-row items-center justify-center gap-2 rounded-xl px-4 py-3 ${fondo}`}
     >
-      {cargando && (
-        <ActivityIndicator
-          color={secundario ? colores.primaryDark : '#FFFFFF'}
-        />
-      )}
-      <Text
-        className={`text-center font-bold ${secundario ? 'text-primary-dark' : 'text-white'}`}
-      >
+      {cargando && <ActivityIndicator color={colorLoader} />}
+      <Text className={`text-center font-bold ${textoColor}`}>
         {texto}
       </Text>
     </Pressable>

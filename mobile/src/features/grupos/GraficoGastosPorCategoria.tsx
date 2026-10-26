@@ -1,21 +1,15 @@
 import { View, Text } from 'react-native'
-import type { GastoFirestore, MonedaGrupo } from '@/services/firestore'
-import { formatearDinero } from '@/services/moneda'
+import type { GastoFirestore } from '@/services/firestore'
+import { COLOR_CATEGORIAS } from '@/theme/categorias'
+import { formatearMoneda, type MonedaCodigo } from '@/theme/moneda'
 import { resumirGastosPorCategoria } from './gastosPorCategoria'
-
-const coloresCategoria = {
-  Alojamiento: '#3FA772',
-  Comida: '#38BDF8',
-  Transporte: '#F59E0B',
-  Otro: '#94A3B8',
-} as const
 
 export function GastosPorCategoria({
   gastos,
   moneda,
 }: {
   gastos: GastoFirestore[]
-  moneda: MonedaGrupo
+  moneda: MonedaCodigo
 }) {
   const resumen = resumirGastosPorCategoria(gastos)
   const total = resumen.reduce((suma, item) => suma + item.monto, 0)
@@ -45,7 +39,7 @@ export function GastosPorCategoria({
               <View
                 key={item.categoria}
                 accessible
-                accessibilityLabel={`${item.categoria}: ${formatearDinero(item.monto, moneda)}, ${porcentaje}%`}
+                accessibilityLabel={`${item.categoria}: ${formatearMoneda(item.monto, moneda)}, ${porcentaje}%`}
                 className="gap-2"
               >
                 <View className="flex-row items-center justify-between gap-2">
@@ -53,7 +47,7 @@ export function GastosPorCategoria({
                     {item.categoria}
                   </Text>
                   <Text className="text-sm font-semibold text-text">
-                    {formatearDinero(item.monto, moneda)}
+                    {formatearMoneda(item.monto, moneda)}
                   </Text>
                   <Text className="w-10 text-right text-xs text-text-muted">
                     {porcentaje}%
@@ -64,7 +58,7 @@ export function GastosPorCategoria({
                     className="h-2 rounded-full"
                     style={{
                       width: `${item.porcentaje}%`,
-                      backgroundColor: coloresCategoria[item.categoria],
+                      backgroundColor: COLOR_CATEGORIAS[item.categoria].primary,
                     }}
                   />
                 </View>

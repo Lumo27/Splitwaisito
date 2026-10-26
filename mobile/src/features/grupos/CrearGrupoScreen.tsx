@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { router } from 'expo-router'
-import { Pressable, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import {
   Boton,
   Campo,
@@ -10,19 +10,16 @@ import {
   Tarjeta,
   Titulo,
 } from '@/components/Formulario'
-import {
-  crearGrupo,
-  monedasGrupo,
-  type MonedaGrupo,
-} from '@/services/firestore'
+import { crearGrupo } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
+import { LISTA_MONEDAS, type MonedaCodigo } from '@/theme/moneda'
 
 export function CrearGrupoScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
   const [nombre, setNombre] = useState('')
+  const [moneda, setMoneda] = useState<MonedaCodigo>('ARS')
   const [elegidos, setElegidos] = useState<string[]>([])
-  const [moneda, setMoneda] = useState<MonedaGrupo>('ARS')
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
   const enviando = useRef(false)
@@ -43,12 +40,7 @@ export function CrearGrupoScreen() {
       const miembros = elegidos.filter((id) =>
         amigos.some((amigo) => amigo.id === id),
       )
-      const grupo = await crearGrupo(
-        nombre.trim(),
-        usuario.id,
-        miembros,
-        moneda,
-      )
+      const grupo = await crearGrupo(nombre.trim(), usuario.id, miembros, moneda)
       router.replace({ pathname: '/grupos/[id]', params: { id: grupo.id } })
     } catch {
       setError(
@@ -75,36 +67,20 @@ export function CrearGrupoScreen() {
           editable={!guardando}
           autoCapitalize="sentences"
         />
+        <Text className="text-sm font-semibold text-text">Moneda del grupo</Text>
+        <Text className="text-sm text-text-muted">
+          Todos los gastos y saldos se expresarán en esta moneda.
+        </Text>
         <View className="gap-2">
-          <Text className="text-sm font-semibold text-text">
-            Moneda del grupo
-          </Text>
-          <View className="flex-row gap-2">
-            {monedasGrupo.map((opcion) => {
-              const elegida = moneda === opcion
-              return (
-                <Pressable
-                  key={opcion}
-                  accessibilityRole="radio"
-                  accessibilityLabel={`Moneda ${opcion}`}
-                  accessibilityState={{ checked: elegida, disabled: guardando }}
-                  disabled={guardando}
-                  onPress={() => setMoneda(opcion)}
-                  className={`min-h-12 flex-1 items-center justify-center rounded-xl border px-3 py-2 ${elegida ? 'border-primary bg-primary-light' : 'border-slate-200 bg-white'}`}
-                >
-                  <Text
-                    className={
-                      elegida
-                        ? 'font-semibold text-primary-dark'
-                        : 'text-text'
-                    }
-                  >
-                    {opcion}
-                  </Text>
-                </Pressable>
-              )
-            })}
-          </View>
+          {LISTA_MONEDAS.map((item) => (
+            <Opcion
+              key={item.codigo}
+              texto={item.nombre}
+              elegida={moneda === item.codigo}
+              disabled={guardando}
+              onPress={() => setMoneda(item.codigo)}
+            />
+          ))}
         </View>
         <Text className="text-sm font-semibold text-text">Integrantes</Text>
         <Text className="text-sm text-text-muted">Vos ya estás incluido.</Text>

@@ -16,14 +16,22 @@ if errorlevel 1 goto instalar_error
 
 :iniciar
  echo.
- echo Iniciando Splitwaisito en modo demo para Expo Go...
  echo Conecta el celular y la computadora a la misma red Wi-Fi.
  echo Android: escanea el QR desde Expo Go.
  echo iPhone: escanea el QR con la Camara.
  echo Deja esta ventana abierta mientras usas la app.
  echo Para detenerla, presiona Ctrl+C.
  echo.
-call npm run start:seeds -- --go --lan
+if exist ".env.local" goto iniciar_firebase
+ echo Iniciando Splitwaisito en modo demo sin credenciales...
+ call npm run start:seeds -- --go --lan
+ goto verificar_salida
+
+:iniciar_firebase
+ echo Iniciando Splitwaisito conectado a Firebase real...
+ call npx expo start --clear --go --lan
+
+:verificar_salida
 if errorlevel 1 goto iniciar_error
  goto fin
 

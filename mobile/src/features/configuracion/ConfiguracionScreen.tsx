@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { router } from 'expo-router'
-import { Alert, Text } from 'react-native'
+import { Text } from 'react-native'
 import {
   Boton,
   Mensaje,
@@ -13,6 +13,7 @@ import { MODO_SEEDS } from '@/services/firebase'
 import { getUsuarioPerfil } from '@/services/firestore'
 import { restablecerSeeds } from '@/services/seedBackend'
 import { useAppStore } from '@/store/useAppStore'
+import { confirmar } from '@/utils/alerta'
 
 export function ConfiguracionScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
@@ -43,24 +44,22 @@ export function ConfiguracionScreen() {
     setError('')
     setMensaje('')
     try {
-      restablecerSeeds()
+      await restablecerSeeds()
       const perfil = await getUsuarioPerfil(usuario.id)
-      if (!perfil) throw new Error('Perfil de prueba ausente')
-      const store = useAppStore.getState()
-      store.iniciarSesion(
-        perfil.nombre,
-        perfil.email,
-        perfil.alias,
-        perfil.id,
-        perfil.fotoUrl,
-        perfil.descripcion,
-      )
-      store.reemplazarAmigos(perfil.amigos ?? [])
-      store.reemplazarGastos([])
+      if (perfil) {
+        useAppStore.getState().iniciarSesion(
+          perfil.nombre,
+          perfil.email,
+          perfil.alias,
+          perfil.id,
+          perfil.fotoUrl,
+          perfil.descripcion,
+          perfil.moneda,
+        )
+      }
       setMensaje('Datos de ejemplo restablecidos.')
-      router.replace('/grupos')
     } catch {
-      setError('No pudimos restablecer los datos. Volvé a intentar.')
+      setError('No pudimos restablecer los datos de ejemplo.')
     } finally {
       mutacion.current = false
       setOcupado(false)
@@ -68,15 +67,20 @@ export function ConfiguracionScreen() {
   }
   return (
     <Pantalla>
-      <Titulo>Configuración</Titulo>
+      <Titulo>Ajustes de cuenta</Titulo>
+      <Text className="text-text-muted">
+        Gestioná tu sesión y el entorno de la aplicación.
+      </Text>
+      <Mensaje texto={mensaje} />
+      <Mensaje texto={error} error />
       <Tarjeta>
-        <Text className="font-bold text-text">Tu sesión</Text>
+        <Text className="font-bold text-text">Sesión actual</Text>
         <Text className="text-sm text-text-muted">
-          {usuario?.email ?? 'Sin sesión activa'}
+          {usuario?.email || 'Sin sesión activa'}
         </Text>
-        <Text className="text-sm text-text-muted">
+        <Text className="text-xs text-text-muted">
           {MODO_SEEDS
-            ? 'Estás usando datos de ejemplo, guardados en este dispositivo.'
+            ? 'Modo demo activo (sin credenciales reales de Firebase).'
             : 'Estás conectado a Firebase.'}
         </Text>
         <Boton
@@ -84,15 +88,16 @@ export function ConfiguracionScreen() {
           secundario
           disabled={ocupado}
           onPress={() =>
-            Alert.alert('Cerrar sesión', '¿Querés salir de tu cuenta?', [
-              { text: 'Cancelar', style: 'cancel' },
-              {
-                text: 'Salir',
-                onPress: () => {
-                  void salir()
-                },
+            confirmar({
+              titulo: 'Cerrar sesión',
+              mensaje: '¿Querés salir de tu cuenta?',
+              textoConfirmar: 'Salir',
+              textoCancelar: 'Cancelar',
+              destructivo: false,
+              alConfirmar: () => {
+                void salir()
               },
-            ])
+            })
           }
         />
       </Tarjeta>
@@ -105,35 +110,30 @@ export function ConfiguracionScreen() {
           </Text>
           <Boton
             texto="Restablecer datos de ejemplo"
-            secundario
+            peligro
             disabled={ocupado}
             onPress={() =>
-              Alert.alert(
-                'Restablecer datos',
-                'Se borrarán los cambios realizados en el modo demo de este dispositivo. ¿Continuar?',
-                [
-                  { text: 'Cancelar', style: 'cancel' },
-                  {
-                    text: 'Restablecer',
-                    style: 'destructive',
-                    onPress: () => {
-                      void reiniciar()
-                    },
-                  },
-                ],
-              )
+              confirmar({
+                titulo: 'Restablecer datos',
+                mensaje:
+                  'Se borrarán los cambios realizados en el modo demo de este dispositivo. ¿Continuar?',
+                textoConfirmar: 'Restablecer',
+                textoCancelar: 'Cancelar',
+                destructivo: true,
+                alConfirmar: () => {
+                  void reiniciar()
+                },
+              })
             }
           />
         </Tarjeta>
       )}
       <Tarjeta>
         <Text className="font-bold text-text">Splitwaisito</Text>
-        <Text className="text-sm text-text-muted">
-          Organizá tus gastos compartidos con claridad.
+        <Text className="text-xs text-text-muted">
+          Versión 1.0.0 · Gastos compartidos simplificados
         </Text>
       </Tarjeta>
-      <Mensaje texto={mensaje} />
-      <Mensaje texto={error} error />
     </Pantalla>
   )
 }

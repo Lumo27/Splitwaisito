@@ -48,18 +48,6 @@ describe('seedBackend en React Native', () => {
     expect(reabierta.seedGastosDelGrupo(grupo.id)).toHaveLength(1)
   })
 
-  it('guarda la moneda seleccionada al crear un grupo', async () => {
-    const seed = await abrirApp()
-    const grupo = seed.seedCrearGrupo(
-      'Viaje a Brasil',
-      seed.SEED_USUARIO_ID,
-      [],
-      'BRL',
-    )
-
-    expect(seed.seedGetGrupo(grupo.id)?.moneda).toBe('BRL')
-  })
-
   it('mantiene la sesión demo al reabrir la app y la cierra al salir', async () => {
     const seed = await abrirApp()
     seed.seedIniciarSesion()

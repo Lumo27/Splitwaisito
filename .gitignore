@@ -40,3 +40,9 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# generated apk download page
+Descargar-APK.html
+
+Descargar-APK.bat
+Descargar-APK.js

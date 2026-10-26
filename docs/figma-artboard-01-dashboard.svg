@@ -1,0 +1,139 @@
+<svg width="390" height="844" viewBox="0 0 390 844" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo Canvas -->
+  <rect width="390" height="844" rx="44" fill="#F8FAFC"/>
+
+  <!-- Status Bar (iOS / Android) -->
+  <g id="Status_Bar">
+    <text x="32" y="32" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700">09:41</text>
+    <!-- Dynamic Island -->
+    <rect x="135" y="14" width="120" height="26" rx="13" fill="#0E1F1C"/>
+    <!-- Indicadores de señal y batería -->
+    <g transform="translate(320, 20)">
+      <path d="M1 9.5H3.5M6 7V9.5M11 4.5V9.5M16 2V9.5" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+      <rect x="22" y="1" width="22" height="11" rx="3" stroke="#0F172A" stroke-width="1.5"/>
+      <rect x="24" y="3" width="14" height="7" rx="1.5" fill="#0F172A"/>
+    </g>
+  </g>
+
+  <!-- Header Superior -->
+  <g id="Header_Usuario" transform="translate(24, 60)">
+    <!-- Avatar -->
+    <rect x="0" y="0" width="44" height="44" rx="22" fill="#059669"/>
+    <text x="22" y="27" fill="#FFFFFF" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">LM</text>
+    <!-- Textos -->
+    <text x="56" y="18" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="500">Bienvenido,</text>
+    <text x="56" y="38" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="700">Lucas Motta</text>
+    <!-- Botón Ajustes -->
+    <circle cx="322" cy="22" r="18" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="322" y="27" font-size="15" text-anchor="middle">⚙️</text>
+  </g>
+
+  <!-- Portada / Hero Balance Card -->
+  <g id="Hero_Balance_Card" transform="translate(24, 124)">
+    <!-- Contenedor Base -->
+    <rect width="342" height="186" rx="28" fill="#047857"/>
+    <!-- Círculos Decorativos Orgánicos -->
+    <circle cx="340" cy="20" r="95" fill="#059669" fill-opacity="0.45"/>
+    <circle cx="310" cy="180" r="65" fill="#10B981" fill-opacity="0.45"/>
+    <!-- Etiqueta Sparkles -->
+    <g transform="translate(24, 28)">
+      <path d="M7 0L8.5 4.5L13 6L8.5 7.5L7 12L5.5 7.5L1 6L5.5 4.5L7 0Z" fill="#A7F3D0"/>
+      <text x="20" y="9" fill="#A7F3D0" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1">BALANCE NETO GENERAL</text>
+    </g>
+    <!-- Monto Principal -->
+    <text x="24" y="90" fill="#FFFFFF" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" letter-spacing="-0.5">+$ 14.500<tspan font-size="20" font-weight="500" fill="#A7F3D0">,00</tspan></text>
+    <!-- Chips de Desglose -->
+    <g transform="translate(24, 114)">
+      <!-- Te Deben -->
+      <rect width="140" height="48" rx="14" fill="#FFFFFF" fill-opacity="0.12"/>
+      <text x="14" y="20" fill="#A6E8D2" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="500">Te deben</text>
+      <text x="14" y="38" fill="#FFFFFF" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700">+$ 22.000</text>
+      <!-- Debes -->
+      <rect x="154" width="140" height="48" rx="14" fill="#FFFFFF" fill-opacity="0.12"/>
+      <text x="168" y="20" fill="#FFB6A6" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="500">Debés</text>
+      <text x="168" y="38" fill="#FFFFFF" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700">-$ 7.500</text>
+    </g>
+  </g>
+
+  <!-- Sección Grupos -->
+  <g id="Seccion_Grupos" transform="translate(24, 332)">
+    <!-- Título y Acción -->
+    <text x="4" y="16" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700">Tus Grupos (3)</text>
+    <text x="338" y="16" fill="#059669" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="end">+ Nuevo grupo</text>
+
+    <!-- Tarjeta Grupo 1: Bariloche -->
+    <g id="Grupo_Bariloche" transform="translate(0, 32)">
+      <rect width="342" height="88" rx="20" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="16" y="18" width="52" height="52" rx="16" fill="#ECFDF5"/>
+      <text x="42" y="50" font-size="24" text-anchor="middle">🏔️</text>
+      <text x="80" y="38" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700">Viaje a Bariloche</text>
+      <text x="80" y="58" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="400">4 miembros · 12 gastos</text>
+      <!-- Badge Estado -->
+      <rect x="220" y="28" width="106" height="28" rx="14" fill="#ECFDF5"/>
+      <text x="273" y="46" fill="#059669" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" text-anchor="middle">+ $12.000</text>
+    </g>
+
+    <!-- Tarjeta Grupo 2: Convivencia -->
+    <g id="Grupo_Convivencia" transform="translate(0, 130)">
+      <rect width="342" height="88" rx="20" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="16" y="18" width="52" height="52" rx="16" fill="#FEF2F2"/>
+      <text x="42" y="50" font-size="24" text-anchor="middle">🏠</text>
+      <text x="80" y="38" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700">Convivencia Dpto</text>
+      <text x="80" y="58" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="400">3 miembros · 8 gastos</text>
+      <!-- Badge Estado -->
+      <rect x="220" y="28" width="106" height="28" rx="14" fill="#FEF2F2"/>
+      <text x="273" y="46" fill="#EF4444" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" text-anchor="middle">Debés $4.250</text>
+    </g>
+
+    <!-- Tarjeta Grupo 3: Asados -->
+    <g id="Grupo_Asados" transform="translate(0, 228)">
+      <rect width="342" height="88" rx="20" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="16" y="18" width="52" height="52" rx="16" fill="#E0F2FE"/>
+      <text x="42" y="50" font-size="24" text-anchor="middle">🍕</text>
+      <text x="80" y="38" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700">Asados Viernes</text>
+      <text x="80" y="58" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="400">5 miembros · 4 gastos</text>
+      <!-- Badge Estado -->
+      <rect x="240" y="28" width="86" height="28" rx="14" fill="#F1F5F9"/>
+      <text x="283" y="46" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" text-anchor="middle">Al día</text>
+    </g>
+  </g>
+
+  <!-- Floating Action Button (FAB) -->
+  <g id="FAB_Nuevo_Gasto" transform="translate(306, 680)">
+    <circle cx="30" cy="30" r="28" fill="#059669"/>
+    <path d="M30 18V42M18 30H42" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Bottom Navigation Bar -->
+  <g id="Bottom_Navigation" transform="translate(0, 756)">
+    <rect width="390" height="88" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+    
+    <!-- Item 1: Grupos (Activo) -->
+    <g transform="translate(44, 14)">
+      <rect x="0" y="0" width="40" height="32" rx="16" fill="#ECFDF5"/>
+      <text x="20" y="22" font-size="16" text-anchor="middle">👥</text>
+      <text x="20" y="44" fill="#059669" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" text-anchor="middle">Grupos</text>
+    </g>
+
+    <!-- Item 2: Amigos -->
+    <g transform="translate(138, 14)">
+      <text x="20" y="22" font-size="16" text-anchor="middle">🤝</text>
+      <text x="20" y="44" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="500" text-anchor="middle">Amigos</text>
+    </g>
+
+    <!-- Item 3: Actividad -->
+    <g transform="translate(232, 14)">
+      <text x="20" y="22" font-size="16" text-anchor="middle">🔔</text>
+      <text x="20" y="44" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="500" text-anchor="middle">Actividad</text>
+    </g>
+
+    <!-- Item 4: Perfil -->
+    <g transform="translate(316, 14)">
+      <text x="20" y="22" font-size="16" text-anchor="middle">👤</text>
+      <text x="20" y="44" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="500" text-anchor="middle">Perfil</text>
+    </g>
+
+    <!-- Home Indicator iOS -->
+    <rect x="125" y="72" width="140" height="4.5" rx="2.5" fill="#0F172A"/>
+  </g>
+</svg>

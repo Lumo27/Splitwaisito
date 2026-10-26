@@ -3,6 +3,7 @@ const CENTAVO = 0.01
 export interface Participante {
   id: string
   nombre: string
+  email?: string
 }
 
 /**
@@ -12,15 +13,20 @@ export interface Participante {
  */
 export function participantesDelGrupo(
   miembros: string[] | undefined,
-  usuarioActual: { id: string; nombre: string } | null,
-  amigos: Array<{ id: string; nombre: string }>,
+  usuarioActual: { id: string; nombre: string; email?: string } | null,
+  amigos: Array<{ id: string; nombre: string; email?: string }>,
 ): Participante[] {
   const usuariosConocidos: Participante[] = [
     {
       id: usuarioActual?.id || 'user-me',
       nombre: usuarioActual?.nombre || 'Yo',
+      email: usuarioActual?.email,
     },
-    ...amigos.map((amigo) => ({ id: amigo.id, nombre: amigo.nombre })),
+    ...amigos.map((amigo) => ({
+      id: amigo.id,
+      nombre: amigo.nombre,
+      email: amigo.email,
+    })),
   ]
 
   if (!miembros) return usuariosConocidos

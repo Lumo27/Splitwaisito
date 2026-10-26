@@ -1,12 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import type {
-  GastoFirestore,
-  GrupoFirestore,
-  MonedaGrupo,
-  UsuarioFirestore,
-} from './firestore'
+import type { GastoFirestore, GrupoFirestore, UsuarioFirestore } from './firestore'
 import type { PerfilAmistad, SolicitudAmistad } from './amistades'
+import type { MonedaCodigo } from '@/theme/moneda'
 
 const CLAVE_DB = 'splitwaisito-seeds-db-v1'
 const CLAVE_SESION = 'splitwaisito-seeds-sesion-v1'
@@ -21,6 +17,7 @@ interface SeedDb {
   gastos: Record<string, GastoFirestore[]>
   solicitudes: SolicitudAmistad[]
   amistades: Array<{ miembros: string[]; perfiles: PerfilAmistad[] }>
+  fotos?: Record<string, string>
 }
 
 const PERSONAS: Perfil[] = [
@@ -245,6 +242,7 @@ export function seedUpsertUsuario(usuario: {
   alias?: string
   fotoUrl?: string | null
   descripcion?: string
+  moneda?: MonedaCodigo
 }) {
   const db = cargar()
   const previo = db.usuarios[usuario.id]
@@ -253,9 +251,10 @@ export function seedUpsertUsuario(usuario: {
     id: usuario.id,
     nombre: usuario.nombre.trim() || 'Usuario',
     email: usuario.email.trim() || 'sin-email@local.com',
-    alias: (usuario.alias ?? usuario.nombre).trim() || 'usuario',
+    alias: usuario.alias !== undefined ? usuario.alias.trim() : (previo?.alias ?? ''),
     fotoUrl: usuario.fotoUrl ?? null,
     descripcion: usuario.descripcion?.trim() ?? '',
+    moneda: usuario.moneda ?? previo?.moneda ?? 'ARS',
     updatedAt: new Date().toISOString(),
   }
   db.usuarios[usuario.id] = payload
@@ -275,12 +274,7 @@ export function seedGuardarAmigos(usuarioId: string, amigos: Perfil[]) {
   guardar(db)
 }
 
-export function seedCrearGrupo(
-  nombre: string,
-  creadorId: string,
-  miembros: string[] = [],
-  moneda: MonedaGrupo = 'ARS',
-) {
+export function seedCrearGrupo(nombre: string, creadorId: string, miembros: string[] = [], moneda: MonedaCodigo = 'ARS') {
   const db = cargar()
   const ahora = new Date().toISOString()
   const grupo: GrupoFirestore = {
@@ -351,7 +345,37 @@ export function seedGastosDelGrupo(grupoId: string) {
 export function seedEliminarGasto(grupoId: string, gastoId: string) {
   const db = cargar()
   db.gastos[grupoId] = (db.gastos[grupoId] ?? []).filter((g) => g.id !== gastoId)
+  if (db.fotos?.[`${grupoId}/${gastoId}`]) {
+    delete db.fotos[`${grupoId}/${gastoId}`]
+  }
   guardar(db)
+}
+
+export function seedGuardarFotoGasto(
+  grupoId: string,
+  gastoId: string,
+  imagenBase64: string,
+) {
+  const db = cargar()
+  db.fotos = db.fotos || {}
+  db.fotos[`${grupoId}/${gastoId}`] = imagenBase64
+  guardar(db)
+}
+
+export function seedObtenerFotoGasto(
+  grupoId: string,
+  gastoId: string,
+): string | null {
+  const db = cargar()
+  return db.fotos?.[`${grupoId}/${gastoId}`] ?? null
+}
+
+export function seedEliminarFotoGasto(grupoId: string, gastoId: string) {
+  const db = cargar()
+  if (db.fotos?.[`${grupoId}/${gastoId}`]) {
+    delete db.fotos[`${grupoId}/${gastoId}`]
+    guardar(db)
+  }
 }
 
 // --- amistades (equivalente a services/amistades.ts) ---

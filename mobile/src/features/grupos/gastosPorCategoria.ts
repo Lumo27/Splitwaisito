@@ -1,13 +1,12 @@
 import type { GastoFirestore } from '@/services/firestore'
+import type { CategoriaGasto } from '@/theme/categorias'
 
-export const categoriasGasto = [
+const categoriasGasto: CategoriaGasto[] = [
   'Alojamiento',
   'Comida',
   'Transporte',
   'Otro',
-] as const
-
-export type CategoriaGasto = (typeof categoriasGasto)[number]
+]
 
 export interface ResumenGastoCategoria {
   categoria: CategoriaGasto
