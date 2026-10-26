@@ -25,6 +25,7 @@ import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
 import { avisar, confirmar } from '@/utils/alerta'
+import { GastosPorCategoria } from './GraficoGastosPorCategoria'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
@@ -252,6 +253,7 @@ export function DetalleGrupoScreen() {
           {dinero(gastos.reduce((total, gasto) => total + gasto.monto, 0))}
         </Text>
       </View>
+      <GastosPorCategoria gastos={gastos} moneda={moneda} />
       <Pressable
         accessibilityRole="button"
         onPress={() =>
