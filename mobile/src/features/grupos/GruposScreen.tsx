@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from 'react'
 import { router, useFocusEffect } from 'expo-router'
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Pressable,
   Text,
@@ -17,6 +16,7 @@ import {
 } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
+import { avisar, confirmar } from '@/utils/alerta'
 
 export function GruposScreen() {
   const usuarioId = useAppStore((state) => state.usuarioActual?.id)
@@ -61,47 +61,36 @@ export function GruposScreen() {
   )
 
   function confirmarEliminar(grupo: GrupoFirestore) {
-    Alert.alert(
-      'Eliminar grupo',
-      `¿Eliminar “${grupo.nombre}” y todos sus gastos? Esta acción no se puede deshacer.`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: () => {
-            if (
-              borradoEnCurso.current ||
-              useAppStore.getState().usuarioActual?.id !== usuarioId
-            )
-              return
-            borradoEnCurso.current = true
-            setEliminando(grupo.id)
-            void eliminarGrupo(grupo.id)
-              .then(() => {
-                if (useAppStore.getState().usuarioActual?.id !== usuarioId)
-                  return
-                // Invalida lecturas anteriores para que no reaparezca el grupo borrado.
-                peticion.current += 1
-                setCargando(false)
-                setGrupos((actuales) =>
-                  actuales.filter((item) => item.id !== grupo.id),
-                )
-              })
-              .catch(() =>
-                Alert.alert(
-                  'No se pudo eliminar',
-                  'Revisá la conexión y volvé a intentar.',
-                ),
-              )
-              .finally(() => {
-                borradoEnCurso.current = false
-                setEliminando(null)
-              })
-          },
-        },
-      ],
-    )
+    confirmar({
+      titulo: 'Eliminar grupo',
+      mensaje: `¿Eliminar “${grupo.nombre}” y todos sus gastos? Esta acción no se puede deshacer.`,
+      textoConfirmar: 'Eliminar',
+      textoCancelar: 'Cancelar',
+      destructivo: true,
+      alConfirmar: async () => {
+        if (borradoEnCurso.current) return
+        borradoEnCurso.current = true
+        setEliminando(grupo.id)
+        const idAEliminar = grupo.id
+        // Actualización optimista inmediata en la UI
+        setGrupos((actuales) =>
+          actuales.filter((item) => item.id !== idAEliminar),
+        )
+        try {
+          await eliminarGrupo(idAEliminar)
+          peticion.current += 1
+        } catch {
+          avisar(
+            'No se pudo eliminar',
+            'Revisá la conexión y volvé a intentar.',
+          )
+          void cargarGrupos()
+        } finally {
+          borradoEnCurso.current = false
+          setEliminando(null)
+        }
+      },
+    })
   }
 
   return (
@@ -205,7 +194,7 @@ export function GruposScreen() {
               </Text>
               <Text className="text-xs text-text-muted">
                 {grupo.miembros.length} integrante
-                {grupo.miembros.length === 1 ? '' : 's'}
+                {grupo.miembros.length === 1 ? '' : 's'} · {grupo.moneda ?? 'ARS'}
               </Text>
               {grupo.descripcion ? (
                 <Text numberOfLines={2} className="text-xs text-text-muted">

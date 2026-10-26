@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore'
 import { db, MODO_SEEDS } from './firebase'
 import * as seed from './seedBackend'
+import type { MonedaCodigo } from '@/theme/moneda'
 
 export interface UsuarioFirestore {
   id: string
@@ -22,6 +23,7 @@ export interface UsuarioFirestore {
   alias: string
   fotoUrl?: string | null
   descripcion?: string
+  moneda?: MonedaCodigo
   amigos?: Array<Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>>
   updatedAt?: string
 }
@@ -30,6 +32,7 @@ export interface GrupoFirestore {
   id: string
   nombre: string
   miembros: string[]
+  moneda?: MonedaCodigo
   descripcion?: string
   createdAt?: string
   updatedAt?: string
@@ -43,8 +46,9 @@ export interface GastoFirestore {
   pagadoPorId: string
   pagadoPorNombre: string
   fecha: string
+  tieneFoto?: boolean
   fotoUrl?: string
-  ubicacion?: { lat: number; lng: number; direccion?: string }
+  ubicacion?: { lat?: number; lng?: number; direccion?: string }
   participantes?: string[]
 }
 
@@ -63,6 +67,7 @@ export async function upsertUsuarioPerfil(usuario: {
   alias?: string
   fotoUrl?: string | null
   descripcion?: string
+  moneda?: MonedaCodigo
 }) {
   if (MODO_SEEDS) return seed.seedUpsertUsuario(usuario)
   if (!db) {
@@ -74,9 +79,10 @@ export async function upsertUsuarioPerfil(usuario: {
     id: usuario.id,
     nombre: usuario.nombre.trim() || 'Usuario',
     email: usuario.email.trim() || 'sin-email@local.com',
-    alias: (usuario.alias ?? usuario.nombre).trim() || 'usuario',
+    alias: usuario.alias !== undefined ? usuario.alias.trim() : '',
     fotoUrl: usuario.fotoUrl ?? null,
     descripcion: usuario.descripcion?.trim() ?? '',
+    moneda: usuario.moneda ?? 'ARS',
     updatedAt: new Date().toISOString(),
   }
 
@@ -110,8 +116,8 @@ export async function guardarAmigosDelUsuario(
   )
 }
 
-export async function crearGrupo(nombre: string, creadorId: string, miembros: string[] = []) {
-  if (MODO_SEEDS) return seed.seedCrearGrupo(nombre, creadorId, miembros)
+export async function crearGrupo(nombre: string, creadorId: string, miembros: string[] = [], moneda: MonedaCodigo = 'ARS') {
+  if (MODO_SEEDS) return seed.seedCrearGrupo(nombre, creadorId, miembros, moneda)
   if (!db) {
     throw new Error('Firebase no configurado aún.')
   }
@@ -119,6 +125,7 @@ export async function crearGrupo(nombre: string, creadorId: string, miembros: st
   const payload: Omit<GrupoFirestore, 'id'> = {
     nombre: nombre.trim() || 'Nuevo grupo',
     miembros: [...new Set([creadorId, ...miembros])],
+    moneda,
     descripcion: '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -240,5 +247,52 @@ export async function eliminarGasto(grupoId: string, gastoId: string) {
     throw new Error('Firebase no configurado aún.')
   }
 
+  await eliminarFotoGasto(grupoId, gastoId).catch(() => {})
   await deleteDoc(doc(db, 'grupos', grupoId, 'gastos', gastoId))
+}
+
+export async function guardarFotoGasto(
+  grupoId: string,
+  gastoId: string,
+  imagenBase64: string,
+) {
+  if (MODO_SEEDS) {
+    return seed.seedGuardarFotoGasto(grupoId, gastoId, imagenBase64)
+  }
+  if (!db) throw new Error('Firebase no configurado aún.')
+  const ref = doc(db, 'grupos', grupoId, 'gastos', gastoId, 'fotos', 'ticket')
+  await setDoc(ref, {
+    imagenBase64,
+    updatedAt: new Date().toISOString(),
+  })
+}
+
+export async function obtenerFotoGasto(
+  grupoId: string,
+  gastoId: string,
+): Promise<string | null> {
+  if (MODO_SEEDS) {
+    return seed.seedObtenerFotoGasto(grupoId, gastoId)
+  }
+  if (!db) return null
+  try {
+    const ref = doc(db, 'grupos', grupoId, 'gastos', gastoId, 'fotos', 'ticket')
+    const snap = await getDoc(ref)
+    return snap.exists() ? (snap.data().imagenBase64 as string) : null
+  } catch {
+    return null
+  }
+}
+
+export async function eliminarFotoGasto(grupoId: string, gastoId: string) {
+  if (MODO_SEEDS) {
+    return seed.seedEliminarFotoGasto(grupoId, gastoId)
+  }
+  if (!db) return
+  try {
+    const ref = doc(db, 'grupos', grupoId, 'gastos', gastoId, 'fotos', 'ticket')
+    await deleteDoc(ref)
+  } catch {
+    // Silencioso si no existía
+  }
 }

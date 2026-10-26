@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
+import { ActivityIndicator, Image, Text, View } from 'react-native'
+import * as SplashScreen from 'expo-splash-screen'
 import { subscribeToAuthChanges } from '@/services/auth'
 import { isFirebaseAvailable, MODO_SEEDS } from '@/services/firebase'
 import { getUsuarioPerfil } from '@/services/firestore'
@@ -58,7 +59,7 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
         store.iniciarSesion(
           nombre,
           usuario.email || '',
-          perfil?.alias || nombre,
+          perfil?.alias?.trim() ?? '',
           usuario.uid,
           perfil?.fotoUrl ?? usuario.photoURL,
           perfil?.descripcion,
@@ -84,13 +85,33 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
       cancelar?.()
     }
   }, [hidratado])
+
+  useEffect(() => {
+    if (authReady && hidratado) {
+      void SplashScreen.hideAsync().catch(() => {})
+    }
+  }, [authReady, hidratado])
+
   if (!authReady || !hidratado)
     return (
-      <View className="flex-1 items-center justify-center gap-3 bg-background p-6">
-        <ActivityIndicator color={colores.primary} />
-        <Text className="text-sm text-text-muted">
-          Restaurando tu sesión...
-        </Text>
+      <View className="flex-1 items-center justify-center gap-4 bg-white p-6">
+        <Image
+          source={require('../../../assets/images/icon.png')}
+          style={{ width: 100, height: 100, borderRadius: 24 }}
+          accessibilityLabel="Logotipo de Splitwaisito"
+        />
+        <View className="items-center gap-1">
+          <Text className="text-2xl font-bold text-text">Splitwaisito</Text>
+          <Text className="text-center text-sm text-text-muted">
+            Compartí los planes, organizá los gastos.
+          </Text>
+        </View>
+        <View className="mt-4 flex-row items-center gap-2">
+          <ActivityIndicator color={colores.primary} size="small" />
+          <Text className="text-xs text-text-muted">
+            Restaurando tu sesión...
+          </Text>
+        </View>
       </View>
     )
   return children
