@@ -135,10 +135,10 @@ Fuente: historial de git, Pull Requests y tablero de Trello.
 | Integrante | Aportes | En curso |
 |---|---|---|
 | **Lucas Tomas Motta** (GitHub `Lumo27`) | Migración del proyecto a Vite + React + TypeScript + Tailwind, con sistema de diseño, navegación y PWA (#1, #3, #4, #5). Proyecto de Firebase y conexión del front (#2). CI y branch protection (#6). Configuración de Vitest. Modo demo y correcciones de pantallas (PR #5, #27). Revisión de PRs, organización de Trello y esta documentación. | #7 modelo de datos, #8 reglas, #9 función de deudas, #21 planilla de IA |
-| **German Morales** (GitHub `Sherman-cdm`) | Estructura y tema visual iniciales (PR #1). Login con Google, sesión, grupos, gastos, deudas, Cloud Function, amistades y reglas de Firestore (PR #2: #10, #14, #26). | #12 lista de grupos con balance |
+| **German Morales** (GitHub `Sherman-cdm`) | Estructura y tema visual iniciales (PR #1). Login con Google, sesión, grupos, gastos, deudas, Cloud Function, amistades y reglas de Firestore (PR #2: #10, #14, #26). Cámara y GPS (#16, #17), moneda preferida (#11), recordatorio WhatsApp (#19), nuevo logotipo oficial y branding (#29), build y compilación de APK Android (#30), autenticación por correo y contraseña en Firebase (#31), y script BAT de descarga con QR (#32). | #12 lista de grupos con balance |
 | **Candela** (GitHub `Candela-Sandoval`) | Pantallas de cargar gasto y saldar deuda separadas de `GruposScreen`, con los campos de foto, ubicación y participantes en el gasto (PR #3: #15, #18). | #15 cargar gasto, #18 saldar deuda |
-| **Vladimir Viale** (GitHub `Vladi1221`) | Creó el repositorio. | #19 recordatorio por WhatsApp (todavía sin subir), #20 README |
-| **Nahu** (GitHub `Nahu2300`) | — | #11 perfil (asignada, sin código subido) |
+| **Vladimir Viale** (GitHub `Vladi1221`) | Creó el repositorio. | #20 README |
+| **Nahu** (GitHub `Nahu2300`) | — | — |
 
 `Code-Libre` figura como colaborador en GitHub, sin actividad ni tarjetas hasta hoy.
 
@@ -146,10 +146,10 @@ Fuente: historial de git, Pull Requests y tablero de Trello.
 
 | Lista | Tarjetas |
 |---|---|
-| **Hecho** | #1, #2, #3, #4, #5, #6, #10, #14, #26, #27 |
-| **En progreso** | #7, #8, #9, #12, #15, #18, #19, #21 |
-| **Asignada** | #11, #20 |
-| **Backlog** | #13, #16, #17, #22, #23, #24, #25, #28 |
+| **Hecho** | #1, #2, #3, #4, #5, #6, #10, #11, #14, #16, #17, #19, #26, #27, #29, #30, #31, #32 |
+| **En progreso** | #7, #8, #9, #12, #15, #18, #21 |
+| **Asignada** | #20 |
+| **Backlog** | #13, #22, #23, #24, #25, #28 |
 
 ## 11. Pendientes y decisiones abiertas
 

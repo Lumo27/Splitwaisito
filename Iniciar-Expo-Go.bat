@@ -1,19 +1,8 @@
 @echo off
 setlocal
-title Splitwaisito - Expo Go
-
-if exist "C:\Program Files\nodejs" set "PATH=C:\Program Files\nodejs;%PATH%"
-
-:: Detectar ubicacion de la carpeta mobile
-if exist "%~dp0mobile" (
-    cd /d "%~dp0mobile"
-) else if exist "%~dp0..\mobile" (
-    cd /d "%~dp0..\mobile"
-) else if exist "C:\Users\naju\.gemini\antigravity\scratch\Splitwaisito\mobile" (
-    cd /d "C:\Users\naju\.gemini\antigravity\scratch\Splitwaisito\mobile"
-) else (
-    goto carpeta_error
-)
+ title Splitwaisito - Expo Go
+cd /d "%~dp0mobile"
+if errorlevel 1 goto carpeta_error
 
 where node >nul 2>nul
 if errorlevel 1 goto node_error
@@ -21,54 +10,47 @@ where npm >nul 2>nul
 if errorlevel 1 goto node_error
 
 if exist "node_modules\expo\package.json" goto iniciar
-echo ========================================================
-echo Instalando las dependencias de la app (npm install)...
-echo ========================================================
-call npm install
+ echo Instalando las dependencias de la app...
+call npm ci
 if errorlevel 1 goto instalar_error
 
 :iniciar
-echo.
-echo ========================================================
-echo  Iniciando Splitwaisito en modo demo para Expo Go...
-echo ========================================================
-echo  1. Conecta tu celular y esta PC a la misma red Wi-Fi.
-echo  2. Abre la app Expo Go en tu celular:
-echo     - En Android: Escanea el codigo QR desde Expo Go.
-echo     - En iPhone:  Escanea el codigo QR con la Camara.
-echo  3. Deja esta ventana abierta mientras usas la app.
-echo  4. Para detener el servidor, presiona Ctrl+C.
-echo ========================================================
-echo.
-call npm run start:seeds -- --go --lan
+ echo.
+ echo Conecta el celular y la computadora a la misma red Wi-Fi.
+ echo Android: escanea el QR desde Expo Go.
+ echo iPhone: escanea el QR con la Camara.
+ echo Deja esta ventana abierta mientras usas la app.
+ echo Para detenerla, presiona Ctrl+C.
+ echo.
+if exist ".env.local" goto iniciar_firebase
+ echo Iniciando Splitwaisito en modo demo sin credenciales...
+ call npm run start:seeds -- --go --lan
+ goto verificar_salida
+
+:iniciar_firebase
+ echo Iniciando Splitwaisito conectado a Firebase real...
+ call npx expo start --clear --go --lan
+
+:verificar_salida
 if errorlevel 1 goto iniciar_error
-goto fin
+ goto fin
 
 :node_error
-echo ========================================================
-echo ERROR: No se encontro Node.js o npm instalado.
-echo Para poder correr Expo Go necesitas tener Node.js instalado.
-echo Puedes descargarlo gratis desde: https://nodejs.org/
-echo (Descarga la version LTS recomendada para la mayoria).
-echo ========================================================
-echo Abriendo sitio de descarga de Node.js en tu navegador...
-start https://nodejs.org/
-goto fin
+ echo No se encontro Node.js o npm. Instala Node.js y vuelve a abrir este archivo.
+ goto fin
 
 :carpeta_error
-echo ERROR: No se encontro la carpeta "mobile".
-echo Asegurate de que el proyecto este en C:\Users\naju\.gemini\antigravity\scratch\Splitwaisito
-goto fin
+ echo No se encontro la carpeta mobile. Deja este BAT en la raiz del proyecto.
+ goto fin
 
 :instalar_error
-echo ERROR: No se pudieron instalar las dependencias.
-echo Revisa tu conexion a Internet o permisos.
-goto fin
+ echo No se pudieron instalar las dependencias. Revisa la conexion y el mensaje anterior.
+ goto fin
 
 :iniciar_error
-echo ERROR: Expo no pudo iniciarse correctamente. Revisa el mensaje anterior.
+ echo Expo no pudo iniciarse. Revisa el mensaje anterior.
 
 :fin
-echo.
+ echo.
 pause
 endlocal

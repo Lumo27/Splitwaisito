@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { useFocusEffect } from 'expo-router'
-import { ActivityIndicator, Alert, Text } from 'react-native'
+import { ActivityIndicator, Text } from 'react-native'
 import {
   Boton,
   Campo,
@@ -20,6 +20,7 @@ import {
 import { guardarAmigosDelUsuario } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
+import { confirmar } from '@/utils/alerta'
 
 export function ActividadScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
@@ -74,12 +75,7 @@ export function ActividadScreen() {
     confirmacion: string,
     actualizarPerfil = false,
   ) {
-    if (
-      mutacion.current ||
-      !usuario ||
-      useAppStore.getState().usuarioActual?.id !== usuario.id
-    )
-      return
+    if (mutacion.current || !usuario) return
     mutacion.current = true
     setOcupado(true)
     setMensaje('')
@@ -169,12 +165,11 @@ export function ActividadScreen() {
       )}
       {solicitudes.map((solicitud) => (
         <Tarjeta key={solicitud.id}>
-          <Text className="font-bold text-text">{solicitud.emisor.nombre}</Text>
-          <Text className="text-sm text-text-muted">
-            {solicitud.emisor.email}
+          <Text className="font-bold text-text">
+            {solicitud.emisor.nombre} ({solicitud.emisor.email})
           </Text>
           <Boton
-            texto={`Aceptar a ${solicitud.emisor.nombre}`}
+            texto="Aceptar solicitud"
             disabled={ocupado}
             onPress={() => {
               void ejecutar(
@@ -185,7 +180,7 @@ export function ActividadScreen() {
             }}
           />
           <Boton
-            texto="Rechazar solicitud"
+            texto="Rechazar"
             secundario
             disabled={ocupado}
             onPress={() => {
@@ -211,27 +206,23 @@ export function ActividadScreen() {
           <Text className="text-sm text-text-muted">{amigo.email}</Text>
           <Boton
             texto={`Eliminar a ${amigo.nombre}`}
-            secundario
+            peligro
             disabled={ocupado}
             onPress={() =>
-              Alert.alert(
-                'Eliminar amigo',
-                `¿Eliminar a ${amigo.nombre} de tus amigos?`,
-                [
-                  { text: 'Cancelar', style: 'cancel' },
-                  {
-                    text: 'Eliminar',
-                    style: 'destructive',
-                    onPress: () => {
-                      void ejecutar(
-                        () => eliminarAmistad(usuario.id, amigo.id),
-                        'Amigo eliminado.',
-                        true,
-                      )
-                    },
-                  },
-                ],
-              )
+              confirmar({
+                titulo: 'Eliminar amigo',
+                mensaje: `¿Eliminar a ${amigo.nombre} de tus amigos?`,
+                textoConfirmar: 'Eliminar',
+                textoCancelar: 'Cancelar',
+                destructivo: true,
+                alConfirmar: () => {
+                  void ejecutar(
+                    () => eliminarAmistad(usuario.id, amigo.id),
+                    'Amigo eliminado.',
+                    true,
+                  )
+                },
+              })
             }
           />
         </Tarjeta>
