@@ -13,6 +13,7 @@ import {
   Tarjeta,
   Titulo,
 } from '@/components/Formulario'
+import { BotonCategoria } from '@/components/BotonCategoria'
 import { MapaSelector } from '@/components/MapaSelector'
 import {
   actualizarGasto,
@@ -375,11 +376,11 @@ export function CargarGastoScreen() {
           editable={!ocupado}
         />
         <Text className="font-semibold text-text">Categoría</Text>
-        <View className="gap-2">
+        <View className="gap-2.5">
           {categorias.map((opcion) => (
-            <Opcion
+            <BotonCategoria
               key={opcion}
-              texto={opcion}
+              categoria={opcion}
               elegida={categoria === opcion}
               disabled={ocupado}
               onPress={() => setCategoria(opcion)}
