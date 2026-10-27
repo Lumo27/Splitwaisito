@@ -127,3 +127,10 @@ Validación: typecheck en 0 errores, 25 pruebas unitarias en verde con Vitest, e
 
 Validación: typecheck en 0 errores (`tsc --noEmit`), 34 pruebas unitarias aprobadas en verde con Vitest (`npm test`), y linter pasando sin errores (`expo lint`).
 
+### Equivalencia informativa a pesos en grupos — German, 26/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Mostrar la equivalencia aproximada en pesos sin cambiar moneda, deudas ni pagos del grupo | «Como usuario argentino, en un grupo en dólares o reales quiero ver al lado de cada monto cuánto es aproximadamente en pesos, sin que cambie la moneda del grupo.» | Se consulta DolarApi para USD/BRL con precio de venta, se persiste la cotización y su fecha en Zustand/AsyncStorage por seis horas y se reutiliza el último valor si falla la red. Se muestran etiquetas informativas bajo el total, las deudas simplificadas y el monto al saldar. Se agregaron tests Vitest para conversión, vigencia, respuesta, errores de red, timeout y caché inválida. |
+
+Validación: typecheck correcto, 45 pruebas aprobadas en Vitest y exportación de Expo para Android, iOS y web. Lint sin errores; cuatro avisos preexistentes de estilo `Array<T>` en otros archivos.

@@ -25,6 +25,8 @@ import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
 import { avisar, confirmar } from '@/utils/alerta'
+import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
+import { useActualizarCotizacionPesos } from '@/hooks/useActualizarCotizacionPesos'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
@@ -96,6 +98,8 @@ export function DetalleGrupoScreen() {
 
   const moneda = grupo?.moneda ?? 'ARS'
   const dinero = (monto: number) => formatearMoneda(monto, moneda)
+  const totalGastos = gastos.reduce((total, gasto) => total + gasto.monto, 0)
+  useActualizarCotizacionPesos(moneda)
 
   function recordarPorWhatsApp(deudorId: string, monto: number) {
     const deudorNombre = nombre(deudorId)
@@ -249,8 +253,9 @@ export function DetalleGrupoScreen() {
           Total de gastos del grupo
         </Text>
         <Text className="text-3xl font-bold text-primary-dark">
-          {dinero(gastos.reduce((total, gasto) => total + gasto.monto, 0))}
+          {dinero(totalGastos)}
         </Text>
+        <EquivalenciaPesos monto={totalGastos} moneda={moneda} />
       </View>
       <Pressable
         accessibilityRole="button"
@@ -326,6 +331,7 @@ export function DetalleGrupoScreen() {
               <Text className="text-lg font-bold text-primary-dark">
                 {dinero(deuda.monto)}
               </Text>
+              <EquivalenciaPesos monto={deuda.monto} moneda={moneda} />
               {deuda.de === usuarioId && (
                 <Pressable
                   accessibilityRole="button"
