@@ -44,9 +44,12 @@ describe('equivalencia a pesos', () => {
 
   it('considera vencida una cotización con fecha futura por reloj desajustado', () => {
     const ahora = 1_800_000_000_000
+    const cotizacionFutura = { venta: 1540, consultadaEn: ahora + 1 }
+
     expect(
-      cotizacionVencida({ venta: 1540, consultadaEn: ahora + 1 }, ahora),
+      cotizacionVencida(cotizacionFutura, ahora),
     ).toBe(true)
+    expect(cotizacionValida(cotizacionFutura, ahora)).toBe(false)
   })
 
   it('no considera válida una cotización persistida corrupta', () => {

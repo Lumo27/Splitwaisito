@@ -42,13 +42,15 @@ export function convertirAPesos(
 
 export function cotizacionValida(
   cotizacion: CotizacionPeso | undefined,
+  ahora = Date.now(),
 ): cotizacion is CotizacionPeso {
   return (
     typeof cotizacion === 'object' &&
     cotizacion !== null &&
     Number.isFinite(cotizacion.venta) &&
     cotizacion.venta > 0 &&
-    Number.isFinite(cotizacion.consultadaEn)
+    Number.isFinite(cotizacion.consultadaEn) &&
+    cotizacion.consultadaEn <= ahora
   )
 }
 
@@ -56,7 +58,7 @@ export function cotizacionVencida(
   cotizacion: CotizacionPeso | undefined,
   ahora = Date.now(),
 ): boolean {
-  if (!cotizacionValida(cotizacion)) return true
+  if (!cotizacionValida(cotizacion, ahora)) return true
   const antiguedad = ahora - cotizacion.consultadaEn
   return antiguedad < 0 || antiguedad > VIGENCIA_COTIZACION_MS
 }
