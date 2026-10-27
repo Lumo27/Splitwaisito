@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { ActivityIndicator, Linking, Text } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
@@ -89,6 +89,21 @@ export function SaldarDeudaScreen() {
   const email = deuda && de === usuarioId ? (acreedor?.email?.trim() ?? '') : ''
   const moneda = grupo?.moneda ?? 'ARS'
   useActualizarCotizacionPesos(moneda)
+  useEffect(() => {
+    let vigente = true
+    if (!email || cargando) return
+    void Clipboard.setStringAsync(email)
+      .then(() => {
+        if (vigente) setCopiado('E-mail copiado.')
+      })
+      .catch(() => {
+        if (vigente)
+          setError('No pudimos copiar el e-mail. Podés volver a intentarlo.')
+      })
+    return () => {
+      vigente = false
+    }
+  }, [email, cargando])
 
   async function copiar(valor: string, mensaje: string) {
     try {
