@@ -127,3 +127,18 @@ Validación: typecheck en 0 errores, 25 pruebas unitarias en verde con Vitest, e
 
 Validación: typecheck en 0 errores (`tsc --noEmit`), 34 pruebas unitarias aprobadas en verde con Vitest (`npm test`), y linter pasando sin errores (`expo lint`).
 
+### Equivalencia informativa a pesos en grupos — German, 26/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Mostrar la equivalencia aproximada en pesos sin cambiar moneda, deudas ni pagos del grupo | «Como usuario argentino, en un grupo en dólares o reales quiero ver al lado de cada monto cuánto es aproximadamente en pesos, sin que cambie la moneda del grupo.» | Se consulta DolarApi para USD/BRL con precio de venta, se persiste la cotización y su fecha en Zustand/AsyncStorage por seis horas y se reutiliza el último valor si falla la red. Se muestran etiquetas informativas bajo el total, las deudas simplificadas y el monto al saldar. Se agregaron tests Vitest para conversión, vigencia, respuesta, errores de red, timeout y caché inválida. |
+
+Validación: typecheck correcto, 45 pruebas aprobadas en Vitest y exportación de Expo para Android, iOS y web. Lint sin errores; cuatro avisos preexistentes de estilo `Array<T>` en otros archivos.
+
+### Integración y correcciones para aprobación del PR de equivalencia — Copilot, 27/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Resolver el bloqueo de merge del PR y completar validaciones para solicitar una nueva revisión | «Integra la equivalencia informativa con el `develop` actual, resuelve los conflictos sin perder el gráfico de categorías ni el copiado automático del e-mail, y valida los cambios.» | Se integró la rama del PR con `develop`, conservando las pantallas de equivalencia en USD/BRL, el gráfico de categorías y el copiado automático del e-mail al saldar deuda. Se corrigió la validación para no aceptar cotizaciones con fecha futura y se completó la persistencia tipada de cotizaciones en Zustand. |
+
+Validación local no disponible porque el entorno no tiene Node.js/npm. La CI de GitHub Actions (run 63) completó con éxito los jobs `lint-test-build` y `mobile`, incluidos lint, typecheck, tests y builds.

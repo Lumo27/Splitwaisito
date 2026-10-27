@@ -34,4 +34,12 @@ describe('deudasDelGrupo', () => {
   it('no genera deudas para un grupo sin gastos', () => {
     expect(deudasDelGrupo(personas, [])).toEqual([])
   })
+  it('ignora un pagador con ID que no pertenece al grupo (dato corrupto)', () => {
+    // 'externo' no está en la lista de participantes: no debe aparecer
+    // como acreedor ni generar deudas hacia un ID desconocido.
+    const gastoExterno = { ...gasto, pagadoPorId: 'externo' }
+    const deudas = deudasDelGrupo(personas, [gastoExterno])
+    const ids = deudas.flatMap((d) => [d.de, d.a])
+    expect(ids).not.toContain('externo')
+  })
 })
