@@ -27,6 +27,7 @@ import { formatearMoneda } from '@/theme/moneda'
 import { avisar, confirmar } from '@/utils/alerta'
 import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
 import { useActualizarCotizacionPesos } from '@/hooks/useActualizarCotizacionPesos'
+import { GastosPorCategoria } from './GraficoGastosPorCategoria'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
@@ -257,6 +258,7 @@ export function DetalleGrupoScreen() {
         </Text>
         <EquivalenciaPesos monto={totalGastos} moneda={moneda} />
       </View>
+      <GastosPorCategoria gastos={gastos} moneda={moneda} />
       <Pressable
         accessibilityRole="button"
         onPress={() =>
