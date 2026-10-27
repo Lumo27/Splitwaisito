@@ -141,4 +141,4 @@ Validación: typecheck correcto, 45 pruebas aprobadas en Vitest y exportación d
 |---|---|---|---|
 | Copilot SDK en VS Code | Resolver el bloqueo de merge del PR y completar validaciones para solicitar una nueva revisión | «Integra la equivalencia informativa con el `develop` actual, resuelve los conflictos sin perder el gráfico de categorías ni el copiado automático del e-mail, y valida los cambios.» | Se integró la rama del PR con `develop`, conservando las pantallas de equivalencia en USD/BRL, el gráfico de categorías y el copiado automático del e-mail al saldar deuda. Se corrigió la validación para no aceptar cotizaciones con fecha futura y se completó la persistencia tipada de cotizaciones en Zustand. |
 
-Validación local pendiente: el entorno no tiene Node.js/npm disponibles. Se solicitará la validación CI del PR después de publicar la actualización.
+Validación local no disponible porque el entorno no tiene Node.js/npm. La CI de GitHub Actions (run 63) completó con éxito los jobs `lint-test-build` y `mobile`, incluidos lint, typecheck, tests y builds.
