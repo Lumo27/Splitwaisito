@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { deudasDelGrupo } from './deudasDelGrupo'
+import { deudasDelGrupo, estadoDeudasGrupo } from './deudasDelGrupo'
 
 const personas = ['a', 'b', 'c'].map((id) => ({ id, nombre: id }))
 const gasto = {
@@ -33,5 +33,21 @@ describe('deudasDelGrupo', () => {
   })
   it('no genera deudas para un grupo sin gastos', () => {
     expect(deudasDelGrupo(personas, [])).toEqual([])
+  })
+})
+
+describe('estadoDeudasGrupo', () => {
+  it('indica que todavía no hay gastos en un grupo vacío', () => {
+    expect(estadoDeudasGrupo([], [])).toBe('sin-gastos')
+  })
+
+  it('indica que todo está saldado cuando hubo gastos y no quedan deudas', () => {
+    expect(estadoDeudasGrupo([gasto], [])).toBe('saldado')
+  })
+
+  it('indica que hay deudas pendientes cuando existen transferencias', () => {
+    expect(
+      estadoDeudasGrupo([gasto], [{ de: 'b', a: 'a', monto: 120 }]),
+    ).toBe('pendiente')
   })
 })

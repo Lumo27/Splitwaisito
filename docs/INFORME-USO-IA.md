@@ -127,3 +127,18 @@ Validación: typecheck en 0 errores, 25 pruebas unitarias en verde con Vitest, e
 
 Validación: typecheck en 0 errores (`tsc --noEmit`), 34 pruebas unitarias aprobadas en verde con Vitest (`npm test`), y linter pasando sin errores (`expo lint`).
 
+### Auditoría de experiencia de usuario — Copilot, 27/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Revisar la experiencia de usuario de punta a punta en la app móvil/web | «Dame una revisión completa de la aplicación total y recomendaciones que se les puede cambiar para mejorar la experiencia de usuario» | Recorrido en navegador de grupos, detalle con y sin gastos, formulario de gasto, amigos, perfil y configuración; inspección del código y pruebas; recomendaciones priorizadas entregadas en la conversación. |
+
+Validación: `npm run typecheck` sin errores y 36 pruebas aprobadas con `npm test`. La planilla `planilla-uso-ia.xlsx` no se encuentra en el workspace; este registro queda en el informe para trasladarlo cuando esté disponible.
+
+### Diferenciación del estado de deudas — Copilot, 28/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Evitar mostrar un estado de liquidación engañoso en grupos sin movimientos | «Separar los estados: “Todavía no hay gastos” cuando el grupo está vacío y “Todo saldado” solo cuando existieron movimientos y no quedan saldos» | Se distinguieron los estados sin gastos, saldado y con deudas pendientes en el detalle del grupo; se agregaron pruebas unitarias para cada estado. |
+
+Validación: pruebas dirigidas y `npm run typecheck`.
