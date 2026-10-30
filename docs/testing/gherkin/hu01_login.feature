@@ -1,4 +1,8 @@
 ﻿# language: es
+# version: 1.0
+# fecha: 29/10/2026
+# commit-probado: 2e3a5cb
+# autor: Candela Sandoval
 
 Característica: HU-01 Iniciar sesión
   Como usuario de Splitwaisito
@@ -9,7 +13,7 @@ Característica: HU-01 Iniciar sesión
   # MODO DEMO
   # ─────────────────────────────────────────────────────────────────────
 
-  @android
+  @HU-01 @TC-HU01-001 @alta @humo @android
   Escenario: Entrar en modo demo correctamente
     Dado que la app corre con MODO_SEEDS=true
     Y el usuario está en la pantalla de login
@@ -21,7 +25,7 @@ Característica: HU-01 Iniciar sesión
   # EMAIL / CONTRASEÑA
   # ─────────────────────────────────────────────────────────────────────
 
-  @requiere-firebase @android
+  @HU-01 @TC-HU01-002 @alta @funcional @requiere-firebase @android
   Escenario: Login con email y contraseña válidos
     Dado que Firebase está configurado con el proveedor email/contraseña habilitado
     Y existe un usuario con email "test@splitwaisito.com" y contraseña "clave123"
@@ -31,7 +35,7 @@ Característica: HU-01 Iniciar sesión
     Y toca "Iniciar sesión"
     Entonces es redirigido a la pantalla de lista de grupos
 
-  @requiere-firebase @android
+  @HU-01 @TC-HU01-003 @alta @funcional @requiere-firebase @android
   Escenario: Registro con datos válidos
     Dado que Firebase está configurado con el proveedor email/contraseña habilitado
     Y el usuario está en la pantalla de login
@@ -46,7 +50,7 @@ Característica: HU-01 Iniciar sesión
   # NEGATIVOS
   # ─────────────────────────────────────────────────────────────────────
 
-  @requiere-firebase @android
+  @HU-01 @TC-HU01-004 @alta @negativo @requiere-firebase @android
   Escenario: Intento de login con email inválido
     Dado que Firebase está configurado
     Y el usuario está en la pantalla de login en modo "Iniciar sesión"
@@ -57,7 +61,7 @@ Característica: HU-01 Iniciar sesión
     Entonces ve el mensaje de error "Ingresá tu e-mail y contraseña."
     Y permanece en la pantalla de login
 
-  @requiere-firebase @android
+  @HU-01 @TC-HU01-005 @alta @negativo @requiere-firebase @android
   Escenario: Registro con contraseña menor a 6 caracteres
     Dado que Firebase está configurado
     Y el usuario está en modo registro
@@ -67,7 +71,7 @@ Característica: HU-01 Iniciar sesión
     Entonces ve el mensaje de error "La contraseña debe tener al menos 6 caracteres."
     Y permanece en la pantalla de login
 
-  @requiere-firebase @android
+  @HU-01 @TC-HU01-006 @media @negativo @requiere-firebase @android
   Escenario: Login con credenciales incorrectas
     Dado que Firebase está configurado
     Y el usuario está en la pantalla de login en modo "Iniciar sesión"
@@ -78,7 +82,7 @@ Característica: HU-01 Iniciar sesión
     Entonces ve el mensaje de error "Datos incorrectos. Revisá tu e-mail y contraseña o registrate."
     Y permanece en la pantalla de login
 
-  @requiere-firebase @android
+  @HU-01 @TC-HU01-007 @media @negativo @requiere-firebase @android
   Escenario: Login sin conexión a internet
     Dado que Firebase está configurado
     Y el dispositivo no tiene conexión a internet
@@ -93,7 +97,7 @@ Característica: HU-01 Iniciar sesión
   # CASOS BORDE — GOOGLE
   # ─────────────────────────────────────────────────────────────────────
 
-  @android
+  @HU-01 @TC-HU01-008 @alta @borde @android
   Escenario: El botón de Google no se muestra en Expo Go
     Dado que la app corre en Expo Go (MODO_SEEDS=false, executionEnvironment=StoreClient)
     Y esExpoGo es verdadero
@@ -101,7 +105,7 @@ Característica: HU-01 Iniciar sesión
     # El bloque de Google está envuelto en {!esExpoGo && ...}
     Entonces el botón "Continuar con Google" NO está visible en pantalla
 
-  @web @falla-conocida
+  @HU-01 @TC-HU01-009 @alta @borde @web @falla-conocida
   Escenario: El botón de Google no debería mostrarse en web pero actualmente falla
     # BUG CONOCIDO: en plataforma web, esExpoGo=false porque Constants.executionEnvironment
     # no es StoreClient. Por eso el botón de Google SÍ se renderiza en web.

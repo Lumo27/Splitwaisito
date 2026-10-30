@@ -1,4 +1,8 @@
 ﻿# language: es
+# version: 1.0
+# fecha: 29/10/2026
+# commit-probado: 2e3a5cb
+# autor: Candela Sandoval
 
 Característica: HU-02 Ver y crear grupos
   Como usuario autenticado
@@ -9,7 +13,7 @@ Característica: HU-02 Ver y crear grupos
   # CAMINOS FELICES
   # ─────────────────────────────────────────────────────────────────────
 
-  @android
+  @HU-02 @TC-HU02-001 @alta @humo @android
   Escenario: Ver lista de grupos con datos precargados
     Dado que el usuario inició sesión correctamente
     Y tiene grupos disponibles (Firestore o modo demo)
@@ -18,7 +22,7 @@ Característica: HU-02 Ver y crear grupos
     Y cada ítem muestra la cantidad de integrantes
     Y puede tocar cada ítem para ir al detalle
 
-  @android
+  @HU-02 @TC-HU02-002 @media @funcional @android
   Escenario: Ver estado vacío cuando no hay grupos
     Dado que el usuario inició sesión correctamente
     Y no tiene ningún grupo creado
@@ -26,7 +30,7 @@ Característica: HU-02 Ver y crear grupos
     Entonces ve el texto "Creá tu primer grupo para compartir los gastos de un viaje, la casa o una salida."
     Y ve el botón "Crear grupo"
 
-  @android @requiere-firebase
+  @HU-02 @TC-HU02-003 @alta @funcional @android @requiere-firebase
   Escenario: Crear grupo con nombre, moneda y un amigo
     Dado que el usuario inició sesión correctamente
     Y tiene al menos un amigo aceptado en su lista
@@ -39,7 +43,7 @@ Característica: HU-02 Ver y crear grupos
     Entonces es redirigido al detalle del grupo "Viaje Bariloche"
     Y el grupo tiene al menos 2 integrantes (usuario + amigo seleccionado)
 
-  @android
+  @HU-02 @TC-HU02-004 @baja @funcional @android
   Escenario: Pull-to-refresh recarga la lista de grupos
     Dado que el usuario está en la lista de grupos con datos cargados
     Cuando desliza hacia abajo para refrescar
@@ -50,7 +54,7 @@ Característica: HU-02 Ver y crear grupos
   # NEGATIVOS
   # ─────────────────────────────────────────────────────────────────────
 
-  @android
+  @HU-02 @TC-HU02-005 @alta @negativo @android
   Escenario: Intentar crear grupo sin nombre
     Dado que el usuario está en la pantalla "Crear grupo"
     Cuando deja el campo nombre vacío
@@ -58,7 +62,7 @@ Característica: HU-02 Ver y crear grupos
     Entonces ve el mensaje de error "Ingresá un nombre para el grupo."
     Y permanece en la pantalla de creación
 
-  @android @requiere-firebase
+  @HU-02 @TC-HU02-006 @alta @negativo @android @requiere-firebase
   Escenario: Error de red al cargar grupos
     Dado que el usuario inició sesión correctamente
     Y Firestore no está disponible (sin conexión o error de red)
@@ -66,7 +70,7 @@ Característica: HU-02 Ver y crear grupos
     Entonces ve el mensaje "No pudimos cargar tus grupos. Revisá la conexión y volvé a intentar."
     Y ve el botón "Volver a intentar"
 
-  @android @requiere-firebase
+  @HU-02 @TC-HU02-007 @media @funcional @android @requiere-firebase
   Escenario: Eliminar un grupo existente
     Dado que el usuario está en la lista de grupos con al menos un grupo
     Cuando toca el ícono de eliminar en un grupo
@@ -78,7 +82,7 @@ Característica: HU-02 Ver y crear grupos
   # CASOS BORDE
   # ─────────────────────────────────────────────────────────────────────
 
-  @android
+  @HU-02 @TC-HU02-008 @media @borde @android
   Escenario: Crear grupo con moneda USD y verificar símbolo en detalle
     Dado que el usuario está en la pantalla "Crear grupo"
     Cuando ingresa nombre "Compras en Miami"

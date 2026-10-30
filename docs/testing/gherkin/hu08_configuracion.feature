@@ -1,4 +1,8 @@
 ﻿# language: es
+# version: 1.0
+# fecha: 29/10/2026
+# commit-probado: 2e3a5cb
+# autor: Candela Sandoval
 
 Característica: HU-08 Configuración y cerrar sesión
   Como usuario autenticado
@@ -9,7 +13,7 @@ Característica: HU-08 Configuración y cerrar sesión
   # CAMINOS FELICES
   # ─────────────────────────────────────────────────────────────────────
 
-  @android @requiere-firebase
+  @HU-08 @TC-HU08-001 @alta @funcional @android @requiere-firebase
   Escenario: Cerrar sesión correctamente
     Dado que el usuario está autenticado en Firebase
     Y está en el tab "Configuración"
@@ -19,7 +23,7 @@ Característica: HU-08 Configuración y cerrar sesión
     Entonces es redirigido a la pantalla de login
     Y el botón Atrás no lleva de vuelta a la app autenticada
 
-  @android
+  @HU-08 @TC-HU08-002 @alta @funcional @android
   Escenario: Restablecer datos de ejemplo en modo demo
     Dado que la app corre con MODO_SEEDS=true
     Y el usuario está en el tab "Configuración"
@@ -33,7 +37,7 @@ Característica: HU-08 Configuración y cerrar sesión
   # NEGATIVOS
   # ─────────────────────────────────────────────────────────────────────
 
-  @android @requiere-firebase
+  @HU-08 @TC-HU08-003 @alta @negativo @android @requiere-firebase
   Escenario: Error de red al cerrar sesión
     Dado que Firebase no está disponible
     Y el usuario toca "Cerrar sesión" y confirma
@@ -41,7 +45,7 @@ Característica: HU-08 Configuración y cerrar sesión
     Entonces ve el mensaje de error "No pudimos cerrar la sesión. Volvé a intentar."
     Y permanece en el tab "Configuración" con la sesión activa
 
-  @android
+  @HU-08 @TC-HU08-004 @media @negativo @android
   Escenario: Cancelar el cierre de sesión en el Alert
     Dado que el usuario está en el tab "Configuración"
     Cuando toca "Cerrar sesión"
@@ -49,7 +53,7 @@ Característica: HU-08 Configuración y cerrar sesión
     Entonces permanece en el tab "Configuración"
     Y la sesión sigue activa
 
-  @android
+  @HU-08 @TC-HU08-005 @media @negativo @android
   Escenario: Botón de restablecer no aparece en modo Firebase real
     Dado que la app corre con MODO_SEEDS=false (Firebase configurado)
     Cuando el usuario navega al tab "Configuración"
@@ -60,14 +64,14 @@ Característica: HU-08 Configuración y cerrar sesión
   # CASOS BORDE
   # ─────────────────────────────────────────────────────────────────────
 
-  @android
+  @HU-08 @TC-HU08-006 @baja @borde @android
   Escenario: Pantalla muestra email del usuario y modo de conexión
     Dado que el usuario está autenticado y navega al tab "Configuración"
     Entonces ve el email de su cuenta activa
     Y si MODO_SEEDS=true ve el texto "Estás usando datos de ejemplo, guardados en este dispositivo."
     Y si MODO_SEEDS=false ve el texto "Estás conectado a Firebase."
 
-  @android
+  @HU-08 @TC-HU08-007 @media @borde @android
   Escenario: Cancelar el restablecimiento de datos en modo demo
     Dado que la app corre con MODO_SEEDS=true
     Y el usuario está en el tab "Configuración"
