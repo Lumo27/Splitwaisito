@@ -27,7 +27,7 @@ import { formatearMoneda } from '@/theme/moneda'
 import { avisar, confirmar } from '@/utils/alerta'
 import { GastosPorCategoria } from './GraficoGastosPorCategoria'
 import { participantesDelGrupo } from './deudas'
-import { deudasDelGrupo } from './deudasDelGrupo'
+import { deudasDelGrupo, estadoDeudasGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
 
 export function DetalleGrupoScreen() {
@@ -91,6 +91,7 @@ export function DetalleGrupoScreen() {
     () => deudasDelGrupo(participantes, gastos),
     [gastos, participantes],
   )
+  const estadoDeudas = estadoDeudasGrupo(gastos, deudas)
   const nombre = (personaId: string) =>
     participantes.find((persona) => persona.id === personaId)?.nombre ??
     'Usuario'
@@ -312,9 +313,11 @@ export function DetalleGrupoScreen() {
         >
           Deudas simplificadas
         </Text>
-        {deudas.length === 0 ? (
+        {estadoDeudas !== 'pendiente' ? (
           <Text className="text-sm text-text-muted">
-            Todo está saldado. No hay transferencias pendientes.
+            {estadoDeudas === 'sin-gastos'
+              ? 'Los saldos aparecerán al cargar el primer gasto.'
+              : 'Todo está saldado. No hay transferencias pendientes.'}
           </Text>
         ) : (
           deudas.map((deuda) => (

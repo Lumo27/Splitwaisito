@@ -2,8 +2,17 @@ import type { GastoFirestore } from '@/services/firestore'
 import {
   calcularBalances,
   simplificarDeudas,
+  type DeudaSimplificada,
   type Participante,
 } from './deudas'
+
+export function estadoDeudasGrupo(
+  gastos: GastoFirestore[],
+  deudas: DeudaSimplificada[],
+): 'sin-gastos' | 'saldado' | 'pendiente' {
+  if (gastos.length === 0) return 'sin-gastos'
+  return deudas.length === 0 ? 'saldado' : 'pendiente'
+}
 
 export function deudasDelGrupo(
   participantes: Participante[],
