@@ -8,12 +8,17 @@ import type {
 } from './firestore'
 import type { PerfilAmistad, SolicitudAmistad } from './amistades'
 import type { MonedaCodigo } from '@/theme/moneda'
-import { COMPROBANTE_NAHUEL, TICKET_CABANA } from './seedFotos'
+import {
+  COMPROBANTE_NAHUEL,
+  COMPROBANTE_CANDE,
+  TICKET_CABANA,
+  TICKET_PARRILLA,
+} from './seedFotos'
 import { MAX_TRANSFERENCIAS_PENDIENTES } from './transferenciasConfig'
 
-// v3: suma foto, ubicación y un pago pendiente de ejemplo; cambiar la clave
-// regenera los datos.
-const CLAVE_DB = 'splitwaisito-seeds-db-v3'
+// v4: suma fotos, ubicaciones, un pago pendiente y un grupo saldado con pago
+// verificado; cambiar la clave regenera los datos.
+const CLAVE_DB = 'splitwaisito-seeds-db-v4'
 const CLAVE_SESION = 'splitwaisito-seeds-sesion-v1'
 
 export const SEED_USUARIO_ID = 'seed-lucas'
@@ -105,6 +110,15 @@ function crearSeed(): SeedDb {
         updatedAt: haceDias(1),
       },
       {
+        id: 'grupo-cena',
+        nombre: 'Cena con Cande',
+        miembros: [yo, 'seed-cande'],
+        moneda: 'ARS',
+        descripcion: 'Saldado con comprobante verificado',
+        createdAt: haceDias(2),
+        updatedAt: haceDias(1),
+      },
+      {
         id: 'grupo-asado',
         nombre: 'Asado del sábado',
         miembros: [yo, 'seed-cande', 'seed-vladi'],
@@ -142,6 +156,26 @@ function crearSeed(): SeedDb {
         gasto('g-d2', 'Internet y luz', 18000, 'Otro', yo, 6),
         gasto('g-d3', 'Compras de la semana', 27000, 'Comida', 'seed-vladi', 1),
       ],
+      'grupo-cena': [
+        {
+          ...gasto('g-c1', 'Cena en Parrilla El Fogón', 64000, 'Comida', yo, 2),
+          participantes: [yo, 'seed-cande'],
+          tieneFoto: true,
+          ubicacion: {
+            lat: -34.5894,
+            lng: -58.4329,
+            direccion: 'Cabrera 5099, Palermo, CABA',
+          },
+        },
+        {
+          ...gasto('g-c2', 'Pago de Cande a Lucas', 32000, 'Otro', 'seed-cande', 1),
+          tipo: 'pago',
+          estado: 'aprobado',
+          aprobacion: 'automatica',
+          participantes: [yo],
+          tieneFoto: true,
+        },
+      ],
       'grupo-asado': [
         gasto('g-a1', 'Carne y chorizos', 32000, 'Comida', yo, 4),
         gasto('g-a2', 'Carbón y bebidas', 12000, 'Otro', 'seed-cande', 4),
@@ -163,6 +197,8 @@ function crearSeed(): SeedDb {
     fotos: {
       'grupo-bariloche/g-b1': TICKET_CABANA,
       'grupo-bariloche/g-b6': COMPROBANTE_NAHUEL,
+      'grupo-cena/g-c1': TICKET_PARRILLA,
+      'grupo-cena/g-c2': COMPROBANTE_CANDE,
     },
   }
 }

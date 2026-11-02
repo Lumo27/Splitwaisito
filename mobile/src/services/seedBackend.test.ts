@@ -27,7 +27,7 @@ describe('seedBackend en React Native', () => {
   it('crea los datos de ejemplo la primera vez', async () => {
     const seed = await abrirApp()
 
-    expect(seed.seedGruposDelUsuario(seed.SEED_USUARIO_ID)).toHaveLength(3)
+    expect(seed.seedGruposDelUsuario(seed.SEED_USUARIO_ID)).toHaveLength(4)
   })
 
   it('conserva los cambios al reabrir la app', async () => {
