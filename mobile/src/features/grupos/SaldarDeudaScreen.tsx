@@ -26,6 +26,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
 import { confirmar } from '@/utils/alerta'
+import { abrirWhatsApp } from '@/utils/whatsapp'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
@@ -147,7 +148,7 @@ export function SaldarDeudaScreen() {
     const mensaje = `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo "${grupoNombre}" en Splitwaisito${aliasDestino}. ¡Avisame cuando te llegue!`
 
     try {
-      await Linking.openURL(`https://wa.me/?text=${encodeURIComponent(mensaje)}`)
+      await abrirWhatsApp(mensaje)
     } catch {
       setError('No pudimos abrir WhatsApp. Verificá que esté instalado.')
     }

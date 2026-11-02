@@ -26,6 +26,7 @@ import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
 import { avisar, confirmar } from '@/utils/alerta'
+import { abrirWhatsApp } from '@/utils/whatsapp'
 import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
 import { useActualizarCotizacionPesos } from '@/hooks/useActualizarCotizacionPesos'
 import { GastosPorCategoria } from './GraficoGastosPorCategoria'
@@ -135,8 +136,7 @@ export function DetalleGrupoScreen() {
       : ' a mi cuenta'
     const grupoNombre = grupo?.nombre ?? 'el grupo'
     const texto = `¡Hola ${deudorNombre}! Te recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}". Podés transferirme${aliasUsuario}. ¡Muchas gracias!`
-    const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
-    void Linking.openURL(url).catch(() => {
+    void abrirWhatsApp(texto).catch(() => {
       avisar(
         'WhatsApp no disponible',
         'No pudimos abrir WhatsApp. Verificá que esté instalado en tu dispositivo.',

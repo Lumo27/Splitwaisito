@@ -24,7 +24,7 @@ export interface UsuarioFirestore {
   fotoUrl?: string | null
   descripcion?: string
   moneda?: MonedaCodigo
-  amigos?: Array<Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>>
+  amigos?: Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>[]
   updatedAt?: string
 }
 
@@ -107,7 +107,7 @@ export async function getUsuarioPerfil(id: string) {
 
 export async function guardarAmigosDelUsuario(
   usuarioId: string,
-  amigos: Array<Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>>,
+  amigos: Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>[],
 ) {
   if (MODO_SEEDS) return seed.seedGuardarAmigos(usuarioId, amigos)
   if (!db) {

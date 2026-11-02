@@ -16,7 +16,7 @@ interface SeedDb {
   grupos: GrupoFirestore[]
   gastos: Record<string, GastoFirestore[]>
   solicitudes: SolicitudAmistad[]
-  amistades: Array<{ miembros: string[]; perfiles: PerfilAmistad[] }>
+  amistades: { miembros: string[]; perfiles: PerfilAmistad[] }[]
   fotos?: Record<string, string>
 }
 
