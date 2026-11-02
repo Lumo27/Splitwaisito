@@ -17,8 +17,11 @@ import {
   eliminarGasto,
   obtenerGastosDelGrupo,
   obtenerGrupoPorId,
+  obtenerTransferenciasDelGrupo,
+  responderTransferencia,
   type GastoFirestore,
   type GrupoFirestore,
+  type TransferenciaFirestore,
 } from '@/services/firestore'
 import { ETIQUETAS_ESTADO_PAGO, esPago, estadoDelPago } from './pagos'
 import { useAppStore } from '@/store/useAppStore'
@@ -42,6 +45,7 @@ export function DetalleGrupoScreen() {
   const amigos = useAppStore((state) => state.amigos)
   const [grupo, setGrupo] = useState<GrupoFirestore | null>(null)
   const [gastos, setGastos] = useState<GastoFirestore[]>([])
+  const [transferencias, setTransferencias] = useState<TransferenciaFirestore[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [ocupado, setOcupado] = useState(false)
@@ -60,13 +64,18 @@ export function DetalleGrupoScreen() {
         if (turno === peticion.current) {
           setGrupo(null)
           setGastos([])
+          setTransferencias([])
         }
         return
       }
-      const lista = await obtenerGastosDelGrupo(id)
+      const [lista, listaTransferencias] = await Promise.all([
+        obtenerGastosDelGrupo(id),
+        obtenerTransferenciasDelGrupo(id),
+      ])
       if (turno !== peticion.current) return
       setGrupo(siguiente)
       setGastos([...lista].sort((a, b) => b.fecha.localeCompare(a.fecha)))
+      setTransferencias(listaTransferencias)
     } catch {
       if (turno === peticion.current)
         setError(
@@ -81,6 +90,7 @@ export function DetalleGrupoScreen() {
     useCallback(() => {
       setGrupo(null)
       setGastos([])
+      setTransferencias([])
       void cargar()
       return () => {
         peticion.current += 1
@@ -93,8 +103,8 @@ export function DetalleGrupoScreen() {
     [grupo, usuario, amigos],
   )
   const deudas = useMemo(
-    () => deudasDelGrupo(participantes, gastos),
-    [gastos, participantes],
+    () => deudasDelGrupo(participantes, gastos, transferencias),
+    [gastos, participantes, transferencias],
   )
   // Los pagos registrados entran en el cálculo de deudas, pero no son gastos:
   // no suman al total, al gráfico ni a la lista de gastos.
@@ -138,6 +148,19 @@ export function DetalleGrupoScreen() {
         await ejecutar(() => eliminarGasto(id, movimientoId))
       },
     })
+  }
+  const transferenciasPendientes = transferencias.filter(
+    (transferencia) => transferencia.estado === 'pendiente',
+  )
+
+  async function responderTransferenciaEnGrupo(
+    transferencia: TransferenciaFirestore,
+    respuesta: 'confirmada' | 'rechazada',
+  ) {
+    if (!usuarioId) return
+    await ejecutar(() =>
+      responderTransferencia(id, transferencia.id, usuarioId, respuesta),
+    )
   }
 
   function recordarPorWhatsApp(deudorId: string, monto: number) {
@@ -346,6 +369,99 @@ export function DetalleGrupoScreen() {
           ))}
         {ocupado && <ActivityIndicator color={colores.primary} />}
       </View>
+      {transferenciasPendientes.length > 0 && (
+        <View className="mt-5 gap-3 rounded-2xl bg-white p-4">
+          <Text
+            accessibilityRole="header"
+            className="text-lg font-bold text-text"
+          >
+            Transferencias por confirmar
+          </Text>
+          {transferenciasPendientes.map((transferencia) => {
+            const soyAcreedor = transferencia.acreedorId === usuarioId
+            return (
+              <View
+                key={transferencia.id}
+                className="gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3"
+              >
+                <Text className="text-sm font-semibold text-text">
+                  {nombre(transferencia.deudorId)} marcó una transferencia de{' '}
+                  {dinero(transferencia.monto)} como realizada para{' '}
+                  {nombre(transferencia.acreedorId)}.
+                </Text>
+                {soyAcreedor ? (
+                  <>
+                    <Text className="text-sm text-text-muted">
+                      Confirmá solo si recibiste el dinero. El saldo se
+                      actualizará después de confirmar.
+                    </Text>
+                    <Pressable
+                      accessibilityRole="button"
+                      disabled={ocupado}
+                      onPress={() => {
+                        confirmar({
+                          titulo: 'Confirmar recepción',
+                          mensaje:
+                            'El saldo se actualizará y esta transferencia quedará registrada como completada.',
+                          textoConfirmar: 'Confirmar recepción',
+                          textoCancelar: 'Volver',
+                          destructivo: false,
+                          alConfirmar: () => {
+                            void responderTransferenciaEnGrupo(
+                              transferencia,
+                              'confirmada',
+                            )
+                          },
+                        })
+                      }}
+                      className="min-h-11 justify-center rounded-xl bg-primary px-3 py-2"
+                    >
+                      <Text className="text-center font-bold text-white">
+                        Confirmar recepción
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      accessibilityRole="button"
+                      disabled={ocupado}
+                      onPress={() => {
+                        confirmar({
+                          titulo: 'Rechazar transferencia',
+                          mensaje:
+                            'La deuda seguirá pendiente y la otra persona podrá volver a avisarte cuando transfiera.',
+                          textoConfirmar: 'No la recibí',
+                          textoCancelar: 'Volver',
+                          destructivo: true,
+                          alConfirmar: () => {
+                            void responderTransferenciaEnGrupo(
+                              transferencia,
+                              'rechazada',
+                            )
+                          },
+                        })
+                      }}
+                      className="min-h-11 justify-center px-3 py-2"
+                    >
+                      <Text className="text-center font-semibold text-red-700">
+                        No la recibí
+                      </Text>
+                    </Pressable>
+                  </>
+                ) : transferencia.deudorId === usuarioId ? (
+                  <Text className="text-sm font-semibold text-amber-800">
+                    Esperando que {nombre(transferencia.acreedorId)} confirme la
+                    recepción.
+                  </Text>
+                ) : (
+                  <Text className="text-sm text-text-muted">
+                    Pendiente de confirmación por{' '}
+                    {nombre(transferencia.acreedorId)}.
+                  </Text>
+                )}
+              </View>
+            )
+          })}
+        </View>
+      )}
       <View className="mt-5 gap-3 rounded-2xl bg-white p-4">
         <Text
           accessibilityRole="header"
@@ -373,20 +489,30 @@ export function DetalleGrupoScreen() {
               </Text>
               <EquivalenciaPesos monto={deuda.monto} moneda={moneda} />
               {deuda.de === usuarioId && (
-                <Pressable
-                  accessibilityRole="button"
-                  onPress={() =>
-                    router.push({
-                      pathname: '/grupos/[id]/saldar',
-                      params: { id, de: deuda.de, a: deuda.a },
-                    })
-                  }
-                  className="min-h-11 justify-center"
-                >
-                  <Text className="font-bold text-primary-dark">
-                    Saldar deuda
+                transferenciasPendientes.some(
+                  (transferencia) =>
+                    transferencia.deudorId === deuda.de &&
+                    transferencia.acreedorId === deuda.a,
+                ) ? (
+                  <Text className="min-h-11 py-3 font-semibold text-amber-800">
+                    Esperando confirmación
                   </Text>
-                </Pressable>
+                ) : (
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() =>
+                      router.push({
+                        pathname: '/grupos/[id]/saldar',
+                        params: { id, de: deuda.de, a: deuda.a },
+                      })
+                    }
+                    className="min-h-11 justify-center"
+                  >
+                    <Text className="font-bold text-primary-dark">
+                      Saldar deuda
+                    </Text>
+                  </Pressable>
+                )
               )}
               {deuda.a === usuarioId && (
                 <Pressable

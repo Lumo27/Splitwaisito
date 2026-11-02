@@ -62,6 +62,47 @@ service cloud.firestore {
           allow read, create, update, delete: if isGroupMember(groupId);
         }
       }
+
+      match /transferencias/{transferenciaId} {
+        allow read: if isGroupMember(groupId);
+        allow create: if isGroupMember(groupId)
+          && request.auth.uid == request.resource.data.deudorId
+          && request.resource.data.acreedorId in get(/databases/$(database)/documents/grupos/$(groupId)).data.miembros
+          && request.resource.data.deudorId != request.resource.data.acreedorId
+          && request.resource.data.monto is number
+          && request.resource.data.monto > 0
+          && request.resource.data.estado == 'pendiente'
+          && request.resource.data.fechaCreacion is string
+          && get(/databases/$(database)/documents/grupos/$(groupId)).data
+            .get('transferenciasPendientes', []).size() < 10
+          && getAfter(/databases/$(database)/documents/grupos/$(groupId)).data
+            .get('transferenciasPendientes', []).size() <= 10
+          && transferenciaId in getAfter(
+            /databases/$(database)/documents/grupos/$(groupId)
+          ).data.get('transferenciasPendientes', [])
+          && request.resource.data.keys().hasOnly([
+            'deudorId',
+            'acreedorId',
+            'monto',
+            'estado',
+            'fechaCreacion'
+          ]);
+        allow update: if isGroupMember(groupId)
+          && request.auth.uid == resource.data.acreedorId
+          && resource.data.estado == 'pendiente'
+          && request.resource.data.estado in ['confirmada', 'rechazada']
+          && request.resource.data.fechaRespuesta is string
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['estado', 'fechaRespuesta'])
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasAll(['estado', 'fechaRespuesta'])
+          && transferenciaId in get(
+            /databases/$(database)/documents/grupos/$(groupId)
+          ).data.get('transferenciasPendientes', [])
+          && !(transferenciaId in getAfter(
+            /databases/$(database)/documents/grupos/$(groupId)
+          ).data.get('transferenciasPendientes', []));
+      }
     }
   }
 }

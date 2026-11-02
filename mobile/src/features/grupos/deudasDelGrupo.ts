@@ -1,4 +1,7 @@
-import type { GastoFirestore } from '@/services/firestore'
+import type {
+  GastoFirestore,
+  TransferenciaFirestore,
+} from '@/services/firestore'
 import { esPago, pagoAprobado } from './pagos'
 import {
   calcularBalances,
@@ -18,6 +21,7 @@ export function estadoDeudasGrupo(
 export function deudasDelGrupo(
   participantes: Participante[],
   gastos: GastoFirestore[],
+  transferencias: TransferenciaFirestore[] = [],
 ) {
   const balances = Object.fromEntries(
     participantes.map((persona) => [persona.id, 0]),
@@ -52,6 +56,13 @@ export function deudasDelGrupo(
         balances[id] = (balances[id] ?? 0) + saldo
       }
     })
+  })
+  transferencias.forEach((transferencia) => {
+    if (transferencia.estado !== 'confirmada') return
+    balances[transferencia.deudorId] =
+      (balances[transferencia.deudorId] ?? 0) + transferencia.monto
+    balances[transferencia.acreedorId] =
+      (balances[transferencia.acreedorId] ?? 0) - transferencia.monto
   })
   return simplificarDeudas(balances)
 }

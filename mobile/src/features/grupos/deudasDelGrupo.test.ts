@@ -10,6 +10,14 @@ const gasto = {
   pagadoPorNombre: 'Ana',
   fecha: '2026-10-06',
 }
+const transferencia = {
+  id: 't1',
+  deudorId: 'b',
+  acreedorId: 'a',
+  monto: 40,
+  estado: 'confirmada' as const,
+  fechaCreacion: '2026-10-07',
+}
 
 describe('deudasDelGrupo', () => {
   it('reparte entre todos cuando no hay selección', () => {
@@ -68,6 +76,32 @@ describe('deudasDelGrupo', () => {
     const deudas = deudasDelGrupo(personas, [gastoExterno])
     const ids = deudas.flatMap((d) => [d.de, d.a])
     expect(ids).not.toContain('externo')
+  })
+
+  it('solo descuenta del saldo las transferencias confirmadas', () => {
+    expect(deudasDelGrupo(personas, [gasto], [transferencia])).toEqual([
+      { de: 'c', a: 'a', monto: 40 },
+    ])
+    expect(
+      deudasDelGrupo(personas, [gasto], [
+        { ...transferencia, estado: 'pendiente' },
+      ]),
+    ).toEqual([
+      { de: 'b', a: 'a', monto: 40 },
+      { de: 'c', a: 'a', monto: 40 },
+    ])
+  })
+
+  it('ignora transferencias rechazadas y conserva cualquier saldo restante', () => {
+    expect(
+      deudasDelGrupo(personas, [gasto], [
+        { ...transferencia, monto: 20, estado: 'rechazada' },
+        { ...transferencia, monto: 20 },
+      ]),
+    ).toEqual([
+      { de: 'c', a: 'a', monto: 40 },
+      { de: 'b', a: 'a', monto: 20 },
+    ])
   })
 })
 

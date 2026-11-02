@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
-import { ActivityIndicator, Image, Text, View } from 'react-native'
+import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native'
+import { House } from 'lucide-react-native'
 import * as Location from 'expo-location'
 import {
   Boton,
@@ -274,6 +275,10 @@ export function CargarGastoScreen() {
     else if (id) router.replace({ pathname: '/grupos/[id]', params: { id } })
   }
 
+  function volverAlInicio() {
+    router.replace('/grupos')
+  }
+
   function confirmarEliminar() {
     if (!id || !gastoId) return
     confirmar({
@@ -326,7 +331,20 @@ export function CargarGastoScreen() {
     )
   return (
     <Pantalla>
-      <Titulo>{gastoId ? 'Editar gasto' : 'Cargar gasto'}</Titulo>
+      <View className="flex-row items-center justify-between gap-3">
+        <View className="flex-1">
+          <Titulo>{gastoId ? 'Editar gasto' : 'Cargar gasto'}</Titulo>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Volver al inicio"
+          onPress={volverAlInicio}
+          className="min-h-9 flex-row items-center justify-center gap-1.5 rounded-lg bg-primary-light px-2.5 py-1.5"
+        >
+          <House size={16} color={colores.primaryDark} />
+          <Text className="text-sm font-semibold text-primary-dark">Inicio</Text>
+        </Pressable>
+      </View>
       <Text className="text-text-muted">{grupo.nombre}</Text>
       <Tarjeta>
         <Campo

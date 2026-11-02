@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import { ActivityIndicator, Image, Text, View } from 'react-native'
+import { ActivityIndicator, Image, Linking, Text, View } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
 import {
   Boton,
@@ -10,11 +10,14 @@ import {
   Titulo,
 } from '@/components/Formulario'
 import {
+  crearTransferenciaPendiente,
   obtenerGastosDelGrupo,
   obtenerGrupoPorId,
+  obtenerTransferenciasDelGrupo,
   registrarPago,
   type GastoFirestore,
   type GrupoFirestore,
+  type TransferenciaFirestore,
 } from '@/services/firestore'
 import { esPago, receptorDelPago } from './pagos'
 import {
@@ -25,11 +28,12 @@ import {
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
-import { avisar } from '@/utils/alerta'
+import { avisar, confirmar } from '@/utils/alerta'
 import { elegirImagen } from '@/utils/imagen'
 import { abrirWhatsApp } from '@/utils/whatsapp'
 import { leerComprobante } from '@/services/comprobantes'
 import { compararComprobante } from './compararComprobante'
+import { MAX_TRANSFERENCIAS_PENDIENTES } from '@/services/transferenciasConfig'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
@@ -45,11 +49,13 @@ export function SaldarDeudaScreen() {
   const amigos = useAppStore((state) => state.amigos)
   const [grupo, setGrupo] = useState<GrupoFirestore | null>(null)
   const [gastos, setGastos] = useState<GastoFirestore[]>([])
+  const [transferencias, setTransferencias] = useState<TransferenciaFirestore[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [copiado, setCopiado] = useState('')
   const [registrando, setRegistrando] = useState(false)
   const [comprobante, setComprobante] = useState<string | null>(null)
+  const [guardandoTransferencia, setGuardandoTransferencia] = useState(false)
   const peticion = useRef(0)
   const usuarioId = usuario?.id
   const cargar = useCallback(async () => {
@@ -63,10 +69,14 @@ export function SaldarDeudaScreen() {
       const actual = await obtenerGrupoPorId(id)
       if (!actual?.miembros.includes(usuarioId))
         throw new Error('El grupo no está disponible.')
-      const lista = await obtenerGastosDelGrupo(id)
+      const [lista, listaTransferencias] = await Promise.all([
+        obtenerGastosDelGrupo(id),
+        obtenerTransferenciasDelGrupo(id),
+      ])
       if (turno === peticion.current) {
         setGrupo(actual)
         setGastos(lista)
+        setTransferencias(listaTransferencias)
       }
     } catch (fallo) {
       if (turno === peticion.current) {
@@ -95,10 +105,23 @@ export function SaldarDeudaScreen() {
         ? deudasDelGrupo(
             participantesDelGrupo(grupo.miembros, usuario, amigos),
             gastos,
+            transferencias,
           ).find((item) => item.de === de && item.a === a)
         : undefined,
-    [grupo, usuario, amigos, gastos, de, a],
+    [grupo, usuario, amigos, gastos, transferencias, de, a],
   )
+  const transferenciaPendiente = transferencias.find(
+    (transferencia) =>
+      transferencia.estado === 'pendiente' &&
+      transferencia.deudorId === de &&
+      transferencia.acreedorId === a,
+  )
+  const pendientesDelGrupo = transferencias.filter(
+    (transferencia) => transferencia.estado === 'pendiente',
+  ).length
+  const limiteDePendientesAlcanzado =
+    !transferenciaPendiente &&
+    pendientesDelGrupo >= MAX_TRANSFERENCIAS_PENDIENTES
   const acreedor = amigos.find((amigo) => amigo.id === a)
   const email = deuda && de === usuarioId ? (acreedor?.email?.trim() ?? '') : ''
   const alias = deuda && de === usuarioId ? (acreedor?.alias?.trim() ?? '') : ''
@@ -116,7 +139,7 @@ export function SaldarDeudaScreen() {
   useActualizarCotizacionPesos(moneda)
   useEffect(() => {
     let vigente = true
-    if (!datoParaTransferir || cargando) return
+    if (!datoParaTransferir || cargando || transferenciaPendiente) return
     const que = alias ? 'Alias' : 'E-mail'
     void Clipboard.setStringAsync(datoParaTransferir)
       .then(() => {
@@ -131,8 +154,7 @@ export function SaldarDeudaScreen() {
     return () => {
       vigente = false
     }
-  }, [datoParaTransferir, alias, cargando])
-
+  }, [datoParaTransferir, alias, cargando, transferenciaPendiente])
   async function copiar(valor: string, mensaje: string) {
     try {
       await Clipboard.setStringAsync(valor)
@@ -159,6 +181,15 @@ export function SaldarDeudaScreen() {
       await abrirWhatsApp(mensaje)
     } catch {
       setError('No pudimos abrir WhatsApp. Verificá que esté instalado.')
+    }
+  }
+  async function abrirMercadoPago() {
+    try {
+      await Linking.openURL('https://www.mercadopago.com.ar/money-transfer')
+    } catch {
+      setError(
+        'No pudimos abrir Mercado Pago. Abrilo desde tu teléfono y elegí Enviar dinero.',
+      )
     }
   }
   async function adjuntarComprobante(camara: boolean) {
@@ -238,6 +269,38 @@ export function SaldarDeudaScreen() {
       setError('No pudimos programar el recordatorio.')
     }
   }
+
+  function marcarComoRealizada() {
+    if (!deuda || guardandoTransferencia) return
+    confirmar({
+      titulo: 'Marcar transferencia como realizada',
+      mensaje:
+        'Esto avisará al acreedor para que confirme si recibió el dinero. La deuda seguirá pendiente hasta que confirme.',
+      textoConfirmar: 'Sí, ya transferí',
+      textoCancelar: 'Todavía no',
+      destructivo: false,
+      alConfirmar: async () => {
+        if (guardandoTransferencia) return
+        setGuardandoTransferencia(true)
+        setError('')
+        try {
+          await crearTransferenciaPendiente(id, de, a, deuda.monto)
+          await cargar()
+          setCopiado(
+            'Avisamos al acreedor. La deuda queda pendiente hasta que confirme.',
+          )
+        } catch (fallo) {
+          setError(
+            fallo instanceof Error
+              ? fallo.message
+              : 'No pudimos registrar la transferencia. Volvé a intentar.',
+          )
+        } finally {
+          setGuardandoTransferencia(false)
+        }
+      },
+    })
+  }
   function volver() {
     router.replace({ pathname: '/grupos/[id]', params: { id } })
   }
@@ -302,93 +365,139 @@ export function SaldarDeudaScreen() {
       </Tarjeta>
       <Mensaje texto={copiado} />
       <Mensaje texto={error} error />
-      <Text className="text-sm leading-6 text-text-muted">
-        Transferí desde el banco o la billetera que quieras usando el alias o el
-        e-mail. Después subí el comprobante para saldar la deuda en el grupo.
-      </Text>
-      <Boton
-        texto="Copiar alias"
-        secundario
-        disabled={!alias}
-        onPress={() => {
-          void copiar(alias, 'Alias copiado.')
-        }}
-      />
-      <Boton
-        texto="Copiar monto"
-        secundario
-        onPress={() => {
-          void copiar(String(deuda.monto), 'Monto copiado.')
-        }}
-      />
-      {recordatoriosDisponibles && (
-        <Boton
-          texto="Recordarme pagar más tarde"
-          secundario
-          onPress={() => {
-            void recordarmePagar()
-          }}
-        />
-      )}
-      {pagoEnRevision ? (
+      {transferenciaPendiente ? (
         <Tarjeta>
-          <Text className="font-bold text-text">Pago en revisión</Text>
-          <Text className="text-sm text-text-muted">
-            Ya subiste un comprobante para esta deuda.{' '}
-            {acreedor?.nombre ?? 'El acreedor'} lo tiene que aprobar desde el
-            detalle del pago.
+          <Text className="font-bold text-amber-800">
+            Transferencia pendiente de confirmación
+          </Text>
+          <Text className="text-sm leading-6 text-text-muted">
+            Ya avisaste que realizaste esta transferencia. La deuda se actualizará
+            cuando {acreedor?.nombre ?? 'el acreedor'} confirme que recibió el
+            dinero.
           </Text>
         </Tarjeta>
       ) : (
-        <Tarjeta>
-          <Text className="font-bold text-text">¿Ya transferiste?</Text>
-          <Text className="text-sm text-text-muted">
-            Subí la captura o la foto del comprobante.
+        <>
+          <Text className="text-sm leading-6 text-text-muted">
+            Transferí desde el banco o la billetera que quieras usando el alias o
+            el e-mail. Podés subir el comprobante para que el pago se verifique.
           </Text>
-          {comprobante && (
-            <Image
-              source={{ uri: comprobante }}
-              accessibilityLabel="Comprobante de pago"
-              className="w-full rounded-xl"
-              style={{ height: 360 }}
-              resizeMode="contain"
+          <Boton
+            texto="Copiar alias"
+            secundario
+            disabled={!alias}
+            onPress={() => {
+              void copiar(alias, 'Alias copiado.')
+            }}
+          />
+          <Boton
+            texto="Copiar monto"
+            secundario
+            onPress={() => {
+              void copiar(String(deuda.monto), 'Monto copiado.')
+            }}
+          />
+          {recordatoriosDisponibles && (
+            <Boton
+              texto="Recordarme pagar más tarde"
+              secundario
+              onPress={() => {
+                void recordarmePagar()
+              }}
             />
           )}
-          <View className="flex-row gap-3">
-            <View className="flex-1">
+          {limiteDePendientesAlcanzado && (
+            <Mensaje
+              texto="Este grupo ya tiene 10 transferencias pendientes. Cuando se confirme o rechace alguna, vas a poder registrar otra."
+              error
+            />
+          )}
+          {pagoEnRevision ? (
+            <Tarjeta>
+              <Text className="font-bold text-text">Pago en revisión</Text>
+              <Text className="text-sm text-text-muted">
+                Ya subiste un comprobante para esta deuda.{' '}
+                {acreedor?.nombre ?? 'El acreedor'} lo tiene que aprobar desde
+                el detalle del pago.
+              </Text>
+            </Tarjeta>
+          ) : (
+            <>
+              <Tarjeta>
+                <Text className="font-bold text-text">¿Ya transferiste?</Text>
+                <Text className="text-sm text-text-muted">
+                  Subí la captura o la foto del comprobante.
+                </Text>
+                {comprobante && (
+                  <Image
+                    source={{ uri: comprobante }}
+                    accessibilityLabel="Comprobante de pago"
+                    className="w-full rounded-xl"
+                    style={{ height: 360 }}
+                    resizeMode="contain"
+                  />
+                )}
+                <View className="flex-row gap-3">
+                  <View className="flex-1">
+                    <Boton
+                      texto="Tomar foto"
+                      secundario
+                      onPress={() => {
+                        void adjuntarComprobante(true)
+                      }}
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <Boton
+                      texto="Elegir captura"
+                      secundario
+                      onPress={() => {
+                        void adjuntarComprobante(false)
+                      }}
+                    />
+                  </View>
+                </View>
+                <Boton
+                  texto="Registrar pago con comprobante"
+                  cargando={registrando}
+                  disabled={
+                    !comprobante ||
+                    registrando ||
+                    limiteDePendientesAlcanzado
+                  }
+                  onPress={registrarConComprobante}
+                />
+              </Tarjeta>
               <Boton
-                texto="Tomar foto"
-                secundario
+                texto="Abrir Enviar dinero en Mercado Pago"
                 onPress={() => {
-                  void adjuntarComprobante(true)
+                  void abrirMercadoPago()
                 }}
               />
-            </View>
-            <View className="flex-1">
               <Boton
-                texto="Elegir captura"
+                texto="Avisar por WhatsApp"
                 secundario
                 onPress={() => {
-                  void adjuntarComprobante(false)
+                  void compartirPorWhatsApp()
                 }}
               />
-            </View>
-          </View>
-          <Boton
-            texto="Registrar pago con comprobante"
-            cargando={registrando}
-            disabled={!comprobante || registrando}
-            onPress={registrarConComprobante}
-          />
-        </Tarjeta>
+              <Text className="text-sm leading-6 text-text-muted">
+                También podés registrar manualmente que transferiste; la deuda
+                seguirá pendiente hasta que el acreedor confirme la recepción.
+              </Text>
+              <Boton
+                texto="Marqué la transferencia como realizada"
+                secundario
+                cargando={guardandoTransferencia}
+                disabled={
+                  guardandoTransferencia || limiteDePendientesAlcanzado
+                }
+                onPress={marcarComoRealizada}
+              />
+            </>
+          )}
+        </>
       )}
-      <Boton
-        texto="Avisar por WhatsApp"
-        secundario
-        onPress={() => {
-          void compartirPorWhatsApp()
-        }}
-      />
       <Boton texto="Volver al grupo" secundario onPress={volver} />
     </Pantalla>
   )

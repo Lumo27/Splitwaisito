@@ -158,3 +158,19 @@ Validación: typecheck correcto, 45 pruebas aprobadas en Vitest y exportación d
 | Copilot SDK en VS Code | Resolver el bloqueo de merge del PR y completar validaciones para solicitar una nueva revisión | «Integra la equivalencia informativa con el `develop` actual, resuelve los conflictos sin perder el gráfico de categorías ni el copiado automático del e-mail, y valida los cambios.» | Se integró la rama del PR con `develop`, conservando las pantallas de equivalencia en USD/BRL, el gráfico de categorías y el copiado automático del e-mail al saldar deuda. Se corrigió la validación para no aceptar cotizaciones con fecha futura y se completó la persistencia tipada de cotizaciones en Zustand. |
 
 Validación local no disponible porque el entorno no tiene Node.js/npm. La CI de GitHub Actions (run 63) completó con éxito los jobs `lint-test-build` y `mobile`, incluidos lint, typecheck, tests y builds.
+
+### Confirmación manual de transferencias — Copilot, 28/10/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Registrar avisos de transferencia, permitir su confirmación o rechazo por el acreedor y limitar las solicitudes pendientes | «Agregar un paso de confirmación manual… hasta un límite de 10 pendientes y luego bloquea nuevas hasta confirmar o rechazar la actual» | Estados pendiente, confirmada y rechazada; persistencia en Firebase y modo demo; actualización del saldo solo al confirmar; máximo de 10 pendientes por grupo con cupo liberado al responder. |
+
+Validación: 17 pruebas dirigidas aprobadas, `npm run typecheck` y `npm run build` correctos. `npm run lint` terminó sin errores y con cuatro advertencias preexistentes de estilo. Las reglas de Firestore deben publicarse para habilitar el límite en Firebase.
+
+### Acceso al inicio desde cargar gasto — Copilot, 02/11/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Facilitar volver a la pantalla de grupos desde el formulario de gasto | «Agregar un botón pequeño en la parte de arriba a la derecha para retroceder a la ventana de inicio» | Botón accesible «Inicio» en el encabezado del formulario de carga y edición, con navegación directa a la lista de grupos. |
+
+Validación: exportación web correcta y recorrido manual del botón hasta la lista de grupos.

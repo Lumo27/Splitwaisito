@@ -76,4 +76,115 @@ describe('seedBackend en React Native', () => {
     const gasto = seed.seedGastosDelGrupo('grupo-asado').find((g) => g.id === 'g-a1')
     expect(gasto?.monto).toBe(35000)
   })
+
+  it('registra una transferencia y solo el acreedor puede confirmarla', async () => {
+    const seed = await abrirApp()
+    const transferencia = seed.seedCrearTransferenciaPendiente(
+      'grupo-bariloche',
+      seed.SEED_USUARIO_ID,
+      'seed-cande',
+      12000,
+    )
+
+    expect(transferencia.estado).toBe('pendiente')
+    expect(() =>
+      seed.seedResponderTransferencia(
+        'grupo-bariloche',
+        transferencia.id,
+        seed.SEED_USUARIO_ID,
+        'confirmada',
+      ),
+    ).toThrow('Solo el acreedor puede responder')
+
+    const confirmada = seed.seedResponderTransferencia(
+      'grupo-bariloche',
+      transferencia.id,
+      'seed-cande',
+      'confirmada',
+    )
+    expect(confirmada.estado).toBe('confirmada')
+    expect(confirmada.fechaRespuesta).toBeTruthy()
+  })
+
+  it('rechaza solicitudes duplicadas de transferencia pendientes', async () => {
+    const seed = await abrirApp()
+    seed.seedCrearTransferenciaPendiente(
+      'grupo-bariloche',
+      seed.SEED_USUARIO_ID,
+      'seed-cande',
+      12000,
+    )
+
+    expect(() =>
+      seed.seedCrearTransferenciaPendiente(
+        'grupo-bariloche',
+        seed.SEED_USUARIO_ID,
+        'seed-cande',
+        12000,
+      ),
+    ).toThrow('Ya hay una transferencia pendiente')
+  })
+
+  it('limita a diez pendientes por grupo y libera el cupo al responder', async () => {
+    const seed = await abrirApp()
+    const pares = [
+      ['seed-lucas', 'seed-cande'],
+      ['seed-lucas', 'seed-german'],
+      ['seed-lucas', 'seed-nahuel'],
+      ['seed-cande', 'seed-lucas'],
+      ['seed-cande', 'seed-german'],
+      ['seed-cande', 'seed-nahuel'],
+      ['seed-german', 'seed-lucas'],
+      ['seed-german', 'seed-cande'],
+      ['seed-german', 'seed-nahuel'],
+      ['seed-nahuel', 'seed-lucas'],
+      ['seed-nahuel', 'seed-cande'],
+      ['seed-nahuel', 'seed-german'],
+    ] as const
+
+    const pendientes = pares.slice(0, 10).map(([deudorId, acreedorId]) =>
+      seed.seedCrearTransferenciaPendiente(
+        'grupo-bariloche',
+        deudorId,
+        acreedorId,
+        1000,
+      ),
+    )
+    expect(() =>
+      seed.seedCrearTransferenciaPendiente(
+        'grupo-bariloche',
+        ...pares[10],
+        1000,
+      ),
+    ).toThrow('El grupo ya tiene 10 transferencias pendientes')
+
+    seed.seedResponderTransferencia(
+      'grupo-bariloche',
+      pendientes[0].id,
+      pendientes[0].acreedorId,
+      'rechazada',
+    )
+
+    expect(
+      seed.seedCrearTransferenciaPendiente(
+        'grupo-bariloche',
+        ...pares[10],
+        1000,
+      ).estado,
+    ).toBe('pendiente')
+
+    seed.seedResponderTransferencia(
+      'grupo-bariloche',
+      pendientes[1].id,
+      pendientes[1].acreedorId,
+      'confirmada',
+    )
+    expect(
+      seed.seedCrearTransferenciaPendiente(
+        'grupo-bariloche',
+        ...pares[11],
+        1000,
+      ).estado,
+    ).toBe('pendiente')
+  })
 })

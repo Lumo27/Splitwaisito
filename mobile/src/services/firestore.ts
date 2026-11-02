@@ -7,6 +7,7 @@ import {
   getDoc,
   getDocs,
   query,
+  runTransaction,
   setDoc,
   updateDoc,
   where,
@@ -14,6 +15,7 @@ import {
 } from 'firebase/firestore'
 import { db, MODO_SEEDS } from './firebase'
 import * as seed from './seedBackend'
+import { MAX_TRANSFERENCIAS_PENDIENTES } from './transferenciasConfig'
 import type { MonedaCodigo } from '@/theme/moneda'
 
 export interface UsuarioFirestore {
@@ -60,6 +62,15 @@ export interface GastoFirestore {
 
 export type EstadoPago = 'pendiente' | 'aprobado' | 'rechazado'
 
+export interface TransferenciaFirestore {
+  id: string
+  deudorId: string
+  acreedorId: string
+  monto: number
+  estado: 'pendiente' | 'confirmada' | 'rechazada'
+  fechaCreacion: string
+  fechaRespuesta?: string
+}
 
 export const usuariosRef = db
   ? (collection(db, 'usuarios') as ReturnType<typeof collection>)
@@ -287,6 +298,179 @@ export async function obtenerGastosDelGrupo(grupoId: string) {
     id: documento.id,
     ...documento.data(),
   })) as GastoFirestore[]
+}
+
+export async function obtenerTransferenciasDelGrupo(grupoId: string) {
+  if (MODO_SEEDS) return seed.seedTransferenciasDelGrupo(grupoId)
+  if (!db) {
+    throw new Error('Firebase no configurado aún.')
+  }
+
+  const snap = await getDocs(
+    collection(db, 'grupos', grupoId, 'transferencias'),
+  )
+
+  const transferencias = snap.docs.map(
+    (documento) =>
+      ({
+      id: documento.id,
+      ...documento.data(),
+      }) as TransferenciaFirestore,
+  )
+
+  return transferencias.sort((a, b) =>
+    b.fechaCreacion.localeCompare(a.fechaCreacion),
+  )
+}
+
+export async function crearTransferenciaPendiente(
+  grupoId: string,
+  deudorId: string,
+  acreedorId: string,
+  monto: number,
+) {
+  if (MODO_SEEDS) {
+    return seed.seedCrearTransferenciaPendiente(
+      grupoId,
+      deudorId,
+      acreedorId,
+      monto,
+    )
+  }
+  if (!db) throw new Error('Firebase no configurado aún.')
+  if (!Number.isFinite(monto) || monto <= 0 || deudorId === acreedorId) {
+    throw new Error('Los datos de la transferencia no son válidos.')
+  }
+  const firestore = db
+
+  const payload = {
+    deudorId,
+    acreedorId,
+    monto,
+    estado: 'pendiente' as const,
+    fechaCreacion: new Date().toISOString(),
+  }
+  const grupoRef = doc(firestore, 'grupos', grupoId)
+  const transferenciaRef = doc(
+    collection(firestore, 'grupos', grupoId, 'transferencias'),
+  )
+
+  await runTransaction(firestore, async (transaccion) => {
+    const grupoSnapshot = await transaccion.get(grupoRef)
+    if (!grupoSnapshot.exists()) {
+      throw new Error('El grupo no está disponible.')
+    }
+
+    const grupo = grupoSnapshot.data()
+    if (
+      !Array.isArray(grupo.miembros) ||
+      !grupo.miembros.includes(deudorId) ||
+      !grupo.miembros.includes(acreedorId)
+    ) {
+      throw new Error('Ambas personas deben ser integrantes del grupo.')
+    }
+
+    const idsPendientes = grupo.transferenciasPendientes ?? []
+    if (!Array.isArray(idsPendientes)) {
+      throw new Error('No pudimos validar las transferencias pendientes del grupo.')
+    }
+    if (idsPendientes.length >= MAX_TRANSFERENCIAS_PENDIENTES) {
+      throw new Error(
+        'El grupo ya tiene 10 transferencias pendientes. Esperá a que se confirme o rechace alguna.',
+      )
+    }
+
+    const existentes = await Promise.all(
+      idsPendientes.map((transferenciaId: string) =>
+        transaccion.get(
+          doc(firestore, 'grupos', grupoId, 'transferencias', transferenciaId),
+        ),
+      ),
+    )
+    if (
+      existentes.some((snapshot) => {
+        const transferencia = snapshot.data()
+        return (
+          snapshot.exists() &&
+          transferencia?.estado === 'pendiente' &&
+          transferencia.deudorId === deudorId &&
+          transferencia.acreedorId === acreedorId
+        )
+      })
+    ) {
+      throw new Error('Ya hay una transferencia pendiente para esta deuda.')
+    }
+
+    transaccion.update(grupoRef, {
+      transferenciasPendientes: [...idsPendientes, transferenciaRef.id],
+    })
+    transaccion.set(transferenciaRef, payload)
+  })
+
+  return { id: transferenciaRef.id, ...payload }
+}
+
+export async function responderTransferencia(
+  grupoId: string,
+  transferenciaId: string,
+  usuarioId: string,
+  respuesta: 'confirmada' | 'rechazada',
+) {
+  if (MODO_SEEDS) {
+    return seed.seedResponderTransferencia(
+      grupoId,
+      transferenciaId,
+      usuarioId,
+      respuesta,
+    )
+  }
+  if (!db) throw new Error('Firebase no configurado aún.')
+  const firestore = db
+
+  const referencia = doc(
+    firestore,
+    'grupos',
+    grupoId,
+    'transferencias',
+    transferenciaId,
+  )
+  const grupoRef = doc(firestore, 'grupos', grupoId)
+
+  await runTransaction(firestore, async (transaccion) => {
+    const [existente, grupoSnapshot] = await Promise.all([
+      transaccion.get(referencia),
+      transaccion.get(grupoRef),
+    ])
+    if (!existente.exists()) {
+      throw new Error('La solicitud de transferencia ya no está disponible.')
+    }
+    if (!grupoSnapshot.exists()) {
+      throw new Error('El grupo no está disponible.')
+    }
+
+    const transferencia = existente.data()
+    if (transferencia.acreedorId !== usuarioId) {
+      throw new Error('Solo el acreedor puede responder a esta solicitud.')
+    }
+    if (transferencia.estado !== 'pendiente') {
+      throw new Error('Esta solicitud ya fue respondida.')
+    }
+
+    const idsPendientes = grupoSnapshot.data().transferenciasPendientes
+    if (!Array.isArray(idsPendientes) || !idsPendientes.includes(transferenciaId)) {
+      throw new Error('No pudimos actualizar el límite de transferencias del grupo.')
+    }
+
+    transaccion.update(referencia, {
+      estado: respuesta,
+      fechaRespuesta: new Date().toISOString(),
+    })
+    transaccion.update(grupoRef, {
+      transferenciasPendientes: idsPendientes.filter(
+        (id: string) => id !== transferenciaId,
+      ),
+    })
+  })
 }
 
 export async function eliminarGasto(grupoId: string, gastoId: string) {

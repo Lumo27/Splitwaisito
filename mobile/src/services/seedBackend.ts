@@ -1,9 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import type { GastoFirestore, GrupoFirestore, UsuarioFirestore } from './firestore'
+import type {
+  GastoFirestore,
+  GrupoFirestore,
+  TransferenciaFirestore,
+  UsuarioFirestore,
+} from './firestore'
 import type { PerfilAmistad, SolicitudAmistad } from './amistades'
 import type { MonedaCodigo } from '@/theme/moneda'
 import { COMPROBANTE_NAHUEL, TICKET_CABANA } from './seedFotos'
+import { MAX_TRANSFERENCIAS_PENDIENTES } from './transferenciasConfig'
 
 // v3: suma foto, ubicación y un pago pendiente de ejemplo; cambiar la clave
 // regenera los datos.
@@ -18,6 +24,7 @@ interface SeedDb {
   usuarios: Record<string, UsuarioFirestore>
   grupos: GrupoFirestore[]
   gastos: Record<string, GastoFirestore[]>
+  transferencias?: Record<string, TransferenciaFirestore[]>
   solicitudes: SolicitudAmistad[]
   amistades: { miembros: string[]; perfiles: PerfilAmistad[] }[]
   fotos?: Record<string, string>
@@ -335,6 +342,7 @@ export function seedEliminarGrupo(grupoId: string) {
   const db = cargar()
   db.grupos = db.grupos.filter((g) => g.id !== grupoId)
   delete db.gastos[grupoId]
+  delete db.transferencias?.[grupoId]
   guardar(db)
 }
 
@@ -371,6 +379,89 @@ export function seedEliminarGasto(grupoId: string, gastoId: string) {
     delete db.fotos[`${grupoId}/${gastoId}`]
   }
   guardar(db)
+}
+
+export function seedTransferenciasDelGrupo(grupoId: string) {
+  return [...(cargar().transferencias?.[grupoId] ?? [])].sort((a, b) =>
+    b.fechaCreacion.localeCompare(a.fechaCreacion),
+  )
+}
+
+export function seedCrearTransferenciaPendiente(
+  grupoId: string,
+  deudorId: string,
+  acreedorId: string,
+  monto: number,
+) {
+  const db = cargar()
+  const grupo = db.grupos.find((item) => item.id === grupoId)
+  if (!grupo || !grupo.miembros.includes(deudorId) || !grupo.miembros.includes(acreedorId)) {
+    throw new Error('Ambas personas deben ser integrantes del grupo.')
+  }
+  if (!Number.isFinite(monto) || monto <= 0 || deudorId === acreedorId) {
+    throw new Error('Los datos de la transferencia no son válidos.')
+  }
+
+  const existentes = db.transferencias?.[grupoId] ?? []
+  const pendientes = existentes.filter((item) => item.estado === 'pendiente')
+  if (pendientes.length >= MAX_TRANSFERENCIAS_PENDIENTES) {
+    throw new Error(
+      'El grupo ya tiene 10 transferencias pendientes. Esperá a que se confirme o rechace alguna.',
+    )
+  }
+  if (
+    pendientes.some(
+      (item) =>
+        item.deudorId === deudorId &&
+        item.acreedorId === acreedorId,
+    )
+  ) {
+    throw new Error('Ya hay una transferencia pendiente para esta deuda.')
+  }
+
+  const transferencia: TransferenciaFirestore = {
+    id: idNuevo('transferencia'),
+    deudorId,
+    acreedorId,
+    monto,
+    estado: 'pendiente',
+    fechaCreacion: new Date().toISOString(),
+  }
+  db.transferencias = db.transferencias ?? {}
+  db.transferencias[grupoId] = [transferencia, ...existentes]
+  guardar(db)
+  return transferencia
+}
+
+export function seedResponderTransferencia(
+  grupoId: string,
+  transferenciaId: string,
+  usuarioId: string,
+  respuesta: 'confirmada' | 'rechazada',
+) {
+  const db = cargar()
+  const transferencias = db.transferencias?.[grupoId] ?? []
+  const existente = transferencias.find((item) => item.id === transferenciaId)
+  if (!existente) {
+    throw new Error('La solicitud de transferencia ya no está disponible.')
+  }
+  if (existente.acreedorId !== usuarioId) {
+    throw new Error('Solo el acreedor puede responder a esta solicitud.')
+  }
+  if (existente.estado !== 'pendiente') {
+    throw new Error('Esta solicitud ya fue respondida.')
+  }
+
+  const actualizada: TransferenciaFirestore = {
+    ...existente,
+    estado: respuesta,
+    fechaRespuesta: new Date().toISOString(),
+  }
+  db.transferencias![grupoId] = transferencias.map((item) =>
+    item.id === transferenciaId ? actualizada : item,
+  )
+  guardar(db)
+  return actualizada
 }
 
 export function seedGuardarFotoGasto(
