@@ -56,6 +56,8 @@ export interface GastoFirestore {
   estado?: EstadoPago
   /** Solo en pagos: por qué la verificación automática no lo aprobó. */
   motivos?: string[]
+  /** Solo en pagos aprobados: si lo aprobó la IA o quien recibió el dinero. */
+  aprobacion?: 'automatica' | 'manual'
 }
 
 export type EstadoPago = 'pendiente' | 'aprobado' | 'rechazado'
@@ -248,6 +250,7 @@ export async function registrarPago(
   const guardado = await guardarGasto(grupoId, {
     tipo: 'pago',
     estado: pago.estado,
+    ...(pago.estado === 'aprobado' ? { aprobacion: 'automatica' as const } : {}),
     ...(pago.motivos?.length ? { motivos: pago.motivos } : {}),
     tieneFoto: Boolean(pago.comprobante),
     descripcion: `Pago de ${pago.deNombre} a ${pago.aNombre}`,
