@@ -1,4 +1,5 @@
 import type { GastoFirestore } from '@/services/firestore'
+import { esPago, pagoAprobado } from './pagos'
 import {
   calcularBalances,
   simplificarDeudas,
@@ -21,7 +22,11 @@ export function deudasDelGrupo(
   const balances = Object.fromEntries(
     participantes.map((persona) => [persona.id, 0]),
   )
-  gastos.forEach((gasto, index) => {
+  // Los pagos pendientes o rechazados todavía no saldan nada.
+  const vigentes = gastos.filter(
+    (gasto) => !esPago(gasto) || pagoAprobado(gasto),
+  )
+  vigentes.forEach((gasto, index) => {
     const reparto = gasto.participantes?.length
       ? participantes.filter((persona) =>
           gasto.participantes?.includes(persona.id),

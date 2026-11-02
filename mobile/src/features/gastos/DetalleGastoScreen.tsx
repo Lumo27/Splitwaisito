@@ -11,13 +11,20 @@ import {
 } from '@/components/Formulario'
 import { MapaGoogle, urlGoogleMaps } from '@/components/MapaGoogle'
 import {
-  esPago,
+  actualizarGasto,
   obtenerFotoGasto,
   obtenerGastosDelGrupo,
   obtenerGrupoPorId,
+  type EstadoPago,
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
+import {
+  ETIQUETAS_ESTADO_PAGO,
+  esPago,
+  estadoDelPago,
+  receptorDelPago,
+} from '../grupos/pagos'
 import { useAppStore } from '@/store/useAppStore'
 import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { colores } from '@/theme/colores'
@@ -37,6 +44,7 @@ export function DetalleGastoScreen() {
   const [foto, setFoto] = useState<string | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [resolviendo, setResolviendo] = useState(false)
 
   const cargar = useCallback(async () => {
     setCargando(true)
@@ -65,6 +73,19 @@ export function DetalleGastoScreen() {
       setCargando(false)
     }
   }, [id, gastoId])
+
+  async function resolverPago(estado: EstadoPago) {
+    setResolviendo(true)
+    setError('')
+    try {
+      await actualizarGasto(id, gastoId, { estado })
+      setGasto((actual) => (actual ? { ...actual, estado } : actual))
+    } catch {
+      setError('No pudimos actualizar el pago. Volvé a intentar.')
+    } finally {
+      setResolviendo(false)
+    }
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -97,31 +118,74 @@ export function DetalleGastoScreen() {
   const paleta = COLOR_CATEGORIAS[gasto.categoria] ?? COLOR_CATEGORIAS.Otro
   const { lat, lng, direccion } = gasto.ubicacion ?? {}
   const tieneCoordenadas = typeof lat === 'number' && typeof lng === 'number'
+  const estado = ETIQUETAS_ESTADO_PAGO[estadoDelPago(gasto)]
+  const puedeResolver =
+    pago &&
+    gasto.estado === 'pendiente' &&
+    usuario?.id === receptorDelPago(gasto)
 
   return (
     <Pantalla>
       <Tarjeta>
-        {!pago && (
-          <View
-            className="self-start rounded-xl px-3 py-1"
-            style={{ backgroundColor: paleta.light }}
+        <View
+          className="self-start rounded-xl px-3 py-1"
+          style={{ backgroundColor: pago ? estado.fondo : paleta.light }}
+        >
+          <Text
+            style={{
+              color: pago ? estado.color : paleta.dark,
+              fontWeight: '700',
+              fontSize: 12,
+            }}
           >
-            <Text
-              style={{ color: paleta.dark, fontWeight: '700', fontSize: 12 }}
-            >
-              {gasto.categoria}
-            </Text>
-          </View>
-        )}
+            {pago ? estado.texto : gasto.categoria}
+          </Text>
+        </View>
         <Titulo>{gasto.descripcion}</Titulo>
         <Text className="text-4xl font-bold text-primary-dark">
           {formatearMoneda(gasto.monto, moneda)}
         </Text>
         <Text className="text-sm text-text-muted">
-          {pago ? 'Transferencia registrada' : `Pagó ${gasto.pagadoPorNombre}`}{' '}
-          · {formatearFecha(gasto.fecha)} · {grupo.nombre}
+          {pago ? 'Transferencia' : `Pagó ${gasto.pagadoPorNombre}`} ·{' '}
+          {formatearFecha(gasto.fecha)} · {grupo.nombre}
         </Text>
       </Tarjeta>
+
+      {pago && gasto.estado === 'pendiente' && (
+        <Tarjeta>
+          <Text className="font-bold text-text">
+            {puedeResolver
+              ? 'Revisá el comprobante'
+              : 'Esperando que quien recibe lo apruebe'}
+          </Text>
+          {gasto.motivos?.map((motivo) => (
+            <Text key={motivo} className="text-sm text-text-muted">
+              • {motivo}
+            </Text>
+          ))}
+          {puedeResolver && (
+            <>
+              <Boton
+                texto="Aprobar: recibí el dinero"
+                cargando={resolviendo}
+                disabled={resolviendo}
+                onPress={() => {
+                  void resolverPago('aprobado')
+                }}
+              />
+              <Boton
+                texto="Rechazar"
+                peligro
+                disabled={resolviendo}
+                onPress={() => {
+                  void resolverPago('rechazado')
+                }}
+              />
+            </>
+          )}
+        </Tarjeta>
+      )}
+      <Mensaje texto={error} error />
 
       {!pago && reparto.length > 0 && (
         <Tarjeta>

@@ -17,10 +17,10 @@ import {
   eliminarGasto,
   obtenerGastosDelGrupo,
   obtenerGrupoPorId,
-  esPago,
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
+import { ETIQUETAS_ESTADO_PAGO, esPago, estadoDelPago } from './pagos'
 import { useAppStore } from '@/store/useAppStore'
 import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { colores } from '@/theme/colores'
@@ -556,6 +556,14 @@ export function DetalleGrupoScreen() {
                   {formatearFecha(pago.fecha)}
                   {pago.tieneFoto ? ' · Con comprobante' : ''}
                 </Text>
+                <Text
+                  className="mt-1 text-xs font-bold"
+                  style={{
+                    color: ETIQUETAS_ESTADO_PAGO[estadoDelPago(pago)].color,
+                  }}
+                >
+                  {ETIQUETAS_ESTADO_PAGO[estadoDelPago(pago)].texto}
+                </Text>
               </Pressable>
               <Text className="font-bold text-primary-dark">
                 {dinero(pago.monto)}
@@ -570,7 +578,7 @@ export function DetalleGrupoScreen() {
                     eliminarMovimiento(
                       pago,
                       'Deshacer pago',
-                      `¿Deshacer “${pago.descripcion}”? La deuda vuelve a quedar pendiente.`,
+                      `¿Deshacer “${pago.descripcion}”? Se borra el pago y su comprobante.`,
                     )
                   }
                 >

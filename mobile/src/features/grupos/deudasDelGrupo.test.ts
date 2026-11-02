@@ -43,6 +43,21 @@ describe('deudasDelGrupo', () => {
       { de: 'c', a: 'a', monto: 40 },
     ])
   })
+  it('un pago pendiente o rechazado todavía no salda la deuda', () => {
+    const pago = {
+      ...gasto,
+      tipo: 'pago' as const,
+      monto: 40,
+      pagadoPorId: 'b',
+      participantes: ['a'],
+    }
+    const sinPagos = deudasDelGrupo(personas, [gasto])
+    for (const estado of ['pendiente', 'rechazado'] as const) {
+      expect(deudasDelGrupo(personas, [gasto, { ...pago, estado }])).toEqual(
+        sinPagos,
+      )
+    }
+  })
   it('no genera deudas para un grupo sin gastos', () => {
     expect(deudasDelGrupo(personas, [])).toEqual([])
   })

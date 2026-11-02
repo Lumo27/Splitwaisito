@@ -51,7 +51,9 @@ Colecciones: `usuarios`, `grupos`, `grupos/{id}/gastos`. Reglas de seguridad (`f
 
 **No hay integración de pagos real: Splitwaisito no mueve dinero.** Flujo actual (desde el 02/11/2026): la pantalla "Saldar deuda" copia el alias del acreedor (o su e-mail si no tiene alias) y muestra el monto, para transferir desde cualquier banco o billetera. Después el deudor sube la foto o captura del comprobante y se registra un movimiento de tipo `pago` (pagado por el deudor, repartido solo con el acreedor) que el cálculo de deudas compensa; el comprobante queda guardado como foto del movimiento y el pago se puede deshacer desde el detalle del grupo.
 
-Se descartó el botón que abría Mercado Pago "Enviar dinero": rebotaba entre la app y el navegador sin llegar a la transferencia. Tampoco existe API pública para precargar monto o destinatario (se probó exhaustivamente). Próximo paso propuesto: verificar el comprobante con OCR en el dispositivo (ML Kit, solo en el APK) comparando CBU/CVU, alias, nombre, monto y fecha, más la confirmación del acreedor.
+Verificación (desde el 02/11/2026): `mobile/src/services/comprobantes.ts` usa Firebase AI Logic (Gemini Developer API, plan Spark) para leer destinatario, alias, monto y fecha, y `compararComprobante.ts` los compara con la deuda. Si coincide, el pago se guarda `aprobado`; si no o si la IA no está disponible, `pendiente`, y lo aprueba o rechaza quien recibe el dinero (las reglas de Firestore solo le permiten a él cambiar el estado). Solo los pagos aprobados saldan la deuda. Límite conocido: la verificación corre en el cliente, así que no es a prueba de un usuario malicioso; hacerla en el servidor requeriría Cloud Functions (plan Blaze).
+
+Se descartó el botón que abría Mercado Pago "Enviar dinero": rebotaba entre la app y el navegador sin llegar a la transferencia. Tampoco existe API pública para precargar monto o destinatario (se probó exhaustivamente).
 
 ## Git / CI
 

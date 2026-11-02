@@ -52,10 +52,14 @@ export interface GastoFirestore {
   participantes?: string[]
   /** 'pago' marca una transferencia registrada al saldar una deuda. */
   tipo?: 'gasto' | 'pago'
+  /** Solo en pagos. Sin estado (pagos viejos) cuenta como aprobado. */
+  estado?: EstadoPago
+  /** Solo en pagos: por qué la verificación automática no lo aprobó. */
+  motivos?: string[]
 }
 
-export const esPago = (gasto: Pick<GastoFirestore, 'tipo'>) =>
-  gasto.tipo === 'pago'
+export type EstadoPago = 'pendiente' | 'aprobado' | 'rechazado'
+
 
 export const usuariosRef = db
   ? (collection(db, 'usuarios') as ReturnType<typeof collection>)
@@ -225,7 +229,8 @@ export async function guardarGasto(
  * Registra que `de` le transfirió `monto` a `a`. Se guarda como un movimiento
  * pagado por el deudor y repartido solo con el acreedor, así el cálculo de
  * deudas lo compensa sin lógica aparte. El comprobante se guarda como la foto
- * del movimiento.
+ * del movimiento. Si la verificación automática no lo aprobó, queda pendiente
+ * hasta que quien recibe el dinero lo apruebe.
  */
 export async function registrarPago(
   grupoId: string,
@@ -236,10 +241,14 @@ export async function registrarPago(
     aNombre: string
     monto: number
     comprobante?: string
+    estado: EstadoPago
+    motivos?: string[]
   },
 ) {
   const guardado = await guardarGasto(grupoId, {
     tipo: 'pago',
+    estado: pago.estado,
+    ...(pago.motivos?.length ? { motivos: pago.motivos } : {}),
     tieneFoto: Boolean(pago.comprobante),
     descripcion: `Pago de ${pago.deNombre} a ${pago.aNombre}`,
     monto: pago.monto,

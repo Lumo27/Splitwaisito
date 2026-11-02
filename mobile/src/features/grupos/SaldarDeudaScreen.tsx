@@ -10,13 +10,13 @@ import {
   Titulo,
 } from '@/components/Formulario'
 import {
-  esPago,
   obtenerGastosDelGrupo,
   obtenerGrupoPorId,
   registrarPago,
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
+import { esPago, receptorDelPago } from './pagos'
 import {
   DEMORA_RECORDATORIO_SEGUNDOS,
   programarRecordatorioDePago,
@@ -25,9 +25,11 @@ import {
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
-import { confirmar } from '@/utils/alerta'
+import { avisar } from '@/utils/alerta'
 import { elegirImagen } from '@/utils/imagen'
 import { abrirWhatsApp } from '@/utils/whatsapp'
+import { leerComprobante } from '@/services/comprobantes'
+import { compararComprobante } from './compararComprobante'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
@@ -104,6 +106,13 @@ export function SaldarDeudaScreen() {
   const datoParaTransferir = alias || email
   const moneda = grupo?.moneda ?? 'ARS'
   const cantidadGastos = gastos.filter((gasto) => !esPago(gasto)).length
+  const pagoEnRevision = gastos.some(
+    (gasto) =>
+      esPago(gasto) &&
+      gasto.estado === 'pendiente' &&
+      gasto.pagadoPorId === de &&
+      receptorDelPago(gasto) === a,
+  )
   useActualizarCotizacionPesos(moneda)
   useEffect(() => {
     let vigente = true
@@ -165,33 +174,48 @@ export function SaldarDeudaScreen() {
       )
     }
   }
-  function registrarConComprobante() {
+  async function registrarConComprobante() {
     if (!deuda || !usuario || !id || !comprobante) return
     const acreedorNombre = acreedor?.nombre ?? 'otro integrante'
-    confirmar({
-      titulo: 'Registrar pago',
-      mensaje: `Se registra que le transferiste ${formatearMoneda(deuda.monto, moneda)} a ${acreedorNombre}, con este comprobante. La deuda queda saldada en el grupo.`,
-      textoConfirmar: 'Registrar',
-      destructivo: false,
-      alConfirmar: async () => {
-        setRegistrando(true)
-        try {
-          await registrarPago(id, {
-            deId: usuario.id,
-            deNombre: usuario.nombre,
-            aId: deuda.a,
-            aNombre: acreedorNombre,
+    setRegistrando(true)
+    setError('')
+    try {
+      const leidos = await leerComprobante(comprobante)
+      const verificacion = leidos
+        ? compararComprobante(leidos, {
+            acreedorNombre,
+            acreedorAlias: alias,
             monto: deuda.monto,
-            comprobante,
+            hoy: new Date().toISOString().slice(0, 10),
           })
-          volver()
-        } catch {
-          setError('No pudimos registrar el pago. Volvé a intentar.')
-        } finally {
-          setRegistrando(false)
-        }
-      },
-    })
+        : {
+            coincide: false,
+            motivos: ['No se pudo verificar el comprobante automáticamente.'],
+          }
+      await registrarPago(id, {
+        deId: usuario.id,
+        deNombre: usuario.nombre,
+        aId: deuda.a,
+        aNombre: acreedorNombre,
+        monto: deuda.monto,
+        comprobante,
+        estado: verificacion.coincide ? 'aprobado' : 'pendiente',
+        motivos: verificacion.motivos,
+      })
+      avisar(
+        verificacion.coincide
+          ? 'Pago verificado'
+          : 'Pago pendiente de aprobación',
+        verificacion.coincide
+          ? 'El comprobante coincide con la deuda: quedó saldada.'
+          : `${acreedorNombre} tiene que revisar el comprobante y aprobarlo. ${verificacion.motivos.join(' ')}`,
+      )
+      volver()
+    } catch {
+      setError('No pudimos registrar el pago. Volvé a intentar.')
+    } finally {
+      setRegistrando(false)
+    }
   }
   async function recordarmePagar() {
     if (!deuda) return
@@ -306,47 +330,58 @@ export function SaldarDeudaScreen() {
           }}
         />
       )}
-      <Tarjeta>
-        <Text className="font-bold text-text">¿Ya transferiste?</Text>
-        <Text className="text-sm text-text-muted">
-          Subí la captura o la foto del comprobante.
-        </Text>
-        {comprobante && (
-          <Image
-            source={{ uri: comprobante }}
-            accessibilityLabel="Comprobante de pago"
-            className="w-full rounded-xl"
-            style={{ height: 360 }}
-            resizeMode="contain"
+      {pagoEnRevision ? (
+        <Tarjeta>
+          <Text className="font-bold text-text">Pago en revisión</Text>
+          <Text className="text-sm text-text-muted">
+            Ya subiste un comprobante para esta deuda.{' '}
+            {acreedor?.nombre ?? 'El acreedor'} lo tiene que aprobar desde el
+            detalle del pago.
+          </Text>
+        </Tarjeta>
+      ) : (
+        <Tarjeta>
+          <Text className="font-bold text-text">¿Ya transferiste?</Text>
+          <Text className="text-sm text-text-muted">
+            Subí la captura o la foto del comprobante.
+          </Text>
+          {comprobante && (
+            <Image
+              source={{ uri: comprobante }}
+              accessibilityLabel="Comprobante de pago"
+              className="w-full rounded-xl"
+              style={{ height: 360 }}
+              resizeMode="contain"
+            />
+          )}
+          <View className="flex-row gap-3">
+            <View className="flex-1">
+              <Boton
+                texto="Tomar foto"
+                secundario
+                onPress={() => {
+                  void adjuntarComprobante(true)
+                }}
+              />
+            </View>
+            <View className="flex-1">
+              <Boton
+                texto="Elegir captura"
+                secundario
+                onPress={() => {
+                  void adjuntarComprobante(false)
+                }}
+              />
+            </View>
+          </View>
+          <Boton
+            texto="Registrar pago con comprobante"
+            cargando={registrando}
+            disabled={!comprobante || registrando}
+            onPress={registrarConComprobante}
           />
-        )}
-        <View className="flex-row gap-3">
-          <View className="flex-1">
-            <Boton
-              texto="Tomar foto"
-              secundario
-              onPress={() => {
-                void adjuntarComprobante(true)
-              }}
-            />
-          </View>
-          <View className="flex-1">
-            <Boton
-              texto="Elegir captura"
-              secundario
-              onPress={() => {
-                void adjuntarComprobante(false)
-              }}
-            />
-          </View>
-        </View>
-        <Boton
-          texto="Registrar pago con comprobante"
-          cargando={registrando}
-          disabled={!comprobante || registrando}
-          onPress={registrarConComprobante}
-        />
-      </Tarjeta>
+        </Tarjeta>
+      )}
       <Boton
         texto="Avisar por WhatsApp"
         secundario

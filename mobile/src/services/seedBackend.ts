@@ -3,10 +3,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import type { GastoFirestore, GrupoFirestore, UsuarioFirestore } from './firestore'
 import type { PerfilAmistad, SolicitudAmistad } from './amistades'
 import type { MonedaCodigo } from '@/theme/moneda'
-import { TICKET_CABANA } from './seedFotos'
+import { COMPROBANTE_NAHUEL, TICKET_CABANA } from './seedFotos'
 
-// v2: suma foto y ubicación de ejemplo; cambiar la clave regenera los datos.
-const CLAVE_DB = 'splitwaisito-seeds-db-v2'
+// v3: suma foto, ubicación y un pago pendiente de ejemplo; cambiar la clave
+// regenera los datos.
+const CLAVE_DB = 'splitwaisito-seeds-db-v3'
 const CLAVE_SESION = 'splitwaisito-seeds-sesion-v1'
 
 export const SEED_USUARIO_ID = 'seed-lucas'
@@ -120,6 +121,14 @@ function crearSeed(): SeedDb {
         gasto('g-b3', 'Nafta y peajes', 36000, 'Transporte', 'seed-german', 8),
         gasto('g-b4', 'Supermercado', 62000, 'Comida', 'seed-nahuel', 7),
         gasto('g-b5', 'Excursión Cerro Catedral', 28000, 'Otro', yo, 5),
+        {
+          ...gasto('g-b6', 'Pago de Nahuel a Lucas', 41500, 'Otro', 'seed-nahuel', 1),
+          tipo: 'pago',
+          estado: 'pendiente',
+          motivos: ['No se pudo verificar el comprobante automáticamente.'],
+          participantes: [yo],
+          tieneFoto: true,
+        },
       ],
       'grupo-depto': [
         gasto('g-d1', 'Alquiler de septiembre', 450000, 'Alojamiento', 'seed-german', 14),
@@ -144,7 +153,10 @@ function crearSeed(): SeedDb {
       miembros: [yo, amigo.id],
       perfiles: [persona(yo), amigo],
     })),
-    fotos: { 'grupo-bariloche/g-b1': TICKET_CABANA },
+    fotos: {
+      'grupo-bariloche/g-b1': TICKET_CABANA,
+      'grupo-bariloche/g-b6': COMPROBANTE_NAHUEL,
+    },
   }
 }
 
