@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
 import { ActivityIndicator, Image, Text, View } from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
-import * as ImageManipulator from 'expo-image-manipulator'
 import * as Location from 'expo-location'
 import {
   Boton,
@@ -32,6 +30,7 @@ import { participantesDelGrupo } from '@/features/grupos/deudas'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
 import { confirmar } from '@/utils/alerta'
+import { elegirImagen } from '@/utils/imagen'
 import { categorias, validarGasto } from './validarGasto'
 
 export function CargarGastoScreen() {
@@ -128,43 +127,8 @@ export function CargarGastoScreen() {
     setOcupado(true)
     setError('')
     try {
-      if (camara) {
-        const { granted } = await ImagePicker.requestCameraPermissionsAsync()
-        if (!granted) {
-          throw new Error('Permití el acceso a la cámara para tomar la foto.')
-        }
-      } else {
-        const { granted } =
-          await ImagePicker.requestMediaLibraryPermissionsAsync()
-        if (!granted) {
-          throw new Error(
-            'Permití el acceso a tus fotos para elegir una imagen.',
-          )
-        }
-      }
-      const opciones: ImagePicker.ImagePickerOptions = {
-        mediaTypes: ['images'],
-        quality: 0.8,
-      }
-      const resultado = camara
-        ? await ImagePicker.launchCameraAsync(opciones)
-        : await ImagePicker.launchImageLibraryAsync(opciones)
-      if (resultado.canceled || !resultado.assets?.[0]) return
-      const imagen = resultado.assets[0]
-      const manipulada = await ImageManipulator.manipulateAsync(
-        imagen.uri,
-        [{ resize: { width: 1200 } }],
-        {
-          compress: 0.7,
-          format: ImageManipulator.SaveFormat.JPEG,
-          base64: true,
-        },
-      )
-      if (manipulada.base64) {
-        setFoto(`data:image/jpeg;base64,${manipulada.base64}`)
-      } else {
-        setFoto(manipulada.uri)
-      }
+      const imagen = await elegirImagen(camara)
+      if (imagen) setFoto(imagen)
     } catch (fallo) {
       setError(
         fallo instanceof Error

@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react'
-import { Modal, Platform, Pressable, Text, View } from 'react-native'
-import { WebView } from 'react-native-webview'
+import { useState } from 'react'
+import { Modal, Pressable, Text, View } from 'react-native'
 import { MapPin, X } from 'lucide-react-native'
 import { colores } from '@/theme/colores'
+import { MapaLeaflet, type Coordenadas } from './MapaLeaflet'
 
 interface Props {
   visible: boolean
   onCerrar: () => void
-  coordenadasIniciales?: { lat: number; lng: number }
-  onSeleccionar: (coords: { lat: number; lng: number }) => void
+  coordenadasIniciales?: Coordenadas
+  onSeleccionar: (coords: Coordenadas) => void
 }
 
 export function MapaSelector({
@@ -17,77 +17,9 @@ export function MapaSelector({
   coordenadasIniciales,
   onSeleccionar,
 }: Props) {
-  const [seleccion, setSeleccion] = useState<{ lat: number; lng: number } | null>(
+  const [seleccion, setSeleccion] = useState<Coordenadas | null>(
     coordenadasIniciales ?? null,
   )
-
-  const latInicial = coordenadasIniciales?.lat ?? -34.6037
-  const lngInicial = coordenadasIniciales?.lng ?? -58.3816
-  const tieneInicial = Boolean(coordenadasIniciales)
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-        <style>
-          body, html, #map { margin: 0; padding: 0; width: 100%; height: 100%; }
-          .leaflet-control-attribution { font-size: 10px; }
-        </style>
-      </head>
-      <body>
-        <div id="map"></div>
-        <script>
-          const map = L.map('map').setView([${latInicial}, ${lngInicial}], ${tieneInicial ? 15 : 13});
-          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-          }).addTo(map);
-
-          let marker = ${tieneInicial ? `L.marker([${latInicial}, ${lngInicial}]).addTo(map)` : 'null'};
-
-          map.on('click', function(e) {
-            const lat = e.latlng.lat;
-            const lng = e.latlng.lng;
-            if (marker) {
-              marker.setLatLng(e.latlng);
-            } else {
-              marker = L.marker(e.latlng).addTo(map);
-            }
-            const mensaje = JSON.stringify({ lat, lng });
-            if (window.ReactNativeWebView) {
-              window.ReactNativeWebView.postMessage(mensaje);
-            } else if (window.parent !== window) {
-              window.parent.postMessage(mensaje, '*');
-            }
-          });
-        </script>
-      </body>
-    </html>
-  `
-
-  function recibirMensaje(data: unknown) {
-    if (typeof data !== 'string') return
-    try {
-      const coords = JSON.parse(data)
-      if (typeof coords.lat === 'number' && typeof coords.lng === 'number') {
-        setSeleccion({ lat: coords.lat, lng: coords.lng })
-      }
-    } catch {
-      // Mensajes ajenos al mapa
-    }
-  }
-
-  // En web no hay WebView nativo: el mapa va en un iframe y avisa con postMessage.
-  useEffect(() => {
-    if (Platform.OS !== 'web' || !visible) return
-    const escuchar = (event: MessageEvent) => recibirMensaje(event.data)
-    window.addEventListener('message', escuchar)
-    return () => window.removeEventListener('message', escuchar)
-  }, [visible])
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onCerrar}>
@@ -110,24 +42,12 @@ export function MapaSelector({
         </View>
 
         <View className="flex-1">
-          {Platform.OS === 'web' ? (
-            <iframe
-              title="Mapa"
-              srcDoc={html}
-              style={{ border: 0, width: '100%', height: '100%' }}
-            />
-          ) : (
-            <WebView
-              originWhitelist={['*']}
-              source={{ html }}
-              onMessage={(event) => recibirMensaje(event.nativeEvent.data)}
-            />
-          )}
+          <MapaLeaflet marcador={coordenadasIniciales} onTocar={setSeleccion} />
         </View>
 
         <View className="border-t border-slate-200 p-4">
           <Text className="mb-2 text-xs text-text-muted">
-            Tocá en el mapa para marcar el punto. Fuente: © OpenStreetMap.
+            Tocá en el mapa para marcar el punto. Fuente: © OpenStreetMap, © CARTO.
           </Text>
           {seleccion ? (
             <Text className="mb-3 text-sm font-semibold text-primary-dark">

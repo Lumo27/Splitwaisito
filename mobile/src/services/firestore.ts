@@ -224,14 +224,23 @@ export async function guardarGasto(
 /**
  * Registra que `de` le transfirió `monto` a `a`. Se guarda como un movimiento
  * pagado por el deudor y repartido solo con el acreedor, así el cálculo de
- * deudas lo compensa sin lógica aparte.
+ * deudas lo compensa sin lógica aparte. El comprobante se guarda como la foto
+ * del movimiento.
  */
-export function registrarPago(
+export async function registrarPago(
   grupoId: string,
-  pago: { deId: string; deNombre: string; aId: string; aNombre: string; monto: number },
+  pago: {
+    deId: string
+    deNombre: string
+    aId: string
+    aNombre: string
+    monto: number
+    comprobante?: string
+  },
 ) {
-  return guardarGasto(grupoId, {
+  const guardado = await guardarGasto(grupoId, {
     tipo: 'pago',
+    tieneFoto: Boolean(pago.comprobante),
     descripcion: `Pago de ${pago.deNombre} a ${pago.aNombre}`,
     monto: pago.monto,
     categoria: 'Otro',
@@ -240,6 +249,10 @@ export function registrarPago(
     participantes: [pago.aId],
     fecha: new Date().toISOString(),
   })
+  if (pago.comprobante && guardado.id) {
+    await guardarFotoGasto(grupoId, guardado.id, pago.comprobante)
+  }
+  return guardado
 }
 
 export async function actualizarGasto(

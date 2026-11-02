@@ -3,8 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import type { GastoFirestore, GrupoFirestore, UsuarioFirestore } from './firestore'
 import type { PerfilAmistad, SolicitudAmistad } from './amistades'
 import type { MonedaCodigo } from '@/theme/moneda'
+import { TICKET_CABANA } from './seedFotos'
 
-const CLAVE_DB = 'splitwaisito-seeds-db-v1'
+// v2: suma foto y ubicación de ejemplo; cambiar la clave regenera los datos.
+const CLAVE_DB = 'splitwaisito-seeds-db-v2'
 const CLAVE_SESION = 'splitwaisito-seeds-sesion-v1'
 
 export const SEED_USUARIO_ID = 'seed-lucas'
@@ -106,8 +108,15 @@ function crearSeed(): SeedDb {
     ],
     gastos: {
       'grupo-bariloche': [
-        gasto('g-b1', 'Cabaña 4 noches', 240000, 'Alojamiento', yo, 10),
-        gasto('g-b2', 'Cena en el centro', 48000, 'Comida', 'seed-cande', 9),
+        {
+          ...gasto('g-b1', 'Cabaña 4 noches', 240000, 'Alojamiento', yo, 10),
+          tieneFoto: true,
+          ubicacion: { lat: -41.1127, lng: -71.4187, direccion: 'Av. Bustillo km 8.5, Bariloche' },
+        },
+        {
+          ...gasto('g-b2', 'Cena en el centro', 48000, 'Comida', 'seed-cande', 9),
+          ubicacion: { lat: -41.1341, lng: -71.3039, direccion: 'Mitre 400, Bariloche' },
+        },
         gasto('g-b3', 'Nafta y peajes', 36000, 'Transporte', 'seed-german', 8),
         gasto('g-b4', 'Supermercado', 62000, 'Comida', 'seed-nahuel', 7),
         gasto('g-b5', 'Excursión Cerro Catedral', 28000, 'Otro', yo, 5),
@@ -135,6 +144,7 @@ function crearSeed(): SeedDb {
       miembros: [yo, amigo.id],
       perfiles: [persona(yo), amigo],
     })),
+    fotos: { 'grupo-bariloche/g-b1': TICKET_CABANA },
   }
 }
 

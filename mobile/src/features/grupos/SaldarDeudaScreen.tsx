@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import { ActivityIndicator, Linking, Text } from 'react-native'
+import { ActivityIndicator, Image, Text, View } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
 import {
   Boton,
@@ -26,6 +26,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
 import { confirmar } from '@/utils/alerta'
+import { elegirImagen } from '@/utils/imagen'
 import { abrirWhatsApp } from '@/utils/whatsapp'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
@@ -46,6 +47,7 @@ export function SaldarDeudaScreen() {
   const [error, setError] = useState('')
   const [copiado, setCopiado] = useState('')
   const [registrando, setRegistrando] = useState(false)
+  const [comprobante, setComprobante] = useState<string | null>(null)
   const peticion = useRef(0)
   const usuarioId = usuario?.id
   const cargar = useCallback(async () => {
@@ -97,24 +99,30 @@ export function SaldarDeudaScreen() {
   )
   const acreedor = amigos.find((amigo) => amigo.id === a)
   const email = deuda && de === usuarioId ? (acreedor?.email?.trim() ?? '') : ''
+  const alias = deuda && de === usuarioId ? (acreedor?.alias?.trim() ?? '') : ''
+  // Lo primero que se pega en el banco o la billetera: el alias si lo hay.
+  const datoParaTransferir = alias || email
   const moneda = grupo?.moneda ?? 'ARS'
   const cantidadGastos = gastos.filter((gasto) => !esPago(gasto)).length
   useActualizarCotizacionPesos(moneda)
   useEffect(() => {
     let vigente = true
-    if (!email || cargando) return
-    void Clipboard.setStringAsync(email)
+    if (!datoParaTransferir || cargando) return
+    const que = alias ? 'Alias' : 'E-mail'
+    void Clipboard.setStringAsync(datoParaTransferir)
       .then(() => {
-        if (vigente) setCopiado('E-mail copiado.')
+        if (vigente) setCopiado(`${que} copiado.`)
       })
       .catch(() => {
         if (vigente)
-          setError('No pudimos copiar el e-mail. Podés volver a intentarlo.')
+          setError(
+            `No pudimos copiar el ${que.toLowerCase()}. Podés volver a intentarlo.`,
+          )
       })
     return () => {
       vigente = false
     }
-  }, [email, cargando])
+  }, [datoParaTransferir, alias, cargando])
 
   async function copiar(valor: string, mensaje: string) {
     try {
@@ -125,22 +133,13 @@ export function SaldarDeudaScreen() {
       setError('No pudimos copiar el dato. Volvé a intentar.')
     }
   }
-  async function abrirMercadoPago() {
-    try {
-      await Linking.openURL('https://www.mercadopago.com.ar/money-transfer')
-    } catch {
-      setError(
-        'No pudimos abrir Mercado Pago. Abrilo desde tu teléfono y elegí Enviar dinero.',
-      )
-    }
-  }
   async function compartirPorWhatsApp() {
     if (!deuda) return
     const montoTexto = formatearMoneda(deuda.monto, moneda)
     const grupoNombre = grupo?.nombre ?? 'el grupo'
     const destinatarioNombre = acreedor?.nombre ?? 'compañero'
-    const aliasDestino = acreedor?.alias?.trim()
-      ? ` al alias ${acreedor.alias.trim()}`
+    const aliasDestino = alias
+      ? ` al alias ${alias}`
       : email
         ? ` al e-mail ${email}`
         : ''
@@ -153,13 +152,26 @@ export function SaldarDeudaScreen() {
       setError('No pudimos abrir WhatsApp. Verificá que esté instalado.')
     }
   }
-  function marcarComoPagada() {
-    if (!deuda || !usuario || !id) return
+  async function adjuntarComprobante(camara: boolean) {
+    setError('')
+    try {
+      const imagen = await elegirImagen(camara)
+      if (imagen) setComprobante(imagen)
+    } catch (fallo) {
+      setError(
+        fallo instanceof Error
+          ? fallo.message
+          : 'No pudimos abrir la cámara o las fotos.',
+      )
+    }
+  }
+  function registrarConComprobante() {
+    if (!deuda || !usuario || !id || !comprobante) return
     const acreedorNombre = acreedor?.nombre ?? 'otro integrante'
     confirmar({
       titulo: 'Registrar pago',
-      mensaje: `¿Ya le transferiste ${formatearMoneda(deuda.monto, moneda)} a ${acreedorNombre}? La deuda se marca como saldada en el grupo.`,
-      textoConfirmar: 'Ya pagué',
+      mensaje: `Se registra que le transferiste ${formatearMoneda(deuda.monto, moneda)} a ${acreedorNombre}, con este comprobante. La deuda queda saldada en el grupo.`,
+      textoConfirmar: 'Registrar',
       destructivo: false,
       alConfirmar: async () => {
         setRegistrando(true)
@@ -170,6 +182,7 @@ export function SaldarDeudaScreen() {
             aId: deuda.a,
             aNombre: acreedorNombre,
             monto: deuda.monto,
+            comprobante,
           })
           volver()
         } catch {
@@ -246,29 +259,42 @@ export function SaldarDeudaScreen() {
           {grupo?.nombre} · {cantidadGastos} gasto
           {cantidadGastos === 1 ? '' : 's'}
         </Text>
+        {alias ? (
+          <Text selectable className="text-text">
+            Alias: {alias}
+          </Text>
+        ) : null}
         {email ? (
           <Text selectable className="text-text">
-            {email}
+            E-mail: {email}
           </Text>
-        ) : (
+        ) : null}
+        {!datoParaTransferir && (
           <Text className="text-text-muted">
-            No tenemos el e-mail del acreedor. Pedíselo antes de transferir.
+            No tenemos el alias ni el e-mail del acreedor. Pedíselos antes de
+            transferir.
           </Text>
         )}
       </Tarjeta>
       <Mensaje texto={copiado} />
       <Mensaje texto={error} error />
+      <Text className="text-sm leading-6 text-text-muted">
+        Transferí desde el banco o la billetera que quieras usando el alias o el
+        e-mail. Después subí el comprobante para saldar la deuda en el grupo.
+      </Text>
       <Boton
-        texto="Abrir Enviar dinero en Mercado Pago"
+        texto="Copiar alias"
+        secundario
+        disabled={!alias}
         onPress={() => {
-          void abrirMercadoPago()
+          void copiar(alias, 'Alias copiado.')
         }}
       />
       <Boton
-        texto="Avisar por WhatsApp"
+        texto="Copiar monto"
         secundario
         onPress={() => {
-          void compartirPorWhatsApp()
+          void copiar(String(deuda.monto), 'Monto copiado.')
         }}
       />
       {recordatoriosDisponibles && (
@@ -280,31 +306,53 @@ export function SaldarDeudaScreen() {
           }}
         />
       )}
+      <Tarjeta>
+        <Text className="font-bold text-text">¿Ya transferiste?</Text>
+        <Text className="text-sm text-text-muted">
+          Subí la captura o la foto del comprobante.
+        </Text>
+        {comprobante && (
+          <Image
+            source={{ uri: comprobante }}
+            accessibilityLabel="Comprobante de pago"
+            className="w-full rounded-xl"
+            style={{ height: 360 }}
+            resizeMode="contain"
+          />
+        )}
+        <View className="flex-row gap-3">
+          <View className="flex-1">
+            <Boton
+              texto="Tomar foto"
+              secundario
+              onPress={() => {
+                void adjuntarComprobante(true)
+              }}
+            />
+          </View>
+          <View className="flex-1">
+            <Boton
+              texto="Elegir captura"
+              secundario
+              onPress={() => {
+                void adjuntarComprobante(false)
+              }}
+            />
+          </View>
+        </View>
+        <Boton
+          texto="Registrar pago con comprobante"
+          cargando={registrando}
+          disabled={!comprobante || registrando}
+          onPress={registrarConComprobante}
+        />
+      </Tarjeta>
       <Boton
-        texto="Copiar e-mail"
+        texto="Avisar por WhatsApp"
         secundario
-        disabled={!email}
         onPress={() => {
-          void copiar(email, 'E-mail copiado.')
+          void compartirPorWhatsApp()
         }}
-      />
-      <Boton
-        texto="Copiar monto"
-        secundario
-        onPress={() => {
-          void copiar(String(deuda.monto), 'Monto copiado.')
-        }}
-      />
-      <Text className="text-sm leading-6 text-text-muted">
-        Pegá el e-mail en Mercado Pago y confirmá el destinatario y el monto. La
-        transferencia la realizás desde Mercado Pago; cuando termines, marcala
-        como pagada para saldar la deuda en el grupo.
-      </Text>
-      <Boton
-        texto="Ya pagué, marcar como saldada"
-        cargando={registrando}
-        disabled={registrando}
-        onPress={marcarComoPagada}
       />
       <Boton texto="Volver al grupo" secundario onPress={volver} />
     </Pantalla>

@@ -36,7 +36,8 @@ import { formatearFecha } from './formatearFecha'
 
 export function DetalleGrupoScreen() {
   const { id: rawId } = useLocalSearchParams<{ id: string }>()
-  const id = typeof rawId === 'string' ? rawId : Array.isArray(rawId) ? rawId[0] : ''
+  const id =
+    typeof rawId === 'string' ? rawId : Array.isArray(rawId) ? rawId[0] : ''
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
   const [grupo, setGrupo] = useState<GrupoFirestore | null>(null)
@@ -106,8 +107,19 @@ export function DetalleGrupoScreen() {
 
   const moneda = grupo?.moneda ?? 'ARS'
   const dinero = (monto: number) => formatearMoneda(monto, moneda)
-  const totalGastos = soloGastos.reduce((total, gasto) => total + gasto.monto, 0)
+  const totalGastos = soloGastos.reduce(
+    (total, gasto) => total + gasto.monto,
+    0,
+  )
   useActualizarCotizacionPesos(moneda)
+
+  function verDetalle(movimiento: GastoFirestore) {
+    if (!movimiento.id) return
+    router.push({
+      pathname: '/grupos/[id]/gasto/[gastoId]',
+      params: { id, gastoId: movimiento.id },
+    })
+  }
 
   function eliminarMovimiento(
     movimiento: GastoFirestore,
@@ -174,11 +186,12 @@ export function DetalleGrupoScreen() {
   function abrirRecordatorio(deudorId: string, monto: number) {
     const deudorNombre = nombre(deudorId)
     if (Platform.OS === 'web') {
-      const elegirWhatsApp = typeof window !== 'undefined'
-        ? window.confirm(
-            `Recordar saldo a ${deudorNombre}\n\nPresioná Aceptar para enviar por WhatsApp o Cancelar para enviar por E-mail.`,
-          )
-        : true
+      const elegirWhatsApp =
+        typeof window !== 'undefined'
+          ? window.confirm(
+              `Recordar saldo a ${deudorNombre}\n\nPresioná Aceptar para enviar por WhatsApp o Cancelar para enviar por E-mail.`,
+            )
+          : true
       if (elegirWhatsApp) {
         recordarPorWhatsApp(deudorId, monto)
       } else {
@@ -189,7 +202,8 @@ export function DetalleGrupoScreen() {
 
     confirmar({
       titulo: `Recordar a ${deudorNombre}`,
-      mensaje: '¿Deseás abrir WhatsApp para enviar el recordatorio del saldo pendiente?',
+      mensaje:
+        '¿Deseás abrir WhatsApp para enviar el recordatorio del saldo pendiente?',
       textoConfirmar: 'Abrir WhatsApp',
       textoCancelar: 'Por E-mail',
       destructivo: false,
@@ -206,10 +220,7 @@ export function DetalleGrupoScreen() {
       await accion()
       await cargar()
     } catch {
-      avisar(
-        'No se pudo guardar',
-        'Revisá la conexión y volvé a intentar.',
-      )
+      avisar('No se pudo guardar', 'Revisá la conexión y volvé a intentar.')
     } finally {
       mutacion.current = false
       setOcupado(false)
@@ -404,7 +415,8 @@ export function DetalleGrupoScreen() {
         </Text>
       )}
       {soloGastos.map((gasto, index) => {
-        const paleta = COLOR_CATEGORIAS[gasto.categoria] ?? COLOR_CATEGORIAS.Otro
+        const paleta =
+          COLOR_CATEGORIAS[gasto.categoria] ?? COLOR_CATEGORIAS.Otro
         return (
           <View
             key={gasto.id ?? String(index)}
@@ -418,49 +430,61 @@ export function DetalleGrupoScreen() {
             {/* En la lista solo va el color de la categoría: la ilustración
                 se reserva para los botones, así el scroll no dibuja imágenes. */}
             <View style={{ padding: 20 }}>
-              <View className="flex-row items-center gap-3">
-                <View
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 10,
-                    backgroundColor: paleta?.light ?? '#F1F5F9',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Receipt size={18} color={paleta?.dark ?? colores.primaryDark} />
-                </View>
-                <Text className="flex-1 text-base font-bold text-text">
-                  {gasto.descripcion}
-                </Text>
-                <View
-                  style={{
-                    paddingHorizontal: 10,
-                    paddingVertical: 4,
-                    borderRadius: 12,
-                    backgroundColor: paleta?.light ?? '#F1F5F9',
-                  }}
-                >
-                  <Text
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Ver detalle de ${gasto.descripcion}`}
+                disabled={!gasto.id}
+                onPress={() => verDetalle(gasto)}
+              >
+                <View className="flex-row items-center gap-3">
+                  <View
                     style={{
-                      fontSize: 12,
-                      fontWeight: '700',
-                      color: paleta?.dark ?? colores.primaryDark,
+                      width: 34,
+                      height: 34,
+                      borderRadius: 10,
+                      backgroundColor: paleta?.light ?? '#F1F5F9',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
                   >
-                    {gasto.categoria}
+                    <Receipt
+                      size={18}
+                      color={paleta?.dark ?? colores.primaryDark}
+                    />
+                  </View>
+                  <Text className="flex-1 text-base font-bold text-text">
+                    {gasto.descripcion}
                   </Text>
+                  <View
+                    style={{
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                      borderRadius: 12,
+                      backgroundColor: paleta?.light ?? '#F1F5F9',
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        fontWeight: '700',
+                        color: paleta?.dark ?? colores.primaryDark,
+                      }}
+                    >
+                      {gasto.categoria}
+                    </Text>
+                  </View>
                 </View>
-              </View>
 
-              <Text className="mt-2 text-xl font-bold text-text">
-                {dinero(gasto.monto)}
-              </Text>
+                <Text className="mt-2 text-xl font-bold text-text">
+                  {dinero(gasto.monto)}
+                </Text>
 
-              <Text className="mt-0.5 text-xs text-text-muted">
-                Pagó {gasto.pagadoPorNombre} · {formatearFecha(gasto.fecha)}
-              </Text>
+                <Text className="mt-0.5 text-xs text-text-muted">
+                  Pagó {gasto.pagadoPorNombre} · {formatearFecha(gasto.fecha)}
+                  {gasto.tieneFoto ? ' · Con foto' : ''}
+                  {gasto.ubicacion ? ' · Con ubicación' : ''}
+                </Text>
+              </Pressable>
 
               <View className="mt-3 flex-row items-center justify-between border-t border-slate-200/60 pt-2">
                 {gasto.id ? (
@@ -518,14 +542,21 @@ export function DetalleGrupoScreen() {
               key={pago.id ?? String(index)}
               className="mb-3 flex-row items-center gap-3 rounded-2xl bg-white p-4"
             >
-              <View className="flex-1">
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Ver detalle de ${pago.descripcion}`}
+                disabled={!pago.id}
+                onPress={() => verDetalle(pago)}
+                className="flex-1"
+              >
                 <Text className="font-semibold text-text">
                   {pago.descripcion}
                 </Text>
                 <Text className="text-xs text-text-muted">
                   {formatearFecha(pago.fecha)}
+                  {pago.tieneFoto ? ' · Con comprobante' : ''}
                 </Text>
-              </View>
+              </Pressable>
               <Text className="font-bold text-primary-dark">
                 {dinero(pago.monto)}
               </Text>
