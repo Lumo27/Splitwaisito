@@ -50,7 +50,12 @@ export interface GastoFirestore {
   fotoUrl?: string
   ubicacion?: { lat?: number; lng?: number; direccion?: string }
   participantes?: string[]
+  /** 'pago' marca una transferencia registrada al saldar una deuda. */
+  tipo?: 'gasto' | 'pago'
 }
+
+export const esPago = (gasto: Pick<GastoFirestore, 'tipo'>) =>
+  gasto.tipo === 'pago'
 
 export const usuariosRef = db
   ? (collection(db, 'usuarios') as ReturnType<typeof collection>)
@@ -214,6 +219,27 @@ export async function guardarGasto(
     id: ref.id,
     ...gasto,
   } as GastoFirestore
+}
+
+/**
+ * Registra que `de` le transfirió `monto` a `a`. Se guarda como un movimiento
+ * pagado por el deudor y repartido solo con el acreedor, así el cálculo de
+ * deudas lo compensa sin lógica aparte.
+ */
+export function registrarPago(
+  grupoId: string,
+  pago: { deId: string; deNombre: string; aId: string; aNombre: string; monto: number },
+) {
+  return guardarGasto(grupoId, {
+    tipo: 'pago',
+    descripcion: `Pago de ${pago.deNombre} a ${pago.aNombre}`,
+    monto: pago.monto,
+    categoria: 'Otro',
+    pagadoPorId: pago.deId,
+    pagadoPorNombre: pago.deNombre,
+    participantes: [pago.aId],
+    fecha: new Date().toISOString(),
+  })
 }
 
 export async function actualizarGasto(

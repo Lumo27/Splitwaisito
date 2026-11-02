@@ -1,4 +1,5 @@
 import type { MonedaCodigo } from '@/theme/moneda'
+import { DOLAR_API_BASE } from './dolar'
 
 export type MonedaExtranjera = Exclude<MonedaCodigo, 'ARS'>
 
@@ -15,8 +16,8 @@ export const VIGENCIA_COTIZACION_MS = 6 * 60 * 60 * 1000
 export const TIEMPO_LIMITE_COTIZACION_MS = 10 * 1000
 
 const URLs_COTIZACION: Record<MonedaExtranjera, string> = {
-  USD: 'https://dolarapi.com/v1/dolares/oficial',
-  BRL: 'https://dolarapi.com/v1/cotizaciones/brl',
+  USD: `${DOLAR_API_BASE}/dolares/oficial`,
+  BRL: `${DOLAR_API_BASE}/cotizaciones/brl`,
 }
 
 const solicitudesEnCurso = new Map<

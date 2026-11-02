@@ -17,6 +17,7 @@ import {
   eliminarGasto,
   obtenerGastosDelGrupo,
   obtenerGrupoPorId,
+  esPago,
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
@@ -93,15 +94,38 @@ export function DetalleGrupoScreen() {
     () => deudasDelGrupo(participantes, gastos),
     [gastos, participantes],
   )
-  const estadoDeudas = estadoDeudasGrupo(gastos, deudas)
+  // Los pagos registrados entran en el cálculo de deudas, pero no son gastos:
+  // no suman al total, al gráfico ni a la lista de gastos.
+  const soloGastos = useMemo(() => gastos.filter((g) => !esPago(g)), [gastos])
+  const pagos = useMemo(() => gastos.filter(esPago), [gastos])
+  const estadoDeudas = estadoDeudasGrupo(soloGastos, deudas)
   const nombre = (personaId: string) =>
     participantes.find((persona) => persona.id === personaId)?.nombre ??
     'Usuario'
 
   const moneda = grupo?.moneda ?? 'ARS'
   const dinero = (monto: number) => formatearMoneda(monto, moneda)
-  const totalGastos = gastos.reduce((total, gasto) => total + gasto.monto, 0)
+  const totalGastos = soloGastos.reduce((total, gasto) => total + gasto.monto, 0)
   useActualizarCotizacionPesos(moneda)
+
+  function eliminarMovimiento(
+    movimiento: GastoFirestore,
+    titulo: string,
+    mensaje: string,
+  ) {
+    const movimientoId = movimiento.id
+    if (!movimientoId) return
+    confirmar({
+      titulo,
+      mensaje,
+      textoConfirmar: titulo.split(' ')[0],
+      alConfirmar: async () => {
+        // Actualización optimista inmediata
+        setGastos((prev) => prev.filter((item) => item.id !== movimientoId))
+        await ejecutar(() => eliminarGasto(id, movimientoId))
+      },
+    })
+  }
 
   function recordarPorWhatsApp(deudorId: string, monto: number) {
     const deudorNombre = nombre(deudorId)
@@ -259,7 +283,7 @@ export function DetalleGrupoScreen() {
         </Text>
         <EquivalenciaPesos monto={totalGastos} moneda={moneda} />
       </View>
-      <GastosPorCategoria gastos={gastos} moneda={moneda} />
+      <GastosPorCategoria gastos={soloGastos} moneda={moneda} />
       <Pressable
         accessibilityRole="button"
         onPress={() =>
@@ -372,14 +396,14 @@ export function DetalleGrupoScreen() {
         accessibilityRole="header"
         className="mb-3 mt-6 text-lg font-bold text-text"
       >
-        Gastos ({gastos.length})
+        Gastos ({soloGastos.length})
       </Text>
-      {!gastos.length && (
+      {!soloGastos.length && (
         <Text className="text-sm text-text-muted">
           Todavía no hay gastos. Cargá el primero para empezar.
         </Text>
       )}
-      {gastos.map((gasto, index) => {
+      {soloGastos.map((gasto, index) => {
         const paleta = COLOR_CATEGORIAS[gasto.categoria] ?? COLOR_CATEGORIAS.Otro
         return (
           <View
@@ -464,23 +488,13 @@ export function DetalleGrupoScreen() {
                     accessibilityLabel={`Eliminar gasto ${gasto.descripcion}`}
                     disabled={ocupado}
                     className="min-h-11 flex-row items-center justify-end gap-1.5 py-1"
-                    onPress={() => {
-                      const gastoIdAEliminar = gasto.id!
-                      confirmar({
-                        titulo: 'Eliminar gasto',
-                        mensaje: `¿Eliminar “${gasto.descripcion}”? Esta acción no se puede deshacer.`,
-                        textoConfirmar: 'Eliminar',
-                        textoCancelar: 'Cancelar',
-                        destructivo: true,
-                        alConfirmar: async () => {
-                          // Actualización optimista inmediata
-                          setGastos((prev) =>
-                            prev.filter((item) => item.id !== gastoIdAEliminar),
-                          )
-                          await ejecutar(() => eliminarGasto(id, gastoIdAEliminar))
-                        },
-                      })
-                    }}
+                    onPress={() =>
+                      eliminarMovimiento(
+                        gasto,
+                        'Eliminar gasto',
+                        `¿Eliminar “${gasto.descripcion}”? Esta acción no se puede deshacer.`,
+                      )
+                    }
                   >
                     <Trash2 size={16} color="#B42318" />
                     <Text className="font-semibold text-red-700">Eliminar</Text>
@@ -491,6 +505,51 @@ export function DetalleGrupoScreen() {
           </View>
         )
       })}
+      {pagos.length > 0 && (
+        <>
+          <Text
+            accessibilityRole="header"
+            className="mb-3 mt-6 text-lg font-bold text-text"
+          >
+            Pagos registrados ({pagos.length})
+          </Text>
+          {pagos.map((pago, index) => (
+            <View
+              key={pago.id ?? String(index)}
+              className="mb-3 flex-row items-center gap-3 rounded-2xl bg-white p-4"
+            >
+              <View className="flex-1">
+                <Text className="font-semibold text-text">
+                  {pago.descripcion}
+                </Text>
+                <Text className="text-xs text-text-muted">
+                  {formatearFecha(pago.fecha)}
+                </Text>
+              </View>
+              <Text className="font-bold text-primary-dark">
+                {dinero(pago.monto)}
+              </Text>
+              {pago.id ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Deshacer ${pago.descripcion}`}
+                  disabled={ocupado}
+                  className="min-h-11 justify-center"
+                  onPress={() =>
+                    eliminarMovimiento(
+                      pago,
+                      'Deshacer pago',
+                      `¿Deshacer “${pago.descripcion}”? La deuda vuelve a quedar pendiente.`,
+                    )
+                  }
+                >
+                  <Text className="font-semibold text-red-700">Deshacer</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          ))}
+        </>
+      )}
     </ScrollView>
   )
 }

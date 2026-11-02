@@ -10,14 +10,17 @@ import {
   Titulo,
 } from '@/components/Formulario'
 import {
+  esPago,
   obtenerGastosDelGrupo,
   obtenerGrupoPorId,
+  registrarPago,
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
+import { confirmar } from '@/utils/alerta'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
@@ -36,6 +39,7 @@ export function SaldarDeudaScreen() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [copiado, setCopiado] = useState('')
+  const [registrando, setRegistrando] = useState(false)
   const peticion = useRef(0)
   const usuarioId = usuario?.id
   const cargar = useCallback(async () => {
@@ -88,6 +92,7 @@ export function SaldarDeudaScreen() {
   const acreedor = amigos.find((amigo) => amigo.id === a)
   const email = deuda && de === usuarioId ? (acreedor?.email?.trim() ?? '') : ''
   const moneda = grupo?.moneda ?? 'ARS'
+  const cantidadGastos = gastos.filter((gasto) => !esPago(gasto)).length
   useActualizarCotizacionPesos(moneda)
   useEffect(() => {
     let vigente = true
@@ -125,7 +130,7 @@ export function SaldarDeudaScreen() {
   }
   async function compartirPorWhatsApp() {
     if (!deuda) return
-    const montoTexto = formatearMoneda(deuda.monto, grupo?.moneda ?? 'ARS')
+    const montoTexto = formatearMoneda(deuda.monto, moneda)
     const grupoNombre = grupo?.nombre ?? 'el grupo'
     const destinatarioNombre = acreedor?.nombre ?? 'compañero'
     const aliasDestino = acreedor?.alias?.trim()
@@ -134,13 +139,40 @@ export function SaldarDeudaScreen() {
         ? ` al e-mail ${email}`
         : ''
 
-    const mensaje = `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo \"${grupoNombre}\" en Splitwaisito${aliasDestino}. ¡Avisame cuando te llegue!`
+    const mensaje = `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo "${grupoNombre}" en Splitwaisito${aliasDestino}. ¡Avisame cuando te llegue!`
 
     try {
       await Linking.openURL(`https://wa.me/?text=${encodeURIComponent(mensaje)}`)
     } catch {
       setError('No pudimos abrir WhatsApp. Verificá que esté instalado.')
     }
+  }
+  function marcarComoPagada() {
+    if (!deuda || !usuario || !id) return
+    const acreedorNombre = acreedor?.nombre ?? 'otro integrante'
+    confirmar({
+      titulo: 'Registrar pago',
+      mensaje: `¿Ya le transferiste ${formatearMoneda(deuda.monto, moneda)} a ${acreedorNombre}? La deuda se marca como saldada en el grupo.`,
+      textoConfirmar: 'Ya pagué',
+      destructivo: false,
+      alConfirmar: async () => {
+        setRegistrando(true)
+        try {
+          await registrarPago(id, {
+            deId: usuario.id,
+            deNombre: usuario.nombre,
+            aId: deuda.a,
+            aNombre: acreedorNombre,
+            monto: deuda.monto,
+          })
+          volver()
+        } catch {
+          setError('No pudimos registrar el pago. Volvé a intentar.')
+        } finally {
+          setRegistrando(false)
+        }
+      },
+    })
   }
   function volver() {
     router.replace({ pathname: '/grupos/[id]', params: { id } })
@@ -184,8 +216,8 @@ export function SaldarDeudaScreen() {
         </Text>
         <EquivalenciaPesos monto={deuda.monto} moneda={moneda} />
         <Text className="text-sm text-text-muted">
-          {grupo?.nombre} · {gastos.length} gasto
-          {gastos.length === 1 ? '' : 's'}
+          {grupo?.nombre} · {cantidadGastos} gasto
+          {cantidadGastos === 1 ? '' : 's'}
         </Text>
         {email ? (
           <Text selectable className="text-text">
@@ -229,9 +261,15 @@ export function SaldarDeudaScreen() {
       />
       <Text className="text-sm leading-6 text-text-muted">
         Pegá el e-mail en Mercado Pago y confirmá el destinatario y el monto. La
-        transferencia la realizás desde Mercado Pago; Splitwaisito te ayuda a
-        consultar los datos.
+        transferencia la realizás desde Mercado Pago; cuando termines, marcala
+        como pagada para saldar la deuda en el grupo.
       </Text>
+      <Boton
+        texto="Ya pagué, marcar como saldada"
+        cargando={registrando}
+        disabled={registrando}
+        onPress={marcarComoPagada}
+      />
       <Boton texto="Volver al grupo" secundario onPress={volver} />
     </Pantalla>
   )
