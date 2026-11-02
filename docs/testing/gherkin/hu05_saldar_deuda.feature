@@ -1,6 +1,6 @@
-﻿# language: es
-# version: 1.0
-# fecha: 29/10/2026
+# language: es
+# version: 1.1
+# fecha: 31/10/2026
 # commit-probado: 2e3a5cb
 # autor: Candela Sandoval
 
@@ -21,14 +21,12 @@ Característica: HU-05 Saldar deuda
     Entonces ve el nombre del acreedor
     Y ve el monto que debe
     Y el email del acreedor fue copiado automáticamente al portapapeles
-    # useEffect al montar: Clipboard.setStringAsync(email)
     Y ve la confirmación "E-mail copiado."
 
   @HU-05 @TC-HU05-002 @alta @funcional @android
   Escenario: Abrir Mercado Pago desde Saldar deuda
     Dado que el usuario está en la pantalla "Saldar deuda" con una deuda válida
     Cuando toca "Abrir Enviar dinero en Mercado Pago"
-    # Linking.openURL('https://www.mercadopago.com.ar/money-transfer')
     Entonces se abre el navegador o la app de Mercado Pago con la URL de transferencia
 
   @HU-05 @TC-HU05-003 @media @funcional @android @hardware

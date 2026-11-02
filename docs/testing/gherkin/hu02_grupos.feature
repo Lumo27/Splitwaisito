@@ -1,6 +1,6 @@
-﻿# language: es
-# version: 1.0
-# fecha: 29/10/2026
+# language: es
+# version: 1.1
+# fecha: 31/10/2026
 # commit-probado: 2e3a5cb
 # autor: Candela Sandoval
 
@@ -16,7 +16,7 @@ Característica: HU-02 Ver y crear grupos
   @HU-02 @TC-HU02-001 @alta @humo @android
   Escenario: Ver lista de grupos con datos precargados
     Dado que el usuario inició sesión correctamente
-    Y tiene grupos disponibles (Firestore o modo demo)
+    Y tiene grupos disponibles en modo demo o en la cuenta conectada
     Cuando navega al tab "Gastos"
     Entonces ve una lista con el nombre de cada grupo
     Y cada ítem muestra la cantidad de integrantes

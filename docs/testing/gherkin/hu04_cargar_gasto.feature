@@ -1,6 +1,6 @@
-﻿# language: es
-# version: 1.0
-# fecha: 29/10/2026
+# language: es
+# version: 1.1
+# fecha: 31/10/2026
 # commit-probado: 2e3a5cb
 # autor: Candela Sandoval
 
@@ -9,7 +9,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
   quiero cargar gastos con descripción, monto, categoría y participantes
   para llevar el registro compartido y calcular deudas correctamente.
 
-  # Reglas de validarGasto.ts aplicadas en estos escenarios:
   # - Descripción: no vacía ni solo espacios
   # - Monto: regex ^\d+(?:[.,]\d{1,2})?$, valor > 0, <= MAX_SAFE_INTEGER/100
   # - Pagador: debe estar en miembros[] del grupo
@@ -87,7 +86,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Dado que el usuario está en el formulario de gasto
     Cuando deja el campo "¿Qué compraste?" vacío
     Y toca "Guardar gasto"
-    # validarGasto: !descripcion.trim() → error
     Entonces ve el mensaje de error "Ingresá una descripción."
     Y permanece en el formulario
 
@@ -96,7 +94,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Dado que el usuario está en el formulario de gasto con descripción válida
     Cuando ingresa monto "0"
     Y toca "Guardar gasto"
-    # validarGasto: valor <= 0 → error
     Entonces ve el mensaje de error "El monto debe ser mayor que cero y estar dentro del rango permitido."
 
   @HU-04 @TC-HU04-009 @alta @negativo @android
@@ -104,7 +101,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Dado que el usuario está en el formulario de gasto
     Cuando ingresa monto "1.500"
     Y toca "Guardar gasto"
-    # validarGasto: regex ^\d+(?:[.,]\d{1,2})?$ no acepta 1.500 (3 dígitos decimales)
     Entonces ve el mensaje de error "Ingresá un monto válido con hasta dos decimales."
 
   @HU-04 @TC-HU04-010 @alta @negativo @android
@@ -112,7 +108,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Dado que el usuario está en el formulario de gasto
     Cuando ingresa monto "-50"
     Y toca "Guardar gasto"
-    # validarGasto: regex no acepta el signo menos
     Entonces ve el mensaje de error "Ingresá un monto válido con hasta dos decimales."
 
   @HU-04 @TC-HU04-011 @alta @negativo @android
@@ -120,7 +115,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Dado que el usuario está en el formulario de gasto con descripción y monto válidos
     Cuando destilda a todos los participantes de la sección "Dividir entre"
     Y toca "Guardar gasto"
-    # validarGasto: !participantes.length → error
     Entonces ve el mensaje de error "Elegí al menos un participante del grupo."
 
   @HU-04 @TC-HU04-012 @media @negativo @android
@@ -128,7 +122,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Dado que el usuario está en el formulario de gasto
     Cuando ingresa monto "1500,999"
     Y toca "Guardar gasto"
-    # validarGasto: regex ^\d+(?:[.,]\d{1,2})?$ no acepta más de 2 decimales
     Entonces ve el mensaje de error "Ingresá un monto válido con hasta dos decimales."
 
   @HU-04 @TC-HU04-013 @media @negativo @android
@@ -136,7 +129,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Dado que el usuario está en el formulario de gasto
     Cuando ingresa monto "abc"
     Y toca "Guardar gasto"
-    # validarGasto: regex no acepta letras
     Entonces ve el mensaje de error "Ingresá un monto válido con hasta dos decimales."
 
   # ─────────────────────────────────────────────────────────────────────
@@ -149,7 +141,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Cuando ingresa monto "1500,50"
     Y completa los demás campos requeridos
     Y toca "Guardar gasto"
-    # validarGasto: monto.trim().replace(',', '.') → 1500.50
     Entonces el gasto se guarda con monto 1500.50
 
   @HU-04 @TC-HU04-015 @alta @borde @android
@@ -158,8 +149,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Cuando selecciona al pagador "Lucas"
     Y en "Dividir entre" solo selecciona a "Ana" y "Ben" (sin Lucas)
     Y toca "Guardar gasto"
-    # validarGasto: pagador no necesita estar en participantes, solo en miembros[]
-    # deudasDelGrupo: si pagador no está en participantes, recibe el monto completo
     Entonces el gasto se guarda correctamente
     Y Lucas aparece como acreedor del monto total en las deudas
 
@@ -169,7 +158,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Cuando ingresa monto "0,01"
     Y completa los demás campos requeridos
     Y toca "Guardar gasto"
-    # validarGasto: 0.01 > 0 y cumple regex → válido
     Entonces el gasto se guarda correctamente con monto 0.01
 
   @HU-04 @TC-HU04-017 @media @borde @android
@@ -178,7 +166,6 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Cuando ingresa monto "1"
     Y completa los demás campos requeridos
     Y toca "Guardar gasto"
-    # validarGasto: "1" cumple regex ^\d+(?:[.,]\d{1,2})?$ → válido
     Entonces el gasto se guarda correctamente con monto 1
 
   @HU-04 @TC-HU04-018 @media @borde @android
@@ -187,14 +174,12 @@ Característica: HU-04 Cargar, editar y eliminar gasto
     Cuando ingresa monto "999999,99"
     Y completa los demás campos requeridos
     Y toca "Guardar gasto"
-    # validarGasto: 999999.99 <= MAX_SAFE_INTEGER/100 → válido
     Entonces el gasto se guarda correctamente con monto 999999.99
 
   @HU-04 @TC-HU04-019 @media @borde @android @hardware
   Escenario: Permiso de cámara denegado muestra mensaje de error
     Dado que el usuario toca "Tomar foto" en el formulario de gasto
     Y deniega el permiso de cámara
-    # ImagePicker.requestCameraPermissionsAsync().granted === false
     Entonces ve el mensaje de error "Permití el acceso a la cámara para tomar la foto."
     Y el formulario permanece con el resto de los campos intactos
 
@@ -202,6 +187,5 @@ Característica: HU-04 Cargar, editar y eliminar gasto
   Escenario: Permiso de GPS denegado muestra mensaje de error
     Dado que el usuario toca "Detectar mi ubicación GPS" en el formulario de gasto
     Y deniega el permiso de geolocalización
-    # Location.requestForegroundPermissionsAsync().granted === false
     Entonces ve el mensaje de error "Permití el acceso a la ubicación para detectar tu posición actual."
     Y la ubicación permanece sin datos en el formulario

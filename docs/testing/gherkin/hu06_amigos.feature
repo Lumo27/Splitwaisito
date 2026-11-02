@@ -1,6 +1,6 @@
-﻿# language: es
-# version: 1.0
-# fecha: 29/10/2026
+# language: es
+# version: 1.1
+# fecha: 31/10/2026
 # commit-probado: 2e3a5cb
 # autor: Candela Sandoval
 
@@ -92,6 +92,5 @@ Característica: HU-06 Gestionar amigos
   @HU-06 @TC-HU06-010 @baja @borde @android
   Escenario: Lista de amigos se recarga al volver al tab
     Dado que el usuario estaba en otro tab y volvió al tab "Amigos"
-    # useFocusEffect dispara cargar() al recuperar el foco
     Entonces la app vuelve a consultar amigos y solicitudes desde Firestore o seeds
     Y actualiza la lista con los datos más recientes

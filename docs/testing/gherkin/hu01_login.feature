@@ -1,13 +1,14 @@
-﻿# language: es
-# version: 1.0
-# fecha: 29/10/2026
+# language: es
+# version: 1.1
+# fecha: 31/10/2026
 # commit-probado: 2e3a5cb
 # autor: Candela Sandoval
 
 Característica: HU-01 Iniciar sesión
   Como usuario de Splitwaisito
-  quiero poder iniciar sesión con modo demo, email/contraseña o Google
-  para acceder a mis grupos y gastos de forma segura.
+  quiero poder iniciar sesión con modo demo o email/contraseña
+  y acceder a mis grupos y gastos de forma segura.
+  El acceso con Google quedó fuera de esta versión y requiere una compilación compatible.
 
   # ─────────────────────────────────────────────────────────────────────
   # MODO DEMO
@@ -50,15 +51,25 @@ Característica: HU-01 Iniciar sesión
   # NEGATIVOS
   # ─────────────────────────────────────────────────────────────────────
 
-  @HU-01 @TC-HU01-004 @alta @negativo @requiere-firebase @android
-  Escenario: Intento de login con email inválido
-    Dado que Firebase está configurado
-    Y el usuario está en la pantalla de login en modo "Iniciar sesión"
+  @HU-01 @TC-HU01-004 @alta @negativo @android
+  Escenario: Intento de login con campos incompletos o email inválido
+    Dado que el usuario está en la pantalla de login en modo "Iniciar sesión"
     Cuando ingresa email "noesuncorreo"
-    Y ingresa contraseña "clave123"
+    Y deja la contraseña vacía
     Y toca "Iniciar sesión"
-    # validación local antes de llamar a Firebase
     Entonces ve el mensaje de error "Ingresá tu e-mail y contraseña."
+    Y permanece en la pantalla de login
+
+  @HU-01 @TC-HU01-010 @alta @negativo @requiere-firebase @android
+  Escenario: Registro con un email ya utilizado
+    Dado que Firebase está configurado con el proveedor email/contraseña habilitado
+    Y existe una cuenta con el email "existente@test.com"
+    Y el usuario está en modo registro
+    Cuando ingresa nombre "Candela"
+    Y ingresa email "existente@test.com"
+    Y ingresa contraseña "segura1"
+    Y toca "Crear mi cuenta"
+    Entonces ve el mensaje de error "Ese e-mail ya está registrado. Probá iniciando sesión."
     Y permanece en la pantalla de login
 
   @HU-01 @TC-HU01-005 @alta @negativo @requiere-firebase @android
@@ -102,20 +113,13 @@ Característica: HU-01 Iniciar sesión
     Dado que la app corre en Expo Go (MODO_SEEDS=false, executionEnvironment=StoreClient)
     Y esExpoGo es verdadero
     Y el usuario está en la pantalla de login
-    # El bloque de Google está envuelto en {!esExpoGo && ...}
     Entonces el botón "Continuar con Google" NO está visible en pantalla
 
   @HU-01 @TC-HU01-009 @alta @borde @web @falla-conocida
-  Escenario: El botón de Google no debería mostrarse en web pero actualmente falla
-    # BUG CONOCIDO: en plataforma web, esExpoGo=false porque Constants.executionEnvironment
-    # no es StoreClient. Por eso el botón de Google SÍ se renderiza en web.
-    # Al tocarlo, la librería @react-native-google-signin lanza:
-    # "RNGoogleSignIn: not-implemented method on web platform"
-    # Este escenario documenta el comportamiento ESPERADO (que debería fallar hoy).
-    Dado que la app corre en plataforma web (expo start --web)
-    Y esExpoGo es falso en ese entorno
+  Escenario: Google se muestra incorrectamente en web
+    Dado que la app corre en plataforma web
     Y el usuario está en la pantalla de login
-    # Comportamiento esperado (hoy NO se cumple):
-    Entonces el botón "Continuar con Google" NO debería estar visible en pantalla
-    # Comportamiento actual (bug):
-    Pero el botón SÍ aparece y al tocarlo muestra el error "RNGoogleSignIn: not-implemented method on web platform"
+    Cuando observa la pantalla
+    Entonces no debería aparecer el botón "Continuar con Google"
+    Pero el botón actual aparece debido al modo de ejecución de Expo en web
+    Y al tocarlo se muestra un mensaje indicando que Google no está implementado en web

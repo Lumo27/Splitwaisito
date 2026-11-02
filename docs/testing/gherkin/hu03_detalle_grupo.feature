@@ -1,6 +1,6 @@
-﻿# language: es
-# version: 1.0
-# fecha: 29/10/2026
+# language: es
+# version: 1.1
+# fecha: 31/10/2026
 # commit-probado: 2e3a5cb
 # autor: Candela Sandoval
 
@@ -19,14 +19,12 @@ Característica: HU-03 Ver detalle de grupo, gastos y deudas
     Cuando abre el detalle de ese grupo
     Entonces ve el total sumado de todos los gastos
     Y los gastos aparecen ordenados por fecha descendente
-    Y ve la sección "Deudas simplificadas" con las transferencias mínimas necesarias
-    # deudasDelGrupo.ts aplica el algoritmo mayor-deudor-paga-mayor-acreedor
+    Y ve la sección "Deudas" con el importe de cada transferencia pendiente
 
   @HU-03 @TC-HU03-002 @alta @funcional @android
   Escenario: Deuda respeta participantes por gasto (no divide entre todos)
     Dado que el grupo tiene 3 integrantes (A, B y C)
     Y existe un gasto de $120 pagado por A con participantes=[A, B]
-    # deudasDelGrupo.ts filtra por gasto.participantes cuando existe
     Cuando abre el detalle del grupo
     Entonces la deuda calculada es "B le debe $60 a A"
     Y C no aparece como deudor en ese gasto
@@ -44,7 +42,6 @@ Característica: HU-03 Ver detalle de grupo, gastos y deudas
     Y WhatsApp está instalado en el dispositivo
     Cuando toca "Recordar a [nombre]"
     Y en el diálogo de confirmación elige "Abrir WhatsApp"
-    # Linking.openURL('https://wa.me/?text=...')
     Entonces se abre WhatsApp con un mensaje prellenado que incluye el nombre del deudor, el monto y el nombre del grupo
 
   @HU-03 @TC-HU03-005 @media @funcional @android @hardware
@@ -53,7 +50,6 @@ Característica: HU-03 Ver detalle de grupo, gastos y deudas
     Y el deudor tiene email registrado en el grupo
     Cuando toca "Recordar a [nombre]"
     Y en el diálogo de confirmación elige "Por E-mail"
-    # Linking.openURL('mailto:...')
     Entonces se abre el cliente de correo con destinatario, asunto y cuerpo prellenados
 
   # ─────────────────────────────────────────────────────────────────────
@@ -79,7 +75,7 @@ Característica: HU-03 Ver detalle de grupo, gastos y deudas
   # CASOS BORDE
   # ─────────────────────────────────────────────────────────────────────
 
-  @HU-03 @TC-HU03-008 @media @borde @android
+  @HU-03 @TC-HU03-008 @media @borde @android @demo
   Escenario: Grupo sin gastos muestra estado vacío y deudas saldadas
     Dado que el usuario abre el detalle de un grupo que no tiene gastos
     Entonces ve el texto "Todavía no hay gastos. Cargá el primero para empezar."

@@ -1,6 +1,6 @@
-﻿# language: es
-# version: 1.0
-# fecha: 29/10/2026
+# language: es
+# version: 1.1
+# fecha: 31/10/2026
 # commit-probado: 2e3a5cb
 # autor: Candela Sandoval
 
@@ -13,13 +13,12 @@ Característica: HU-08 Configuración y cerrar sesión
   # CAMINOS FELICES
   # ─────────────────────────────────────────────────────────────────────
 
-  @HU-08 @TC-HU08-001 @alta @funcional @android @requiere-firebase
+  @HU-08 @TC-HU08-001 @alta @funcional @android
   Escenario: Cerrar sesión correctamente
     Dado que el usuario está autenticado en Firebase
     Y está en el tab "Configuración"
     Cuando toca "Cerrar sesión"
     Y confirma la acción en el Alert ("Salir")
-    # signOutUser() → router.replace('/login')
     Entonces es redirigido a la pantalla de login
     Y el botón Atrás no lleva de vuelta a la app autenticada
 
@@ -29,7 +28,6 @@ Característica: HU-08 Configuración y cerrar sesión
     Y el usuario está en el tab "Configuración"
     Cuando toca "Restablecer datos de ejemplo"
     Y confirma la acción en el Alert
-    # restablecerSeeds() → router.replace('/grupos')
     Entonces los grupos, gastos, amigos y perfil vuelven al estado inicial del seed
     Y es redirigido al tab "Gastos"
 
@@ -41,7 +39,6 @@ Característica: HU-08 Configuración y cerrar sesión
   Escenario: Error de red al cerrar sesión
     Dado que Firebase no está disponible
     Y el usuario toca "Cerrar sesión" y confirma
-    # signOutUser() lanza excepción → setError
     Entonces ve el mensaje de error "No pudimos cerrar la sesión. Volvé a intentar."
     Y permanece en el tab "Configuración" con la sesión activa
 

@@ -1,6 +1,6 @@
-﻿# language: es
-# version: 1.0
-# fecha: 29/10/2026
+# language: es
+# version: 1.1
+# fecha: 31/10/2026
 # commit-probado: 2e3a5cb
 # autor: Candela Sandoval
 
@@ -13,7 +13,7 @@ Característica: HU-07 Editar perfil y ver cotización del dólar
   # CAMINOS FELICES
   # ─────────────────────────────────────────────────────────────────────
 
-  @HU-07 @TC-HU07-001 @alta @funcional @android @requiere-firebase
+  @HU-07 @TC-HU07-001 @alta @funcional @android
   Escenario: Guardar alias y descripción correctamente
     Dado que el usuario está en el tab "Perfil"
     Cuando edita el campo alias a "german.mp"
@@ -47,7 +47,6 @@ Característica: HU-07 Editar perfil y ver cotización del dólar
   Escenario: Error de red al cargar la cotización del dólar
     Dado que el dispositivo no tiene conexión a internet
     Cuando el usuario abre el tab "Perfil"
-    # obtenerCotizacionesDolar() lanza excepción → setErrorDolar
     Entonces ve el mensaje "No pudimos actualizar la cotización."
     Y ve el botón "Reintentar"
     Y el resto del perfil (alias, descripción) sigue disponible para editar
@@ -77,13 +76,11 @@ Característica: HU-07 Editar perfil y ver cotización del dólar
   Escenario: Descripción de exactamente 160 caracteres es aceptada
     Dado que el usuario está editando su descripción
     Cuando ingresa exactamente 160 caracteres en el campo descripción
-    # maxLength={160} en el Campo
     Entonces el contador muestra "160/160"
     Y el campo acepta el texto sin truncarlo
 
   @HU-07 @TC-HU07-008 @baja @borde @android
   Escenario: Los campos se recargan al volver al tab Perfil
     Dado que el usuario guardó cambios en el perfil y luego navegó a otro tab
-    # useFocusEffect → setAlias(aliasGuardado), setDescripcion(descripcionGuardada)
     Cuando vuelve al tab "Perfil"
     Entonces los campos muestran los valores guardados más recientes, no los del borrador
