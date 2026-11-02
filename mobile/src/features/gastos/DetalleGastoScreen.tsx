@@ -1,6 +1,13 @@
 import { useCallback, useState } from 'react'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import { ActivityIndicator, Image, Linking, Text, View } from 'react-native'
+import {
+  ActivityIndicator,
+  Image,
+  Linking,
+  Pressable,
+  Text,
+  View,
+} from 'react-native'
 import { MapPin } from 'lucide-react-native'
 import {
   Boton,
@@ -24,13 +31,33 @@ import {
   esPago,
   estadoDelPago,
   receptorDelPago,
+  situacionEnGasto,
+  type SituacionEnGasto,
 } from '../grupos/pagos'
 import { useAppStore } from '@/store/useAppStore'
 import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
 import { participantesDelGrupo } from '../grupos/deudas'
+import { deudasDelGrupo } from '../grupos/deudasDelGrupo'
 import { formatearFecha } from '../grupos/formatearFecha'
+
+const SITUACIONES: Record<
+  SituacionEnGasto['tipo'],
+  { texto: string; color: string }
+> = {
+  pagador: { texto: 'Pagó el total', color: colores.primaryDark },
+  'pago-aprobado': {
+    texto: 'Ya pagó su parte',
+    color: ETIQUETAS_ESTADO_PAGO.aprobado.color,
+  },
+  'pago-en-revision': {
+    texto: 'Pago en revisión',
+    color: ETIQUETAS_ESTADO_PAGO.pendiente.color,
+  },
+  debe: { texto: 'Todavía debe', color: ETIQUETAS_ESTADO_PAGO.rechazado.color },
+  'al-dia': { texto: 'Al día', color: colores.textMuted },
+}
 
 export function DetalleGastoScreen() {
   const { id, gastoId } = useLocalSearchParams<{
@@ -41,6 +68,7 @@ export function DetalleGastoScreen() {
   const amigos = useAppStore((state) => state.amigos)
   const [grupo, setGrupo] = useState<GrupoFirestore | null>(null)
   const [gasto, setGasto] = useState<GastoFirestore | null>(null)
+  const [movimientos, setMovimientos] = useState<GastoFirestore[]>([])
   const [foto, setFoto] = useState<string | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -58,6 +86,7 @@ export function DetalleGastoScreen() {
       if (!actual || !encontrado) throw new Error('El movimiento ya no existe.')
       setGrupo(actual)
       setGasto(encontrado)
+      setMovimientos(gastos)
       setFoto(
         encontrado.tieneFoto
           ? await obtenerFotoGasto(id, gastoId)
@@ -78,8 +107,9 @@ export function DetalleGastoScreen() {
     setResolviendo(true)
     setError('')
     try {
-      await actualizarGasto(id, gastoId, { estado })
-      setGasto((actual) => (actual ? { ...actual, estado } : actual))
+      const cambios = { estado, aprobacion: 'manual' as const }
+      await actualizarGasto(id, gastoId, cambios)
+      setGasto((actual) => (actual ? { ...actual, ...cambios } : actual))
     } catch {
       setError('No pudimos actualizar el pago. Volvé a intentar.')
     } finally {
@@ -118,6 +148,10 @@ export function DetalleGastoScreen() {
   const paleta = COLOR_CATEGORIAS[gasto.categoria] ?? COLOR_CATEGORIAS.Otro
   const { lat, lng, direccion } = gasto.ubicacion ?? {}
   const tieneCoordenadas = typeof lat === 'number' && typeof lng === 'number'
+  const deudas = deudasDelGrupo(participantes, movimientos)
+  const nombre = (personaId?: string) =>
+    participantes.find((persona) => persona.id === personaId)?.nombre ??
+    'quien recibe'
   const estado = ETIQUETAS_ESTADO_PAGO[estadoDelPago(gasto)]
   const puedeResolver =
     pago &&
@@ -150,6 +184,21 @@ export function DetalleGastoScreen() {
           {formatearFecha(gasto.fecha)} · {grupo.nombre}
         </Text>
       </Tarjeta>
+
+      {pago && estadoDelPago(gasto) === 'aprobado' && (
+        <Tarjeta>
+          <Text className="font-bold text-text">
+            {gasto.aprobacion === 'automatica'
+              ? 'Verificado automáticamente'
+              : `Aprobado por ${nombre(receptorDelPago(gasto))}`}
+          </Text>
+          <Text className="text-sm text-text-muted">
+            {gasto.aprobacion === 'automatica'
+              ? 'El destinatario, el monto y la fecha del comprobante coinciden con la deuda.'
+              : 'Quien recibió el dinero revisó el comprobante y confirmó el pago.'}
+          </Text>
+        </Tarjeta>
+      )}
 
       {pago && gasto.estado === 'pendiente' && (
         <Tarjeta>
@@ -192,14 +241,45 @@ export function DetalleGastoScreen() {
           <Text className="font-bold text-text">
             Dividido entre {reparto.length}
           </Text>
-          {reparto.map((persona) => (
-            <View key={persona.id} className="flex-row justify-between">
-              <Text className="text-text">{persona.nombre}</Text>
-              <Text className="text-text-muted">
-                {formatearMoneda(gasto.monto / reparto.length, moneda)}
-              </Text>
-            </View>
-          ))}
+          {reparto.map((persona) => {
+            const situacion = situacionEnGasto(
+              persona.id,
+              gasto,
+              movimientos,
+              deudas,
+            )
+            const pagoRelacionado =
+              'pago' in situacion ? situacion.pago : undefined
+            return (
+              <Pressable
+                key={persona.id}
+                accessibilityRole={pagoRelacionado ? 'button' : 'text'}
+                disabled={!pagoRelacionado?.id}
+                onPress={() =>
+                  pagoRelacionado?.id &&
+                  router.push({
+                    pathname: '/grupos/[id]/gasto/[gastoId]',
+                    params: { id, gastoId: pagoRelacionado.id },
+                  })
+                }
+                className="gap-0.5 border-t border-slate-100 pt-2"
+              >
+                <View className="flex-row justify-between">
+                  <Text className="text-text">{persona.nombre}</Text>
+                  <Text className="text-text-muted">
+                    {formatearMoneda(gasto.monto / reparto.length, moneda)}
+                  </Text>
+                </View>
+                <Text
+                  className="text-xs font-semibold"
+                  style={{ color: SITUACIONES[situacion.tipo].color }}
+                >
+                  {SITUACIONES[situacion.tipo].texto}
+                  {pagoRelacionado ? ' · Ver comprobante' : ''}
+                </Text>
+              </Pressable>
+            )
+          })}
         </Tarjeta>
       )}
 
