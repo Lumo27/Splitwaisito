@@ -18,6 +18,8 @@ Conectar teléfono y computadora a la misma Wi-Fi. Android: escanear desde Expo 
 
 El modo demo usa AsyncStorage sin credenciales de Firebase. Las pantallas migradas son inicio de sesión, grupos, detalle, crear grupo, cargar/editar gasto, saldar deuda, amigos, perfil, configuración y pantalla no encontrada. Foto y ubicación son opcionales. Las deudas respetan los participantes seleccionados en cada gasto. Saldar copia los datos y abre Mercado Pago; la app no transfiere dinero ni registra una transferencia como pagada automáticamente.
 
+En grupos en USD o BRL, el total, las deudas y la pantalla para saldarlas pueden mostrar una equivalencia aproximada en pesos. Se consulta DolarApi con el valor de venta y se guarda localmente por seis horas; sin conexión se conserva la última cotización disponible. Es una referencia informativa: los saldos y pagos siguen en la moneda del grupo. En grupos en ARS no se muestra.
+
 ## Acceso real
 
 Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso por e-mail/contraseña requiere habilitar ese proveedor en Firebase y un usuario existente. Las reglas de Firestore y Storage deben permitir las operaciones autorizadas. No se verificó el flujo real con credenciales en esta migración.

@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { MODO_SEEDS } from '@/services/firebase'
 import type { MonedaCodigo } from '@/theme/moneda'
+import type { CotizacionesPesos } from '@/services/equivalenciaPesos'
 
 export interface Usuario {
   id: string
@@ -31,6 +32,7 @@ interface AppState {
   usuarioActual: Usuario | null
   amigos: Usuario[]
   gastos: Gasto[]
+  cotizacionesPesos: CotizacionesPesos
   iniciarSesion: (
     nombre: string,
     email: string,
@@ -56,6 +58,7 @@ interface AppState {
   ) => void
   reemplazarGastos: (gastos: Gasto[]) => void
   eliminarGasto: (id: string) => void
+  guardarCotizacionesPesos: (cotizaciones: CotizacionesPesos) => void
 }
 
 export const useAppStore = create<AppState>()(
@@ -64,6 +67,7 @@ export const useAppStore = create<AppState>()(
       usuarioActual: null,
       amigos: [],
       gastos: [],
+      cotizacionesPesos: {},
 
       iniciarSesion: (nombre, email, alias, id = 'user-me', fotoUrl, descripcion, moneda) =>
         set((state) => ({
@@ -176,6 +180,14 @@ export const useAppStore = create<AppState>()(
       eliminarGasto: (id) =>
         set((state) => ({
           gastos: state.gastos.filter((g) => g.id !== id),
+        })),
+
+      guardarCotizacionesPesos: (cotizaciones) =>
+        set((state) => ({
+          cotizacionesPesos: {
+            ...state.cotizacionesPesos,
+            ...cotizaciones,
+          },
         })),
     }),
     {
