@@ -291,7 +291,7 @@ export function CargarGastoScreen() {
           await guardarFotoGasto(id, guardado.id, foto)
         }
       }
-      router.back()
+      volverAlGrupo()
     } catch (fallo) {
       setError(
         fallo instanceof Error
@@ -302,6 +302,12 @@ export function CargarGastoScreen() {
       operacion.current = false
       setOcupado(false)
     }
+  }
+
+  // Si se entró por enlace directo o tras recargar no hay historial al que volver.
+  function volverAlGrupo() {
+    if (router.canGoBack()) router.back()
+    else if (id) router.replace({ pathname: '/grupos/[id]', params: { id } })
   }
 
   function confirmarEliminar() {
@@ -319,7 +325,7 @@ export function CargarGastoScreen() {
         setError('')
         try {
           await eliminarGasto(id, gastoId)
-          router.back()
+          volverAlGrupo()
         } catch (fallo) {
           setError(
             fallo instanceof Error

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Modal, Pressable, Text, View } from 'react-native'
+import { useEffect, useState } from 'react'
+import { Modal, Platform, Pressable, Text, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { MapPin, X } from 'lucide-react-native'
 import { colores } from '@/theme/colores'
@@ -57,14 +57,37 @@ export function MapaSelector({
             } else {
               marker = L.marker(e.latlng).addTo(map);
             }
+            const mensaje = JSON.stringify({ lat, lng });
             if (window.ReactNativeWebView) {
-              window.ReactNativeWebView.postMessage(JSON.stringify({ lat, lng }));
+              window.ReactNativeWebView.postMessage(mensaje);
+            } else if (window.parent !== window) {
+              window.parent.postMessage(mensaje, '*');
             }
           });
         </script>
       </body>
     </html>
   `
+
+  function recibirMensaje(data: unknown) {
+    if (typeof data !== 'string') return
+    try {
+      const coords = JSON.parse(data)
+      if (typeof coords.lat === 'number' && typeof coords.lng === 'number') {
+        setSeleccion({ lat: coords.lat, lng: coords.lng })
+      }
+    } catch {
+      // Mensajes ajenos al mapa
+    }
+  }
+
+  // En web no hay WebView nativo: el mapa va en un iframe y avisa con postMessage.
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !visible) return
+    const escuchar = (event: MessageEvent) => recibirMensaje(event.data)
+    window.addEventListener('message', escuchar)
+    return () => window.removeEventListener('message', escuchar)
+  }, [visible])
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onCerrar}>
@@ -87,20 +110,19 @@ export function MapaSelector({
         </View>
 
         <View className="flex-1">
-          <WebView
-            originWhitelist={['*']}
-            source={{ html }}
-            onMessage={(event) => {
-              try {
-                const data = JSON.parse(event.nativeEvent.data)
-                if (typeof data.lat === 'number' && typeof data.lng === 'number') {
-                  setSeleccion({ lat: data.lat, lng: data.lng })
-                }
-              } catch {
-                // Formato no JSON
-              }
-            }}
-          />
+          {Platform.OS === 'web' ? (
+            <iframe
+              title="Mapa"
+              srcDoc={html}
+              style={{ border: 0, width: '100%', height: '100%' }}
+            />
+          ) : (
+            <WebView
+              originWhitelist={['*']}
+              source={{ html }}
+              onMessage={(event) => recibirMensaje(event.nativeEvent.data)}
+            />
+          )}
         </View>
 
         <View className="border-t border-slate-200 p-4">
