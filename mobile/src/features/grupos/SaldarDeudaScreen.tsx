@@ -17,6 +17,11 @@ import {
   type GastoFirestore,
   type GrupoFirestore,
 } from '@/services/firestore'
+import {
+  DEMORA_RECORDATORIO_SEGUNDOS,
+  programarRecordatorioDePago,
+  recordatoriosDisponibles,
+} from '@/services/recordatorios'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
@@ -174,6 +179,27 @@ export function SaldarDeudaScreen() {
       },
     })
   }
+  async function recordarmePagar() {
+    if (!deuda) return
+    try {
+      const programado = await programarRecordatorioDePago(
+        'Tenés una deuda pendiente',
+        `Le debés ${formatearMoneda(deuda.monto, moneda)} a ${acreedor?.nombre ?? 'otro integrante'} por "${grupo?.nombre ?? 'el grupo'}".`,
+      )
+      if (programado) {
+        const cuando =
+          DEMORA_RECORDATORIO_SEGUNDOS < 60
+            ? `en ${DEMORA_RECORDATORIO_SEGUNDOS} segundos`
+            : 'en una hora'
+        setCopiado(`Te vamos a avisar ${cuando}.`)
+        setError('')
+      } else {
+        setError('Activá las notificaciones para recibir el recordatorio.')
+      }
+    } catch {
+      setError('No pudimos programar el recordatorio.')
+    }
+  }
   function volver() {
     router.replace({ pathname: '/grupos/[id]', params: { id } })
   }
@@ -244,6 +270,15 @@ export function SaldarDeudaScreen() {
           void compartirPorWhatsApp()
         }}
       />
+      {recordatoriosDisponibles && (
+        <Boton
+          texto="Recordarme pagar más tarde"
+          secundario
+          onPress={() => {
+            void recordarmePagar()
+          }}
+        />
+      )}
       <Boton
         texto="Copiar e-mail"
         secundario
