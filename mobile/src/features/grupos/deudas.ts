@@ -14,7 +14,7 @@ export interface Participante {
 export function participantesDelGrupo(
   miembros: string[] | undefined,
   usuarioActual: { id: string; nombre: string; email?: string } | null,
-  amigos: Array<{ id: string; nombre: string; email?: string }>,
+  amigos: { id: string; nombre: string; email?: string }[],
 ): Participante[] {
   const usuariosConocidos: Participante[] = [
     {

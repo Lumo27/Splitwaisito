@@ -42,6 +42,10 @@ export default function RootLayout() {
             options={{ title: 'Cargar gasto', presentation: 'modal' }}
           />
           <Stack.Screen
+            name="grupos/[id]/gasto/[gastoId]"
+            options={{ title: 'Detalle del movimiento' }}
+          />
+          <Stack.Screen
             name="grupos/[id]/saldar"
             options={{ title: 'Saldar deuda', presentation: 'modal' }}
           />

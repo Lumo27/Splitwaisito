@@ -24,7 +24,7 @@ export interface UsuarioFirestore {
   fotoUrl?: string | null
   descripcion?: string
   moneda?: MonedaCodigo
-  amigos?: Array<Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>>
+  amigos?: Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>[]
   updatedAt?: string
 }
 
@@ -50,7 +50,16 @@ export interface GastoFirestore {
   fotoUrl?: string
   ubicacion?: { lat?: number; lng?: number; direccion?: string }
   participantes?: string[]
+  /** 'pago' marca una transferencia registrada al saldar una deuda. */
+  tipo?: 'gasto' | 'pago'
+  /** Solo en pagos. Sin estado (pagos viejos) cuenta como aprobado. */
+  estado?: EstadoPago
+  /** Solo en pagos: por qué la verificación automática no lo aprobó. */
+  motivos?: string[]
 }
+
+export type EstadoPago = 'pendiente' | 'aprobado' | 'rechazado'
+
 
 export const usuariosRef = db
   ? (collection(db, 'usuarios') as ReturnType<typeof collection>)
@@ -102,7 +111,7 @@ export async function getUsuarioPerfil(id: string) {
 
 export async function guardarAmigosDelUsuario(
   usuarioId: string,
-  amigos: Array<Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>>,
+  amigos: Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>[],
 ) {
   if (MODO_SEEDS) return seed.seedGuardarAmigos(usuarioId, amigos)
   if (!db) {
@@ -214,6 +223,45 @@ export async function guardarGasto(
     id: ref.id,
     ...gasto,
   } as GastoFirestore
+}
+
+/**
+ * Registra que `de` le transfirió `monto` a `a`. Se guarda como un movimiento
+ * pagado por el deudor y repartido solo con el acreedor, así el cálculo de
+ * deudas lo compensa sin lógica aparte. El comprobante se guarda como la foto
+ * del movimiento. Si la verificación automática no lo aprobó, queda pendiente
+ * hasta que quien recibe el dinero lo apruebe.
+ */
+export async function registrarPago(
+  grupoId: string,
+  pago: {
+    deId: string
+    deNombre: string
+    aId: string
+    aNombre: string
+    monto: number
+    comprobante?: string
+    estado: EstadoPago
+    motivos?: string[]
+  },
+) {
+  const guardado = await guardarGasto(grupoId, {
+    tipo: 'pago',
+    estado: pago.estado,
+    ...(pago.motivos?.length ? { motivos: pago.motivos } : {}),
+    tieneFoto: Boolean(pago.comprobante),
+    descripcion: `Pago de ${pago.deNombre} a ${pago.aNombre}`,
+    monto: pago.monto,
+    categoria: 'Otro',
+    pagadoPorId: pago.deId,
+    pagadoPorNombre: pago.deNombre,
+    participantes: [pago.aId],
+    fecha: new Date().toISOString(),
+  })
+  if (pago.comprobante && guardado.id) {
+    await guardarFotoGasto(grupoId, guardado.id, pago.comprobante)
+  }
+  return guardado
 }
 
 export async function actualizarGasto(

@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { initializeApp } from 'firebase/app'
 import { getAuth, getReactNativePersistence, initializeAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
 import { Platform } from 'react-native'
 
 import { hasFirebaseConfig, type FirebaseConfig } from './firebaseConfig'
@@ -37,8 +36,7 @@ export const auth = !app
     ? getAuth(app)
     : initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) })
 export const db = app ? getFirestore(app) : null
-export const storage = app ? getStorage(app) : null
 
 export function isFirebaseAvailable() {
-  return MODO_SEEDS || Boolean(app && auth && db && storage)
+  return MODO_SEEDS || Boolean(app && auth && db)
 }

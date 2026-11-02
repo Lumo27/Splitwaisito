@@ -11,20 +11,33 @@ describe('moneda', () => {
   })
 
   it('formatea montos en pesos argentinos por defecto', () => {
-    const formateado = formatearMoneda(1500)
-    expect(formateado).toContain('$')
-    expect(formateado).toContain('1.500')
+    expect(formatearMoneda(1500)).toBe('$1.500')
+  })
+
+  it('usa punto como separador de miles', () => {
+    expect(formatearMoneda(154000)).toBe('$154.000')
+    expect(formatearMoneda(1000000)).toBe('$1.000.000')
   })
 
   it('formatea montos en dólares (USD)', () => {
-    const formateado = formatearMoneda(250.5, 'USD')
-    expect(formateado).toContain('US$')
-    expect(formateado).toContain('250,5')
+    expect(formatearMoneda(250.5, 'USD')).toBe('US$250,5')
   })
 
   it('formatea montos en reales (BRL)', () => {
-    const formateado = formatearMoneda(320.75, 'BRL')
-    expect(formateado).toContain('R$')
-    expect(formateado).toContain('320,75')
+    expect(formatearMoneda(320.75, 'BRL')).toBe('R$320,75')
+  })
+
+  it('omite decimales cuando son cero', () => {
+    expect(formatearMoneda(100, 'USD')).toBe('US$100')
+    expect(formatearMoneda(1000, 'ARS')).toBe('$1.000')
+  })
+
+  it('formatea montos negativos con signo', () => {
+    expect(formatearMoneda(-50.5, 'USD')).toBe('US$-50,5')
+  })
+
+  it('redondea a dos decimales', () => {
+    // 1/3 de 100 = 33.333... → 33,33
+    expect(formatearMoneda(100 / 3, 'ARS')).toBe('$33,33')
   })
 })

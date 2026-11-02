@@ -26,6 +26,7 @@ import {
 import { upsertUsuarioPerfil } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
+import { formatearMoneda } from '@/theme/moneda'
 
 export function PerfilScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
@@ -233,7 +234,7 @@ export function PerfilScreen() {
                         Compra
                       </Text>
                       <Text className="text-sm font-semibold text-text">
-                        ${cotizacion.compra?.toLocaleString('es-AR') ?? '-'}
+                        {cotizacion.compra ? formatearMoneda(cotizacion.compra) : '-'}
                       </Text>
                     </View>
                     <View className="items-end">
@@ -241,7 +242,7 @@ export function PerfilScreen() {
                         Venta
                       </Text>
                       <Text className="text-base font-bold text-emerald-700">
-                        ${cotizacion.venta?.toLocaleString('es-AR') ?? '-'}
+                        {cotizacion.venta ? formatearMoneda(cotizacion.venta) : '-'}
                       </Text>
                     </View>
                   </View>

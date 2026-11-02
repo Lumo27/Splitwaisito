@@ -7,7 +7,8 @@ export interface CotizacionDolar {
   fechaActualizacion: string
 }
 
-export const DOLAR_API_URL = 'https://dolarapi.com/v1/dolares'
+export const DOLAR_API_BASE = 'https://dolarapi.com/v1'
+export const DOLAR_API_URL = `${DOLAR_API_BASE}/dolares`
 
 export const CASAS_PRINCIPALES = [
   'blue',

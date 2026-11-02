@@ -16,13 +16,15 @@ npm run start:seeds -- --go
 
 Conectar teléfono y computadora a la misma Wi-Fi. Android: escanear desde Expo Go. iPhone: escanear con Cámara y abrir Expo Go. Si la red bloquea la conexión local, usar `npm run start:seeds -- --go --tunnel`.
 
-El modo demo usa AsyncStorage sin credenciales de Firebase. Las pantallas migradas son inicio de sesión, grupos, detalle, crear grupo, cargar/editar gasto, saldar deuda, amigos, perfil, configuración y pantalla no encontrada. Foto y ubicación son opcionales. Las deudas respetan los participantes seleccionados en cada gasto. Saldar copia los datos y abre Mercado Pago; la app no transfiere dinero ni registra una transferencia como pagada automáticamente.
+El modo demo usa AsyncStorage sin credenciales de Firebase. Las pantallas migradas son inicio de sesión, grupos, detalle, crear grupo, cargar/editar gasto, saldar deuda, amigos, perfil, configuración y pantalla no encontrada. Foto y ubicación son opcionales. Las deudas respetan los participantes seleccionados en cada gasto. Saldar copia el alias (o el e-mail) del acreedor para transferir desde cualquier banco o billetera; la app no mueve dinero. Después se sube la foto o captura del comprobante: Gemini (Firebase AI Logic) lee destinatario, alias, monto y fecha, y si coinciden con la deuda el pago se aprueba solo; si no, queda pendiente hasta que quien recibe el dinero lo apruebe o rechace desde el detalle del pago. Solo los pagos aprobados saldan la deuda. En modo demo no hay IA, así que los pagos nuevos quedan pendientes; el grupo «Viaje a Bariloche» trae un pago pendiente de Nahuel para probar la aprobación. Tocar un gasto o pago abre su detalle con foto, reparto y ubicación en Google Maps. «Recordarme pagar más tarde» programa una notificación local: en modo demo llega a los 10 segundos, con datos reales a la hora (no disponible en web).
+
+En grupos en USD o BRL, el total, las deudas y la pantalla para saldarlas pueden mostrar una equivalencia aproximada en pesos. Se consulta DolarApi con el valor de venta y se guarda localmente por seis horas; sin conexión se conserva la última cotización disponible. Es una referencia informativa: los saldos y pagos siguen en la moneda del grupo. En grupos en ARS no se muestra.
 
 ## Acceso real
 
-Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso por e-mail/contraseña requiere habilitar ese proveedor en Firebase y un usuario existente. Las reglas de Firestore y Storage deben permitir las operaciones autorizadas. No se verificó el flujo real con credenciales en esta migración.
+Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso por e-mail/contraseña requiere habilitar ese proveedor en Firebase y un usuario existente. Las reglas de Firestore deben permitir las operaciones autorizadas. Para la verificación de comprobantes hay que habilitar Firebase AI Logic con la Gemini Developer API en la consola (Build > AI Logic); funciona en el plan Spark. No se verificó el flujo real con credenciales en esta migración.
 
-Google OAuth sigue pendiente de implementación y configuración y requiere una compilación de desarrollo con esquema propio: https://docs.expo.dev/guides/authentication/.
+El inicio de sesión con Google usa `@react-native-google-signin/google-signin` y solo funciona en el APK (compilación propia); en Expo Go se usan demo o e-mail/contraseña.
 
 ## Verificaciones
 

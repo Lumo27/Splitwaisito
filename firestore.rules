@@ -50,7 +50,13 @@ service cloud.firestore {
       allow delete: if isMemberOfCurrentGroup();
 
       match /gastos/{gastoId} {
-        allow read, create, update, delete: if isGroupMember(groupId);
+        allow read, create, delete: if isGroupMember(groupId);
+        // El estado de un pago (aprobado o rechazado) solo lo cambia quien
+        // recibe el dinero, que es el único participante del pago.
+        allow update: if isGroupMember(groupId)
+          && (resource.data.get('tipo', 'gasto') != 'pago'
+            || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['estado'])
+            || request.auth.uid in resource.data.participantes);
 
         match /fotos/{fotoId} {
           allow read, create, update, delete: if isGroupMember(groupId);
