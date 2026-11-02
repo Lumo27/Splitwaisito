@@ -20,6 +20,19 @@ El modo demo usa AsyncStorage sin credenciales de Firebase. Las pantallas migrad
 
 En grupos en USD o BRL, el total, las deudas y la pantalla para saldarlas pueden mostrar una equivalencia aproximada en pesos. Se consulta DolarApi con el valor de venta y se guarda localmente por seis horas; sin conexión se conserva la última cotización disponible. Es una referencia informativa: los saldos y pagos siguen en la moneda del grupo. En grupos en ARS no se muestra.
 
+## Datos de ejemplo (seeds)
+
+Los datos mockeados existen solo en modo demo (`npm run start:seeds`); con `npm start` la app usa Firebase real y arranca vacía. Los seeds viven en `src/services/seedBackend.ts` (imágenes en `seedFotos.ts`) y sirven para mostrar cada funcionalidad a medida que se implementa. Al agregar datos, subir la versión de `CLAVE_DB` para que los dispositivos los regeneren. Desde Configuración, «Restablecer datos de ejemplo» vuelve al estado inicial.
+
+| Grupo | Para mostrar |
+|---|---|
+| Viaje a Bariloche | Gasto con foto del ticket y ubicación (Cabaña), gasto con ubicación, gráfico por categoría, deudas simplificadas y un pago de Nahuel **pendiente de aprobación** con comprobante. |
+| Cena con Cande | Gasto con ticket y mapa saldado por un pago **verificado automáticamente**; en el detalle se ve quién pagó su parte. |
+| Depto Palermo | Deuda propia para probar Saldar deuda, subir comprobante y el estado «Pago en revisión». |
+| Asado del sábado | Grupo chico sin extras. |
+
+Además: una solicitud de amistad pendiente (Sofi) y cuatro amigos.
+
 ## Acceso real
 
 Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso por e-mail/contraseña requiere habilitar ese proveedor en Firebase y un usuario existente. Las reglas de Firestore deben permitir las operaciones autorizadas. Para la verificación de comprobantes hay que habilitar Firebase AI Logic con la Gemini Developer API en la consola (Build > AI Logic); funciona en el plan Spark. No se verificó el flujo real con credenciales en esta migración.
