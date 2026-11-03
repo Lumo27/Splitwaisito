@@ -1,0 +1,490 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import type { GastoFirestore, GrupoFirestore, UsuarioFirestore } from './firestore'
+import type { PerfilAmistad, SolicitudAmistad } from './amistades'
+import type { MonedaCodigo } from '@/theme/moneda'
+import {
+  COMPROBANTE_CANDE,
+  COMPROBANTE_NAHUEL,
+  TICKET_CABANA,
+  TICKET_PARRILLA,
+} from './seedFotos'
+
+// v4: suma fotos, ubicaciones, un pago pendiente y un grupo saldado con pago
+// verificado; cambiar la clave regenera los datos.
+const CLAVE_DB = 'splitwaisito-seeds-db-v4'
+const CLAVE_SESION = 'splitwaisito-seeds-sesion-v1'
+
+export const SEED_USUARIO_ID = 'seed-lucas'
+
+type Perfil = Pick<UsuarioFirestore, 'id' | 'nombre' | 'email' | 'alias'>
+
+interface SeedDb {
+  usuarios: Record<string, UsuarioFirestore>
+  grupos: GrupoFirestore[]
+  gastos: Record<string, GastoFirestore[]>
+  solicitudes: SolicitudAmistad[]
+  amistades: { miembros: string[]; perfiles: PerfilAmistad[] }[]
+  fotos?: Record<string, string>
+}
+
+const PERSONAS: Perfil[] = [
+  { id: SEED_USUARIO_ID, nombre: 'Lucas', email: 'lucas@example.com', alias: 'lucas.mp' },
+  { id: 'seed-cande', nombre: 'Cande', email: 'cande@example.com', alias: 'cande.mp' },
+  { id: 'seed-german', nombre: 'Germán', email: 'german@example.com', alias: 'german.mp' },
+  { id: 'seed-nahuel', nombre: 'Nahuel', email: 'nahuel@example.com', alias: 'nahuel.mp' },
+  { id: 'seed-vladi', nombre: 'Vladi', email: 'vladi@example.com', alias: 'vladi.mp' },
+  { id: 'seed-sofi', nombre: 'Sofi', email: 'sofi@example.com', alias: 'sofi.mp' },
+]
+
+function persona(id: string) {
+  const encontrada = PERSONAS.find((p) => p.id === id)
+  if (!encontrada) throw new Error(`Persona de seed inexistente: ${id}`)
+  return encontrada
+}
+
+function haceDias(dias: number, hora = 20) {
+  const fecha = new Date()
+  fecha.setDate(fecha.getDate() - dias)
+  fecha.setHours(hora, 15, 0, 0)
+  return fecha.toISOString()
+}
+
+function gasto(
+  id: string,
+  descripcion: string,
+  monto: number,
+  categoria: GastoFirestore['categoria'],
+  pagadoPorId: string,
+  dias: number,
+): GastoFirestore {
+  return {
+    id,
+    descripcion,
+    monto,
+    categoria,
+    pagadoPorId,
+    pagadoPorNombre: persona(pagadoPorId).nombre,
+    fecha: haceDias(dias),
+  }
+}
+
+function crearSeed(): SeedDb {
+  const yo = SEED_USUARIO_ID
+  const amigos = PERSONAS.filter((p) => ['seed-cande', 'seed-german', 'seed-nahuel', 'seed-vladi'].includes(p.id))
+  const ahora = new Date().toISOString()
+
+  const usuarios: Record<string, UsuarioFirestore> = {}
+  for (const p of PERSONAS) {
+    usuarios[p.id] = { ...p, fotoUrl: null, descripcion: '', updatedAt: ahora }
+  }
+  usuarios[yo].descripcion = 'Cuenta de prueba con datos de ejemplo.'
+  usuarios[yo].amigos = amigos
+
+  return {
+    usuarios,
+    grupos: [
+      {
+        id: 'grupo-bariloche',
+        nombre: 'Viaje a Bariloche',
+        miembros: [yo, 'seed-cande', 'seed-german', 'seed-nahuel'],
+        moneda: 'ARS',
+        descripcion: 'Vacaciones de invierno',
+        createdAt: haceDias(12),
+        updatedAt: haceDias(2),
+      },
+      {
+        id: 'grupo-depto',
+        nombre: 'Depto Palermo',
+        miembros: [yo, 'seed-german', 'seed-vladi'],
+        moneda: 'ARS',
+        descripcion: 'Gastos de convivencia',
+        createdAt: haceDias(40),
+        updatedAt: haceDias(1),
+      },
+      {
+        id: 'grupo-cena',
+        nombre: 'Cena con Cande',
+        miembros: [yo, 'seed-cande'],
+        moneda: 'ARS',
+        descripcion: 'Saldado con comprobante verificado',
+        createdAt: haceDias(2),
+        updatedAt: haceDias(1),
+      },
+      {
+        id: 'grupo-asado',
+        nombre: 'Asado del sábado',
+        miembros: [yo, 'seed-cande', 'seed-vladi'],
+        moneda: 'ARS',
+        descripcion: '',
+        createdAt: haceDias(5),
+        updatedAt: haceDias(4),
+      },
+    ],
+    gastos: {
+      'grupo-bariloche': [
+        {
+          ...gasto('g-b1', 'Cabaña 4 noches', 240000, 'Alojamiento', yo, 10),
+          tieneFoto: true,
+          ubicacion: { lat: -41.1127, lng: -71.4187, direccion: 'Av. Bustillo km 8.5, Bariloche' },
+        },
+        {
+          ...gasto('g-b2', 'Cena en el centro', 48000, 'Comida', 'seed-cande', 9),
+          ubicacion: { lat: -41.1341, lng: -71.3039, direccion: 'Mitre 400, Bariloche' },
+        },
+        gasto('g-b3', 'Nafta y peajes', 36000, 'Transporte', 'seed-german', 8),
+        gasto('g-b4', 'Supermercado', 62000, 'Comida', 'seed-nahuel', 7),
+        gasto('g-b5', 'Excursión Cerro Catedral', 28000, 'Otro', yo, 5),
+        {
+          ...gasto('g-b6', 'Pago de Nahuel a Lucas', 41500, 'Otro', 'seed-nahuel', 1),
+          tipo: 'pago',
+          estado: 'pendiente',
+          motivos: ['No se pudo verificar el comprobante automáticamente.'],
+          participantes: [yo],
+          tieneFoto: true,
+        },
+      ],
+      'grupo-depto': [
+        gasto('g-d1', 'Alquiler de septiembre', 450000, 'Alojamiento', 'seed-german', 14),
+        gasto('g-d2', 'Internet y luz', 18000, 'Otro', yo, 6),
+        gasto('g-d3', 'Compras de la semana', 27000, 'Comida', 'seed-vladi', 1),
+      ],
+      'grupo-cena': [
+        {
+          ...gasto('g-c1', 'Cena en Parrilla El Fogón', 64000, 'Comida', yo, 2),
+          participantes: [yo, 'seed-cande'],
+          tieneFoto: true,
+          ubicacion: {
+            lat: -34.5894,
+            lng: -58.4329,
+            direccion: 'Cabrera 5099, Palermo, CABA',
+          },
+        },
+        {
+          ...gasto('g-c2', 'Pago de Cande a Lucas', 32000, 'Otro', 'seed-cande', 1),
+          tipo: 'pago',
+          estado: 'aprobado',
+          aprobacion: 'automatica',
+          participantes: [yo],
+          tieneFoto: true,
+        },
+      ],
+      'grupo-asado': [
+        gasto('g-a1', 'Carne y chorizos', 32000, 'Comida', yo, 4),
+        gasto('g-a2', 'Carbón y bebidas', 12000, 'Otro', 'seed-cande', 4),
+      ],
+    },
+    solicitudes: [
+      {
+        id: 'solicitud-sofi',
+        emisor: persona('seed-sofi'),
+        destinatarioEmail: persona(yo).email,
+        estado: 'pendiente',
+        createdAt: haceDias(1),
+      },
+    ],
+    amistades: amigos.map((amigo) => ({
+      miembros: [yo, amigo.id],
+      perfiles: [persona(yo), amigo],
+    })),
+    fotos: {
+      'grupo-bariloche/g-b1': TICKET_CABANA,
+      'grupo-bariloche/g-b6': COMPROBANTE_NAHUEL,
+      'grupo-cena/g-c1': TICKET_PARRILLA,
+      'grupo-cena/g-c2': COMPROBANTE_CANDE,
+    },
+  }
+}
+
+// En web el backend falso lee y escribe localStorage, que es síncrono. En React
+// Native el almacenamiento es AsyncStorage (asíncrono), así que los datos viven
+// en memoria: se cargan una vez al abrir la app (inicializarSeeds, que espera
+// AuthBootstrap) y cada cambio se guarda en segundo plano. Así las funciones de
+// abajo siguen siendo síncronas e iguales a las de web.
+let memoria: SeedDb | null = null
+let sesionActiva = false
+
+function persistir(clave: string, valor: string | null) {
+  const operacion = valor === null ? AsyncStorage.removeItem(clave) : AsyncStorage.setItem(clave, valor)
+  // si falla, los cambios viven solo mientras la app esté abierta
+  void operacion.catch(() => undefined)
+}
+
+export async function inicializarSeeds() {
+  try {
+    const [guardado, sesion] = await Promise.all([
+      AsyncStorage.getItem(CLAVE_DB),
+      AsyncStorage.getItem(CLAVE_SESION),
+    ])
+    memoria = guardado ? (JSON.parse(guardado) as SeedDb) : null
+    sesionActiva = sesion === '1'
+  } catch {
+    // datos corruptos o sin AsyncStorage: se regeneran abajo
+    memoria = null
+  }
+
+  if (!memoria) guardar(crearSeed())
+}
+
+// Devuelve una copia, como el JSON.parse de web, para que nadie modifique la
+// memoria sin pasar por guardar().
+function cargar(): SeedDb {
+  if (!memoria) guardar(crearSeed())
+  return JSON.parse(JSON.stringify(memoria)) as SeedDb
+}
+
+function guardar(db: SeedDb) {
+  memoria = db
+  persistir(CLAVE_DB, JSON.stringify(db))
+}
+
+function idNuevo(prefijo: string) {
+  return `${prefijo}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+}
+
+export function restablecerSeeds() {
+  guardar(crearSeed())
+}
+
+// --- sesión (equivalente a Firebase Auth) ---
+
+export interface UsuarioSeed {
+  uid: string
+  displayName: string
+  email: string
+  photoURL: string | null
+}
+
+type Oyente = (usuario: UsuarioSeed | null) => void
+const oyentes = new Set<Oyente>()
+
+function usuarioSesion(): UsuarioSeed | null {
+  if (!sesionActiva) return null
+  const perfil = persona(SEED_USUARIO_ID)
+  return { uid: perfil.id, displayName: perfil.nombre, email: perfil.email, photoURL: null }
+}
+
+function notificar() {
+  const usuario = usuarioSesion()
+  oyentes.forEach((oyente) => oyente(usuario))
+}
+
+export function seedIniciarSesion() {
+  cargar()
+  sesionActiva = true
+  persistir(CLAVE_SESION, '1')
+  notificar()
+  return usuarioSesion() as UsuarioSeed
+}
+
+export function seedCerrarSesion() {
+  sesionActiva = false
+  persistir(CLAVE_SESION, null)
+  notificar()
+}
+
+export function seedSuscribirSesion(oyente: Oyente) {
+  oyentes.add(oyente)
+  oyente(usuarioSesion())
+  return () => {
+    oyentes.delete(oyente)
+  }
+}
+
+// --- usuarios y grupos (equivalente a services/firestore.ts) ---
+
+export function seedUpsertUsuario(usuario: {
+  id: string
+  nombre: string
+  email: string
+  alias?: string
+  fotoUrl?: string | null
+  descripcion?: string
+  moneda?: MonedaCodigo
+}) {
+  const db = cargar()
+  const previo = db.usuarios[usuario.id]
+  const payload: UsuarioFirestore = {
+    ...previo,
+    id: usuario.id,
+    nombre: usuario.nombre.trim() || 'Usuario',
+    email: usuario.email.trim() || 'sin-email@local.com',
+    alias: usuario.alias !== undefined ? usuario.alias.trim() : (previo?.alias ?? ''),
+    fotoUrl: usuario.fotoUrl ?? null,
+    descripcion: usuario.descripcion?.trim() ?? '',
+    moneda: usuario.moneda ?? previo?.moneda ?? 'ARS',
+    updatedAt: new Date().toISOString(),
+  }
+  db.usuarios[usuario.id] = payload
+  guardar(db)
+  return payload
+}
+
+export function seedGetUsuario(id: string) {
+  return cargar().usuarios[id] ?? null
+}
+
+export function seedGuardarAmigos(usuarioId: string, amigos: Perfil[]) {
+  const db = cargar()
+  const previo = db.usuarios[usuarioId]
+  if (!previo) return
+  db.usuarios[usuarioId] = { ...previo, amigos, updatedAt: new Date().toISOString() }
+  guardar(db)
+}
+
+export function seedCrearGrupo(nombre: string, creadorId: string, miembros: string[] = [], moneda: MonedaCodigo = 'ARS') {
+  const db = cargar()
+  const ahora = new Date().toISOString()
+  const grupo: GrupoFirestore = {
+    id: idNuevo('grupo'),
+    nombre: nombre.trim() || 'Nuevo grupo',
+    miembros: [...new Set([creadorId, ...miembros])],
+    moneda,
+    descripcion: '',
+    createdAt: ahora,
+    updatedAt: ahora,
+  }
+  db.grupos.push(grupo)
+  db.gastos[grupo.id] = []
+  guardar(db)
+  return grupo
+}
+
+export function seedGetGrupo(grupoId: string) {
+  return cargar().grupos.find((g) => g.id === grupoId) ?? null
+}
+
+export function seedGruposDelUsuario(uid: string) {
+  return cargar().grupos.filter((g) => g.miembros.includes(uid))
+}
+
+export function seedAgregarMiembro(grupoId: string, uid: string) {
+  const db = cargar()
+  const grupo = db.grupos.find((g) => g.id === grupoId)
+  if (!grupo) return
+  if (!grupo.miembros.includes(uid)) grupo.miembros.push(uid)
+  grupo.updatedAt = new Date().toISOString()
+  guardar(db)
+}
+
+export function seedEliminarGrupo(grupoId: string) {
+  const db = cargar()
+  db.grupos = db.grupos.filter((g) => g.id !== grupoId)
+  delete db.gastos[grupoId]
+  guardar(db)
+}
+
+export function seedGuardarGasto(grupoId: string, nuevo: Omit<GastoFirestore, 'id'>) {
+  const db = cargar()
+  const guardado: GastoFirestore = {
+    ...nuevo,
+    id: idNuevo('gasto'),
+    fecha: nuevo.fecha || new Date().toISOString(),
+  }
+  db.gastos[grupoId] = [guardado, ...(db.gastos[grupoId] ?? [])]
+  guardar(db)
+  return guardado
+}
+
+export function seedActualizarGasto(
+  grupoId: string,
+  gastoId: string,
+  data: Partial<Omit<GastoFirestore, 'id'>>,
+) {
+  const db = cargar()
+  db.gastos[grupoId] = (db.gastos[grupoId] ?? []).map((g) => (g.id === gastoId ? { ...g, ...data } : g))
+  guardar(db)
+}
+
+export function seedGastosDelGrupo(grupoId: string) {
+  return [...(cargar().gastos[grupoId] ?? [])].sort((a, b) => b.fecha.localeCompare(a.fecha))
+}
+
+export function seedEliminarGasto(grupoId: string, gastoId: string) {
+  const db = cargar()
+  db.gastos[grupoId] = (db.gastos[grupoId] ?? []).filter((g) => g.id !== gastoId)
+  if (db.fotos?.[`${grupoId}/${gastoId}`]) {
+    delete db.fotos[`${grupoId}/${gastoId}`]
+  }
+  guardar(db)
+}
+
+export function seedGuardarFotoGasto(
+  grupoId: string,
+  gastoId: string,
+  imagenBase64: string,
+) {
+  const db = cargar()
+  db.fotos = db.fotos || {}
+  db.fotos[`${grupoId}/${gastoId}`] = imagenBase64
+  guardar(db)
+}
+
+export function seedObtenerFotoGasto(
+  grupoId: string,
+  gastoId: string,
+): string | null {
+  const db = cargar()
+  return db.fotos?.[`${grupoId}/${gastoId}`] ?? null
+}
+
+export function seedEliminarFotoGasto(grupoId: string, gastoId: string) {
+  const db = cargar()
+  if (db.fotos?.[`${grupoId}/${gastoId}`]) {
+    delete db.fotos[`${grupoId}/${gastoId}`]
+    guardar(db)
+  }
+}
+
+// --- amistades (equivalente a services/amistades.ts) ---
+
+export function seedCrearSolicitud(emisor: PerfilAmistad, destinatarioEmail: string) {
+  const db = cargar()
+  db.solicitudes.push({
+    id: idNuevo('solicitud'),
+    emisor,
+    destinatarioEmail,
+    estado: 'pendiente',
+    createdAt: new Date().toISOString(),
+  })
+  guardar(db)
+}
+
+export function seedSolicitudesPendientes(email: string) {
+  return cargar().solicitudes.filter(
+    (s) => s.estado === 'pendiente' && s.destinatarioEmail.toLowerCase() === email.toLowerCase(),
+  )
+}
+
+export function seedResponderSolicitud(
+  solicitud: SolicitudAmistad,
+  aceptar: boolean,
+  receptor: PerfilAmistad,
+) {
+  const db = cargar()
+  const guardada = db.solicitudes.find((s) => s.id === solicitud.id)
+  if (guardada) guardada.estado = aceptar ? 'aceptada' : 'rechazada'
+
+  if (aceptar) {
+    const miembros = [solicitud.emisor.id, receptor.id].sort()
+    const yaExiste = db.amistades.some((a) => miembros.every((id) => a.miembros.includes(id)))
+    if (!yaExiste) {
+      db.amistades.push({ miembros, perfiles: [solicitud.emisor, receptor] })
+    }
+  }
+  guardar(db)
+}
+
+export function seedAmigosAceptados(uid: string) {
+  return cargar().amistades.flatMap((a) =>
+    a.miembros.includes(uid) ? a.perfiles.filter((p) => p.id !== uid) : [],
+  )
+}
+
+export function seedEliminarAmistad(uid: string, amigoId: string) {
+  const db = cargar()
+  const antes = db.amistades.length
+  db.amistades = db.amistades.filter((a) => !(a.miembros.includes(uid) && a.miembros.includes(amigoId)))
+  guardar(db)
+  return db.amistades.length < antes
+}

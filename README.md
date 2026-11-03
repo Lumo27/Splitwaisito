@@ -1,3 +1,4 @@
+> Actualización 06/10/2026: el frontend móvil actual está en `mobile/`, con Expo SDK 57, React Native y Expo Router. Todas las pantallas principales están migradas para Expo Go; ver [instrucciones y alcance verificado](mobile/README.md) y [plan de migración](docs/GUIA-MIGRACION-REACT-NATIVE.md). El frontend `web/` conserva la implementación PWA anterior. El login móvil ofrece demo y e-mail/contraseña; Google móvil sigue pendiente. La información PWA debajo se conserva como antecedente.
 # Splitwaisito
 
 PWA gratuita para organizar gastos compartidos en grupo (viajes, convivencia, etc.): cargar gastos, dividirlos, simplificar deudas entre integrantes y saldarlas. Trabajo práctico integrador de Aplicaciones Móviles — equipo de 6 personas.
@@ -21,8 +22,8 @@ Instalable desde el navegador en cualquier dispositivo, sin pasar por ninguna st
 /web            → frontend (Vite + React + TS)
   /src
     /components → sistema de diseño base (Botón, Tarjeta, Avatar, Input) + reutilizables
-    /features   → una carpeta por feature (grupos, gastos, deudas, perfil, auth)
-    /services   → integración con Firebase (auth.ts, firestore.ts, storage.ts)
+    /features   → una carpeta por feature (auth, grupos, actividad, perfil, configuracion)
+    /services   → integración con Firebase (auth.ts, firestore.ts, amistades.ts, storage.ts) y modo demo
 /functions      → Cloud Functions (simplificación de deudas)
 ```
 
@@ -45,7 +46,9 @@ Tablero Trello: [trello.com/b/KnB9B2kP/splitwaisito](https://trello.com/b/KnB9B2
 
 ## Documentación del proceso
 
-- `ficha-tecnica-splitwaisito.docx` — justificación de decisiones técnicas y de diseño.
+- [`docs/DOCUMENTACION.md`](./docs/DOCUMENTACION.md) — estado del proyecto, cómo correrlo, estructura, modelo de datos, flujo de trabajo y quién hizo qué.
+- [`docs/INFORME-USO-IA.md`](./docs/INFORME-USO-IA.md) — informe de uso de IA por sesión y por tarea.
+- [`docs/ficha-tecnica-splitwaisito.pdf`](./docs/ficha-tecnica-splitwaisito.pdf) — justificación de decisiones técnicas y de diseño.
 - `planilla-uso-ia.xlsx` — registro de todo uso de IA (herramienta, finalidad, prompt clave, qué se usó).
 
 Más contexto y decisiones cerradas del proyecto en [`CLAUDE.md`](./CLAUDE.md).

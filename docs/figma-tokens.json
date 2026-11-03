@@ -1,0 +1,77 @@
+{
+  "name": "Splitwaisito Design Tokens",
+  "version": "1.0.0",
+  "color": {
+    "primary": {
+      "default": { "value": "#059669", "type": "color", "description": "Color principal de marca y saldos a favor" },
+      "dark": { "value": "#047857", "type": "color", "description": "Encabezados y Hero Cards" },
+      "light": { "value": "#ECFDF5", "type": "color", "description": "Contenedores suaves y badges positivos" }
+    },
+    "secondary": {
+      "default": { "value": "#0284C7", "type": "color", "description": "Color de acciones secundarias y ubicación" },
+      "light": { "value": "#E0F2FE", "type": "color", "description": "Fondo de chips secundarios" }
+    },
+    "coral": {
+      "default": { "value": "#EF4444", "type": "color", "description": "Alertas, eliminación y saldo deudor" },
+      "light": { "value": "#FEF2F2", "type": "color", "description": "Fondo de badges de deuda" }
+    },
+    "background": {
+      "canvas": { "value": "#F8FAFC", "type": "color", "description": "Fondo general neutro" },
+      "surface": { "value": "#FFFFFF", "type": "color", "description": "Tarjetas y modales" }
+    },
+    "text": {
+      "title": { "value": "#0F172A", "type": "color", "description": "Texto principal de alto contraste" },
+      "muted": { "value": "#64748B", "type": "color", "description": "Textos secundarios y leyendas" }
+    },
+    "border": {
+      "subtle": { "value": "#E2E8F0", "type": "color", "description": "Bordes de tarjetas y separadores" }
+    }
+  },
+  "typography": {
+    "display": {
+      "fontSize": { "value": "36px", "type": "dimension" },
+      "lineHeight": { "value": "44px", "type": "dimension" },
+      "fontWeight": { "value": "800", "type": "fontWeight" }
+    },
+    "titleLarge": {
+      "fontSize": { "value": "24px", "type": "dimension" },
+      "lineHeight": { "value": "32px", "type": "dimension" },
+      "fontWeight": { "value": "700", "type": "fontWeight" }
+    },
+    "titleMedium": {
+      "fontSize": { "value": "20px", "type": "dimension" },
+      "lineHeight": { "value": "28px", "type": "dimension" },
+      "fontWeight": { "value": "700", "type": "fontWeight" }
+    },
+    "titleSmall": {
+      "fontSize": { "value": "16px", "type": "dimension" },
+      "lineHeight": { "value": "24px", "type": "dimension" },
+      "fontWeight": { "value": "600", "type": "fontWeight" }
+    },
+    "body": {
+      "fontSize": { "value": "15px", "type": "dimension" },
+      "lineHeight": { "value": "22px", "type": "dimension" },
+      "fontWeight": { "value": "400", "type": "fontWeight" }
+    },
+    "caption": {
+      "fontSize": { "value": "12px", "type": "dimension" },
+      "lineHeight": { "value": "16px", "type": "dimension" },
+      "fontWeight": { "value": "500", "type": "fontWeight" }
+    }
+  },
+  "spacing": {
+    "xs": { "value": "4px", "type": "dimension" },
+    "sm": { "value": "8px", "type": "dimension" },
+    "md": { "value": "12px", "type": "dimension" },
+    "lg": { "value": "16px", "type": "dimension" },
+    "xl": { "value": "24px", "type": "dimension" },
+    "xxl": { "value": "32px", "type": "dimension" }
+  },
+  "borderRadius": {
+    "sm": { "value": "8px", "type": "dimension" },
+    "md": { "value": "14px", "type": "dimension" },
+    "lg": { "value": "20px", "type": "dimension" },
+    "xl": { "value": "28px", "type": "dimension" },
+    "full": { "value": "9999px", "type": "dimension" }
+  }
+}

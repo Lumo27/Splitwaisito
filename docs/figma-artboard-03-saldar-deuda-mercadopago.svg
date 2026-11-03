@@ -1,0 +1,85 @@
+<svg width="390" height="844" viewBox="0 0 390 844" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo Base con Overlay Oscuro -->
+  <rect width="390" height="844" rx="44" fill="#0D1F1B"/>
+  <rect width="390" height="844" rx="44" fill="#000000" fill-opacity="0.45"/>
+
+  <!-- Status Bar Blanca -->
+  <g id="Status_Bar">
+    <text x="32" y="32" fill="#FFFFFF" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700">09:41</text>
+    <rect x="135" y="14" width="120" height="26" rx="13" fill="#000000"/>
+    <g transform="translate(320, 20)">
+      <path d="M1 9.5H3.5M6 7V9.5M11 4.5V9.5M16 2V9.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+      <rect x="22" y="1" width="22" height="11" rx="3" stroke="#FFFFFF" stroke-width="1.5"/>
+      <rect x="24" y="3" width="14" height="7" rx="1.5" fill="#FFFFFF"/>
+    </g>
+  </g>
+
+  <!-- Bottom Sheet Modal (Blanco con radio superior 36px) -->
+  <g id="Modal_Saldar_Sheet" transform="translate(0, 100)">
+    <path d="M0 36C0 16.1177 16.1177 0 36 0H354C373.882 0 390 16.1177 390 36V744H0V36Z" fill="#FFFFFF"/>
+    
+    <!-- Drag Handle -->
+    <rect x="175" y="14" width="40" height="5" rx="2.5" fill="#CBD5E1"/>
+
+    <!-- Título y Cerrar -->
+    <g transform="translate(24, 40)">
+      <text x="0" y="18" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="20" font-weight="800">Saldar deuda</text>
+      <circle cx="328" cy="12" r="15" fill="#F8FAFC"/>
+      <text x="328" y="17" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">✕</text>
+    </g>
+
+    <!-- Tarjeta de Importe y Acreedor -->
+    <g id="Tarjeta_Monto" transform="translate(24, 84)">
+      <rect width="342" height="120" rx="24" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="171" y="32" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="500" text-anchor="middle">Le transferís a <tspan fill="#0F172A" font-weight="700">Franco</tspan></text>
+      <text x="171" y="74" fill="#047857" font-family="-apple-system, system-ui, sans-serif" font-size="36" font-weight="800" text-anchor="middle">$ 4.250<tspan font-size="22" font-weight="600">,00</tspan></text>
+      <text x="171" y="98" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="500" text-anchor="middle">Viaje a Bariloche · Gastos compartidos</text>
+    </g>
+
+    <!-- 3 Pasos del Flujo Asistido -->
+    <g id="Flujo_3_Pasos" transform="translate(24, 224)">
+      
+      <!-- Paso 1: Copiar Alias y Email -->
+      <g id="Paso_1">
+        <rect width="342" height="114" rx="18" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="16" y="24" fill="#0284C7" font-family="-apple-system, system-ui, sans-serif" font-size="10" font-weight="700" letter-spacing="0.5">PASO 1 · COPIAR DATO DEL DESTINATARIO</text>
+        
+        <!-- Fila Alias -->
+        <text x="16" y="52" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700">Alias: <tspan fill="#64748B" font-weight="500">franco.mp</tspan></text>
+        <rect x="226" y="36" width="102" height="30" rx="8" fill="#E0F2FE"/>
+        <text x="277" y="55" fill="#0284C7" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" text-anchor="middle">Copiar Alias</text>
+
+        <!-- Fila Email -->
+        <text x="16" y="90" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600">E-mail: <tspan fill="#64748B" font-weight="400">franco@mail.com</tspan></text>
+        <rect x="226" y="74" width="102" height="30" rx="8" fill="#F8FAFC"/>
+        <text x="277" y="93" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="11" font-weight="700" text-anchor="middle">Copiar E-mail</text>
+      </g>
+
+      <!-- Paso 2: Abrir Mercado Pago -->
+      <g id="Paso_2" transform="translate(0, 126)">
+        <rect width="342" height="84" rx="18" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+        <text x="16" y="26" fill="#047857" font-family="-apple-system, system-ui, sans-serif" font-size="10" font-weight="700" letter-spacing="0.5">PASO 2 · ENVIAR DINERO EN MERCADO PAGO</text>
+        <text x="16" y="52" fill="#0F172A" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="500">Abrí la app y pegá el alias copiado</text>
+        <!-- Botón MP -->
+        <rect x="206" y="36" width="122" height="36" rx="10" fill="#009EE3"/>
+        <text x="267" y="58" fill="#FFFFFF" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Abrir MP ↗</text>
+      </g>
+
+      <!-- Paso 3: Confirmación -->
+      <g id="Paso_3" transform="translate(0, 222)">
+        <rect width="342" height="64" rx="18" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+        <text x="16" y="24" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="10" font-weight="700" letter-spacing="0.5">PASO 3 · CONFIRMAR SALDO</text>
+        <text x="16" y="46" fill="#64748B" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="400">Una vez enviado, el grupo conserva el saldo al día.</text>
+      </g>
+    </g>
+
+    <!-- Botón Principal "Listo, ya transferí" -->
+    <g id="Boton_Confirmar" transform="translate(24, 550)">
+      <rect width="342" height="56" rx="16" fill="#059669"/>
+      <text x="171" y="34" fill="#FFFFFF" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">Listo, ya transferí</text>
+    </g>
+
+    <!-- Home Indicator -->
+    <rect x="125" y="720" width="140" height="4.5" rx="2.5" fill="#0F172A"/>
+  </g>
+</svg>

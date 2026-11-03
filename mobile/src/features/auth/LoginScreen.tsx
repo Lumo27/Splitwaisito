@@ -1,0 +1,262 @@
+import { useEffect, useRef, useState } from 'react'
+import { Image, Pressable, Text, View } from 'react-native'
+import Constants, { ExecutionEnvironment } from 'expo-constants'
+import {
+  Boton,
+  Campo,
+  Mensaje,
+  Pantalla,
+  Tarjeta,
+  Titulo,
+} from '@/components/Formulario'
+import {
+  signInDemo,
+  signInWithEmail,
+  signInWithGoogleIdToken,
+  signUpWithEmail,
+} from '@/services/auth'
+import { isFirebaseAvailable, MODO_SEEDS } from '@/services/firebase'
+
+let GoogleSigninModule: any = null
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  GoogleSigninModule = require('@react-native-google-signin/google-signin').GoogleSignin
+} catch {
+  GoogleSigninModule = null
+}
+
+export function LoginScreen() {
+  const [esRegistro, setEsRegistro] = useState(false)
+  const [nombre, setNombre] = useState('')
+  const [email, setEmail] = useState('')
+  const [clave, setClave] = useState('')
+  const [error, setError] = useState('')
+  const [ocupado, setOcupado] = useState(false)
+  const operacion = useRef(false)
+
+  const esExpoGo =
+    Constants.executionEnvironment === ExecutionEnvironment.StoreClient ||
+    (Constants as unknown as { appOwnership?: string }).appOwnership === 'expo'
+
+  useEffect(() => {
+    if (!esExpoGo && GoogleSigninModule) {
+      try {
+        GoogleSigninModule.configure({
+          webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+        })
+      } catch {
+        // Ignorar si no se puede inicializar el módulo nativo
+      }
+    }
+  }, [esExpoGo])
+
+  async function entrarConGoogle() {
+    if (operacion.current) return
+    operacion.current = true
+    setOcupado(true)
+    setError('')
+    try {
+      if (!GoogleSigninModule) {
+        throw new Error('El inicio con Google no está disponible en este entorno.')
+      }
+      await GoogleSigninModule.hasPlayServices()
+      const respuesta = await GoogleSigninModule.signIn()
+      const idToken = respuesta.data?.idToken ?? respuesta.idToken
+      if (!idToken) {
+        throw new Error('No pudimos obtener las credenciales de Google.')
+      }
+      await signInWithGoogleIdToken(idToken)
+    } catch (fallo: unknown) {
+      const mensaje =
+        fallo && typeof fallo === 'object' && 'message' in fallo
+          ? String(fallo.message)
+          : 'No pudimos autenticarte con Google.'
+      setError(mensaje)
+    } finally {
+      operacion.current = false
+      setOcupado(false)
+    }
+  }
+
+  async function entrar() {
+    if (operacion.current) return
+    if (
+      !MODO_SEEDS &&
+      (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || !clave)
+    ) {
+      setError('Ingresá tu e-mail y contraseña.')
+      return
+    }
+    if (esRegistro && clave.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.')
+      return
+    }
+    operacion.current = true
+    setOcupado(true)
+    setError('')
+    try {
+      if (MODO_SEEDS) {
+        signInDemo()
+      } else if (esRegistro) {
+        await signUpWithEmail(email.trim(), clave, nombre.trim())
+      } else {
+        await signInWithEmail(email.trim(), clave)
+      }
+    } catch (fallo) {
+      const codigo =
+        fallo && typeof fallo === 'object' && 'code' in fallo
+          ? String(fallo.code)
+          : ''
+      setError(
+        codigo === 'auth/network-request-failed'
+          ? 'No pudimos conectarnos. Revisá tu conexión a internet.'
+          : codigo === 'auth/email-already-in-use'
+            ? 'Ese e-mail ya está registrado. Probá iniciando sesión.'
+            : codigo === 'auth/invalid-credential' ||
+                codigo === 'auth/user-not-found' ||
+                codigo === 'auth/wrong-password'
+              ? 'Datos incorrectos. Revisá tu e-mail y contraseña o registrate.'
+              : codigo === 'auth/weak-password'
+                ? 'La contraseña es muy débil. Usá al menos 6 caracteres.'
+                : codigo === 'auth/operation-not-allowed'
+                  ? 'El método de acceso todavía no está habilitado en Firebase.'
+                  : 'No pudimos ingresar. Revisá tus datos e intentá de nuevo.',
+      )
+    } finally {
+      operacion.current = false
+      setOcupado(false)
+    }
+  }
+
+  return (
+    <Pantalla>
+      <View className="items-center gap-4 py-8">
+        <Image
+          source={require('../../../assets/images/icon.png')}
+          style={{ width: 84, height: 84, borderRadius: 20 }}
+          accessibilityLabel="Logotipo de Splitwaisito"
+        />
+        <Titulo>Splitwaisito</Titulo>
+        <Text className="text-center text-base leading-6 text-text-muted">
+          Compartí los planes, organizá los gastos.
+        </Text>
+      </View>
+      <Tarjeta>
+        <Text
+          accessibilityRole="header"
+          className="text-xl font-bold text-text"
+        >
+          {MODO_SEEDS
+            ? 'Probá la app'
+            : esRegistro
+              ? 'Crear cuenta'
+              : 'Iniciar sesión'}
+        </Text>
+        {MODO_SEEDS ? (
+          <>
+            <Text className="text-sm leading-6 text-text-muted">
+              Explorá grupos, gastos y deudas con datos de ejemplo. Tus cambios
+              se guardan en este dispositivo.
+            </Text>
+            <Boton
+              texto="Entrar con datos de ejemplo"
+              cargando={ocupado}
+              onPress={() => {
+                void entrar()
+              }}
+            />
+          </>
+        ) : (
+          <>
+            {!esExpoGo && (
+              <>
+                <Pressable
+                  accessibilityRole="button"
+                  disabled={ocupado}
+                  onPress={() => {
+                    void entrarConGoogle()
+                  }}
+                  className="flex-row items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm active:bg-slate-50"
+                >
+                  <View className="h-6 w-6 items-center justify-center rounded-full bg-slate-100">
+                    <Text className="text-sm font-extrabold text-[#4285F4]">G</Text>
+                  </View>
+                  <Text className="text-base font-semibold text-slate-700">
+                    Continuar con Google
+                  </Text>
+                </Pressable>
+
+                <View className="my-1 flex-row items-center gap-3">
+                  <View className="h-px flex-1 bg-slate-200" />
+                  <Text className="text-xs font-medium uppercase text-slate-400">
+                    o con correo y contraseña
+                  </Text>
+                  <View className="h-px flex-1 bg-slate-200" />
+                </View>
+              </>
+            )}
+
+            {esRegistro && (
+              <Campo
+                label="Tu nombre"
+                placeholder="Ej: Germán Morales"
+                value={nombre}
+                onChangeText={setNombre}
+                autoCapitalize="words"
+                editable={!ocupado}
+              />
+            )}
+            <Campo
+              label="E-mail"
+              placeholder="tu@correo.com"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              autoComplete="email"
+              editable={!ocupado}
+            />
+            <Campo
+              label="Contraseña"
+              placeholder={esRegistro ? 'Mínimo 6 caracteres' : '••••••••'}
+              value={clave}
+              onChangeText={setClave}
+              secureTextEntry
+              autoComplete={esRegistro ? 'new-password' : 'current-password'}
+              editable={!ocupado}
+            />
+            <Boton
+              texto={esRegistro ? 'Crear mi cuenta' : 'Iniciar sesión'}
+              cargando={ocupado}
+              disabled={!isFirebaseAvailable()}
+              onPress={() => {
+                void entrar()
+              }}
+            />
+
+            <Pressable
+              disabled={ocupado}
+              onPress={() => {
+                setError('')
+                setEsRegistro((prev) => !prev)
+              }}
+              className="items-center py-2"
+            >
+              <Text className="text-sm font-semibold text-primary">
+                {esRegistro
+                  ? '¿Ya tenés cuenta? Iniciá sesión'
+                  : '¿No tenés cuenta todavía? Registrate gratis'}
+              </Text>
+            </Pressable>
+
+            {!isFirebaseAvailable() && (
+              <Mensaje texto="El acceso a cuentas todavía no está configurado. Contactá al equipo para habilitarlo." />
+            )}
+          </>
+        )}
+        <Mensaje texto={error} error />
+      </Tarjeta>
+    </Pantalla>
+  )
+}
