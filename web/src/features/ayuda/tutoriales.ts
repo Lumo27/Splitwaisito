@@ -1,6 +1,6 @@
-export { obtenerTutorial, TUTORIALES } from '../../../../mobile/src/features/ayuda/tutoriales'
+export { obtenerTutorial, TUTORIALES } from '../../../../shared/features/ayuda/tutoriales'
 export type {
   Tutorial,
   TutorialKey,
   TutorialStep,
-} from '../../../../mobile/src/features/ayuda/tutoriales'
+} from '../../../../shared/features/ayuda/tutoriales'

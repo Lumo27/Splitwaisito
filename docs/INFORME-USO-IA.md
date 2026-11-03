@@ -158,3 +158,11 @@ Validación: typecheck correcto, 45 pruebas aprobadas en Vitest y exportación d
 | Copilot SDK en VS Code | Resolver el bloqueo de merge del PR y completar validaciones para solicitar una nueva revisión | «Integra la equivalencia informativa con el `develop` actual, resuelve los conflictos sin perder el gráfico de categorías ni el copiado automático del e-mail, y valida los cambios.» | Se integró la rama del PR con `develop`, conservando las pantallas de equivalencia en USD/BRL, el gráfico de categorías y el copiado automático del e-mail al saldar deuda. Se corrigió la validación para no aceptar cotizaciones con fecha futura y se completó la persistencia tipada de cotizaciones en Zustand. |
 
 Validación local no disponible porque el entorno no tiene Node.js/npm. La CI de GitHub Actions (run 63) completó con éxito los jobs `lint-test-build` y `mobile`, incluidos lint, typecheck, tests y builds.
+
+### Corrección del build web del PR #26 — Copilot, 03/11/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Corregir el check de build web que bloqueaba la revisión del PR #26 | «Revisa el build web: el PR está bloqueado mientras falle el check» y «Corregilo» | Se identificó que Vite seguía imports desde `web/` hasta `mobile/`, cuyo `tsconfig.json` extiende `expo/tsconfig.base`, ausente en las dependencias del job web. Se movieron los módulos compartidos de términos y tutoriales a `shared/`, se actualizaron las importaciones web y móvil, y se configuró Metro para incluir la carpeta compartida. También se actualizó `mobile/README.md`. |
+
+Validación: lint, typecheck, 10 pruebas y build web aprobados; lint, typecheck, 79 pruebas y exportación Expo para Android, iOS y web aprobados. `git diff --check` sin errores. La planilla `planilla-uso-ia.xlsx` no está disponible en el workspace; este registro queda en el informe para trasladarlo cuando esté disponible.

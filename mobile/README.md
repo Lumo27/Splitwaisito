@@ -37,11 +37,13 @@ Además: una solicitud de amistad pendiente (Sofi) y cuatro amigos.
 
 Las rutas de la app móvil y de la PWA web requieren aceptar los términos una sola vez por cuenta. La aceptación se guarda en `aceptacionesTerminos/{uid}` de Firestore con el UID, la versión aceptada, el estado y la fecha del servidor; las reglas de `firestore.rules` limitan lectura y escritura al titular y bloquean el acceso a grupos y amistades hasta aceptar. Una aceptación registrada no se invalida al cambiar la versión de los términos ni al cerrar sesión. La pantalla queda bloqueada si no se puede verificar el registro. En modo demo, sin autenticación ni backend, la aceptación se guarda solo para el usuario de ejemplo en el almacenamiento local.
 
-El contenido aceptado está en `mobile/src/features/terminos/terminos.ts` y lo comparte la PWA. Si cambian las cláusulas, actualizar `TERMINOS_VERSION` en ese archivo y la versión permitida en `firestore.rules`; esto registra la versión aceptada por nuevas cuentas, pero no vuelve a pedir aceptación a cuentas que ya aceptaron.
+El contenido aceptado compartido por ambas plataformas está en `shared/features/terminos/terminos.ts`. Si cambian las cláusulas, actualizar `TERMINOS_VERSION` en ese archivo y la versión permitida en `firestore.rules`; esto registra la versión aceptada por nuevas cuentas, pero no vuelve a pedir aceptación a cuentas que ya aceptaron.
 
 ## Ayuda interactiva
 
-El botón `?` aparece en las pantallas autenticadas de móvil y web, y abre un tutorial por contexto con pasos navegables. Los textos compartidos están en `mobile/src/features/ayuda/tutoriales.ts`; la PWA usa esa misma fuente. El contexto se deriva de la ruta para cubrir grupos, gastos, detalle y comprobantes, saldos, amistades, perfil y configuración.
+El botón `?` aparece en las pantallas autenticadas de móvil y web, y abre un tutorial por contexto con pasos navegables. Los textos compartidos están en `shared/features/ayuda/tutoriales.ts`. El contexto se deriva de la ruta para cubrir grupos, gastos, detalle y comprobantes, saldos, amistades, perfil y configuración.
+
+Los módulos compartidos se mantienen fuera de `web/` y `mobile/` para que el build web no lea la configuración TypeScript de Expo. Metro incluye `shared/` como watch folder para poder empaquetar esos módulos en la app móvil.
 
 ## Acceso real
 
