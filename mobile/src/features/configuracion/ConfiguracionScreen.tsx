@@ -129,7 +129,7 @@ export function ConfiguracionScreen() {
         </Tarjeta>
       )}
       <Tarjeta>
-        <Text className="font-bold text-text">Splitwaisito</Text>
+        <Text className="font-bold text-text">Junti</Text>
         <Text className="text-xs text-text-muted">
           Versión 1.0.0 · Gastos compartidos simplificados
         </Text>

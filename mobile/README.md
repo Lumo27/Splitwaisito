@@ -1,4 +1,4 @@
-# Splitwaisito en Expo Go
+# Junti en Expo Go
 
 ## Inicio con doble clic en Windows
 

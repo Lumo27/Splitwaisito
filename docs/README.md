@@ -1,4 +1,4 @@
-# Documentación — Splitwaisito
+# Documentación — Junti
 
 Todo lo que armamos antes de escribir código: la idea, el diseño y cómo laburamos en equipo. Si tenés una duda de "para qué es esto" o "cómo se hace tal cosa", está acá antes de preguntar en el grupo.
 
@@ -11,11 +11,11 @@ Todo lo que armamos antes de escribir código: la idea, el diseño y cómo labur
 ## Material de diseño y consigna
 
 - **Proyecto Integrador Aplicaciones Móviles (1).pdf** — la consigna del trabajo práctico.
-- **splitwaisito-wireframes.pdf** — las pantallas del MVP (login, grupos, detalle de grupo, cargar gasto, saldar deuda, perfil, agregar amigos y crear grupo), con la paleta y el diseño final.
+- **junti-wireframes.pdf** — las pantallas del MVP (login, grupos, detalle de grupo, cargar gasto, saldar deuda, perfil, agregar amigos y crear grupo), con la paleta y el diseño final.
 - **boton-transferir-prototipo.html** — prototipo del botón de transferencia (saldar deuda).
-- El backlog con estado en vivo está en el [tablero de Trello](https://trello.com/b/KnB9B2kP/splitwaisito).
+- El backlog con estado en vivo está en el tablero de Trello del equipo.
 - **guia-flujo-trabajo.pdf** — cómo es el flujo de trabajo con Git/GitHub paso a paso (rama, commits, PR, review, merge), pensada para quien nunca usó ramas ni Pull Requests.
-- **ficha-tecnica-splitwaisito.pdf** — el documento formal del proyecto: concepto, alcance del MVP, justificación de las categorías de gasto, stack técnico, arquitectura, mecanismo de pago y proceso de creación con IA. Es lo que se muestra si el docente pide el detalle completo.
+- **ficha-tecnica-junti.pdf** — el documento formal del proyecto: concepto, alcance del MVP, justificación de las categorías de gasto, stack técnico, arquitectura, mecanismo de pago y proceso de creación con IA. Es lo que se muestra si el docente pide el detalle completo.
 - **planilla-uso-ia.xlsx** — registro de uso de IA que pide la consigna (todavía falta subirla a esta carpeta). **Cada uno suma sus propias filas** a medida que usa IA para algo del proyecto (tiene una hoja "Cómo completar" con el detalle).
 
 ## Algo cambió desde acá

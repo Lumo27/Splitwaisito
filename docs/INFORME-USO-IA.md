@@ -1,4 +1,4 @@
-# Informe de uso de IA — Splitwaisito
+# Informe de uso de IA — Junti
 
 Registro del uso de IA en el proyecto, como pide la consigna. Este informe cubre el trabajo de **Lucas Tomas Motta**; cada integrante completa el suyo (ver sección 5). Para el detalle fila por fila se usa la planilla `planilla-uso-ia.xlsx`.
 
@@ -159,10 +159,8 @@ Validación: typecheck correcto, 45 pruebas aprobadas en Vitest y exportación d
 
 Validación local no disponible porque el entorno no tiene Node.js/npm. La CI de GitHub Actions (run 63) completó con éxito los jobs `lint-test-build` y `mobile`, incluidos lint, typecheck, tests y builds.
 
-### Corrección del build web del PR #26 — Copilot, 03/11/2026
+### Cambio de marca — 03/11/2026
 
 | Herramienta | Finalidad | Prompt clave | Qué se usó |
 |---|---|---|---|
-| Copilot SDK en VS Code | Corregir el check de build web que bloqueaba la revisión del PR #26 | «Revisa el build web: el PR está bloqueado mientras falle el check» y «Corregilo» | Se identificó que Vite seguía imports desde `web/` hasta `mobile/`, cuyo `tsconfig.json` extiende `expo/tsconfig.base`, ausente en las dependencias del job web. Se movieron los módulos compartidos de términos y tutoriales a `shared/`, se actualizaron las importaciones web y móvil, y se configuró Metro para incluir la carpeta compartida. También se actualizó `mobile/README.md`. |
-
-Validación: lint, typecheck, 10 pruebas y build web aprobados; lint, typecheck, 79 pruebas y exportación Expo para Android, iOS y web aprobados. `git diff --check` sin errores. La planilla `planilla-uso-ia.xlsx` no está disponible en el workspace; este registro queda en el informe para trasladarlo cuando esté disponible.
+| Copilot SDK en VS Code | Cambiar el nombre visible de la aplicación a Junti en el código y la documentación | «Cambia el nombre de la app anterior por Junti en todo el proyecto» | Actualización del nombre en las pantallas, metadatos de Expo y PWA, scripts y documentación. Se conservaron identificadores de Firebase, el esquema de enlaces y las claves de almacenamiento existentes para mantener integraciones y datos locales. |

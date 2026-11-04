@@ -28,7 +28,7 @@ export function TabsLayout() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-bold text-white">
               $
             </div>
-            <span className="font-bold text-text">Splitwaisito</span>
+            <span className="font-bold text-text">Junti</span>
           </div>
           <div className="flex flex-col gap-1">
             {tabs.map(({ to, label, Icon }) => (
