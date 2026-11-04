@@ -208,7 +208,7 @@ export function SaldarDeudaScreen() {
 
       <p className="mt-4 text-[11px] leading-relaxed text-text-muted">
         Pegá el e-mail en &quot;Enviar dinero&quot; dentro de Mercado Pago y confirmá el monto.
-        Splitwaisito no mueve tu dinero — te ahorra buscar el dato.
+        Junti no mueve tu dinero — te ahorra buscar el dato.
       </p>
     </Modal>
   )
@@ -282,4 +282,3 @@ function initials(nombre: string) {
     .map((parte) => parte[0]?.toUpperCase())
     .join('')
 }
-

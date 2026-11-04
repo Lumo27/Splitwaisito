@@ -13,8 +13,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Splitwaisito',
-        short_name: 'Splitwaisito',
+        name: 'Junti',
+        short_name: 'Junti',
         description: 'Organizá y saldá gastos compartidos en grupo.',
         theme_color: '#3FA772',
         background_color: '#F8FAFC',

@@ -153,7 +153,7 @@ export function SaldarDeudaScreen() {
         ? ` al e-mail ${email}`
         : ''
 
-    const mensaje = `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo "${grupoNombre}" en Splitwaisito${aliasDestino}. ¡Avisame cuando te llegue!`
+    const mensaje = `¡Hola ${destinatarioNombre}! Te aviso que te transferí ${montoTexto} por el grupo "${grupoNombre}" en Junti${aliasDestino}. ¡Avisame cuando te llegue!`
 
     try {
       await abrirWhatsApp(mensaje)

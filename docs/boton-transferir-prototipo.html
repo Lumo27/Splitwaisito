@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prototipo · Botón Transferir — Splitwaisito</title>
+<title>Prototipo · Botón Transferir — Junti</title>
 <style>
   :root{
     --bg:#0f1420; --card:#171e2e; --card2:#1d2740; --text:#e8ecf5; --muted:#93a0b8;
@@ -51,7 +51,7 @@
 </head>
 <body>
   <h1>Deudas del grupo <span>· prototipo</span></h1>
-  <p class="sub">Simulación del botón "Transferir" de Splitwaisito con el mecanismo validado en el spike. Abrilo en el teléfono para probar el flujo completo.</p>
+  <p class="sub">Simulación del botón "Transferir" de Junti con el mecanismo validado en el spike. Abrilo en el teléfono para probar el flujo completo.</p>
 
   <div id="list"></div>
 
@@ -142,7 +142,7 @@
   window.openMPWeb=function(){window.open("https://www.mercadopago.com.ar/money-transfer","_blank");};
   window.notifyWA=function(i){
     var d=debts[i];
-    var text="Hola "+d.nombre+"! Te transferí "+fmt(d.monto)+" por \""+d.motivo+"\" vía Splitwaisito 💸";
+    var text="Hola "+d.nombre+"! Te transferí "+fmt(d.monto)+" por \""+d.motivo+"\" vía Junti 💸";
     window.open("https://wa.me/"+d.tel+"?text="+encodeURIComponent(text),"_blank");
   };
   window.addDebt=function(){

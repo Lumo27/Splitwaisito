@@ -134,9 +134,9 @@ export function LoginScreen() {
         <Image
           source={require('../../../assets/images/icon.png')}
           style={{ width: 84, height: 84, borderRadius: 20 }}
-          accessibilityLabel="Logotipo de Splitwaisito"
+          accessibilityLabel="Logotipo de Junti"
         />
-        <Titulo>Splitwaisito</Titulo>
+        <Titulo>Junti</Titulo>
         <Text className="text-center text-base leading-6 text-text-muted">
           Compartí los planes, organizá los gastos.
         </Text>

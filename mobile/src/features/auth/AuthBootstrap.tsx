@@ -98,10 +98,10 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
         <Image
           source={require('../../../assets/images/icon.png')}
           style={{ width: 100, height: 100, borderRadius: 24 }}
-          accessibilityLabel="Logotipo de Splitwaisito"
+          accessibilityLabel="Logotipo de Junti"
         />
         <View className="items-center gap-1">
-          <Text className="text-2xl font-bold text-text">Splitwaisito</Text>
+          <Text className="text-2xl font-bold text-text">Junti</Text>
           <Text className="text-center text-sm text-text-muted">
             Compartí los planes, organizá los gastos.
           </Text>

@@ -1,4 +1,4 @@
-# Informe de uso de IA — Splitwaisito
+# Informe de uso de IA — Junti
 
 Registro del uso de IA en el proyecto, como pide la consigna. Este informe cubre el trabajo de **Lucas Tomas Motta**; cada integrante completa el suyo (ver sección 5). Para el detalle fila por fila se usa la planilla `planilla-uso-ia.xlsx`.
 
@@ -158,3 +158,9 @@ Validación: typecheck correcto, 45 pruebas aprobadas en Vitest y exportación d
 | Copilot SDK en VS Code | Resolver el bloqueo de merge del PR y completar validaciones para solicitar una nueva revisión | «Integra la equivalencia informativa con el `develop` actual, resuelve los conflictos sin perder el gráfico de categorías ni el copiado automático del e-mail, y valida los cambios.» | Se integró la rama del PR con `develop`, conservando las pantallas de equivalencia en USD/BRL, el gráfico de categorías y el copiado automático del e-mail al saldar deuda. Se corrigió la validación para no aceptar cotizaciones con fecha futura y se completó la persistencia tipada de cotizaciones en Zustand. |
 
 Validación local no disponible porque el entorno no tiene Node.js/npm. La CI de GitHub Actions (run 63) completó con éxito los jobs `lint-test-build` y `mobile`, incluidos lint, typecheck, tests y builds.
+
+### Cambio de marca — 03/11/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Cambiar el nombre visible de la aplicación a Junti en el código y la documentación | «Cambia el nombre de la app anterior por Junti en todo el proyecto» | Actualización del nombre en las pantallas, metadatos de Expo y PWA, scripts y documentación. Se conservaron identificadores de Firebase, el esquema de enlaces y las claves de almacenamiento existentes para mantener integraciones y datos locales. |

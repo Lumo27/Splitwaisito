@@ -1,5 +1,5 @@
 > Actualización 06/10/2026: el frontend móvil actual está en `mobile/`, con Expo SDK 57, React Native y Expo Router. Todas las pantallas principales están migradas para Expo Go; ver [instrucciones y alcance verificado](mobile/README.md) y [plan de migración](docs/GUIA-MIGRACION-REACT-NATIVE.md). El frontend `web/` conserva la implementación PWA anterior. El login móvil ofrece demo y e-mail/contraseña; Google móvil sigue pendiente. La información PWA debajo se conserva como antecedente.
-# Splitwaisito
+# Junti
 
 PWA gratuita para organizar gastos compartidos en grupo (viajes, convivencia, etc.): cargar gastos, dividirlos, simplificar deudas entre integrantes y saldarlas. Trabajo práctico integrador de Aplicaciones Móviles — equipo de 6 personas.
 
@@ -42,13 +42,13 @@ Rama (`feature/...` o `fix/...` desde `develop`) → commits → PR hacia `devel
 
 ## Gestión del equipo
 
-Tablero Trello: [trello.com/b/KnB9B2kP/splitwaisito](https://trello.com/b/KnB9B2kP/splitwaisito) — Backlog → Asignada → En progreso → En revisión → Hecho. Cada uno se autoasigna arrastrando su tarjeta a "Asignada".
+Tablero Trello del equipo: [abrir tablero](https://trello.com/b/KnB9B2kP/splitwaisito) — Backlog → Asignada → En progreso → En revisión → Hecho. Cada uno se autoasigna arrastrando su tarjeta a "Asignada".
 
 ## Documentación del proceso
 
 - [`docs/DOCUMENTACION.md`](./docs/DOCUMENTACION.md) — estado del proyecto, cómo correrlo, estructura, modelo de datos, flujo de trabajo y quién hizo qué.
 - [`docs/INFORME-USO-IA.md`](./docs/INFORME-USO-IA.md) — informe de uso de IA por sesión y por tarea.
-- [`docs/ficha-tecnica-splitwaisito.pdf`](./docs/ficha-tecnica-splitwaisito.pdf) — justificación de decisiones técnicas y de diseño.
+- [`docs/ficha-tecnica-junti.pdf`](./docs/ficha-tecnica-junti.pdf) — justificación de decisiones técnicas y de diseño.
 - `planilla-uso-ia.xlsx` — registro de todo uso de IA (herramienta, finalidad, prompt clave, qué se usó).
 
 Más contexto y decisiones cerradas del proyecto en [`CLAUDE.md`](./CLAUDE.md).

@@ -1,7 +1,7 @@
 > Actualización 06/10/2026: el frontend móvil actual está en `mobile/`, con Expo SDK 57, React Native y Expo Router. Todas las pantallas principales están migradas para Expo Go; ver [instrucciones y alcance verificado](mobile/README.md) y [plan de migración](docs/GUIA-MIGRACION-REACT-NATIVE.md). El frontend `web/` conserva la implementación PWA anterior. El login móvil ofrece demo y e-mail/contraseña; Google funciona solo en el APK (no en Expo Go). La información PWA debajo se conserva como antecedente.
 
 > Actualización 02/11/2026: Firebase queda en plan Spark (gratis), así que no se usan Storage ni Cloud Functions: las fotos se comprimen y se guardan en Firestore, y la simplificación de deudas corre en el cliente (`mobile/src/features/grupos/deudas.ts`). Nada de la app puede depender de servicios pagos. El pago ya no pasa por Mercado Pago: ver «Mecanismo de pago» abajo.
-# Splitwaisito
+# Junti
 
 Clon gratuito de Splitwise para el trabajo práctico integrador de Aplicaciones Móviles (equipo de 6, sin sprints). Grupos de gasto compartido (viajes, convivencia, etc.): cargar gastos, dividirlos, simplificar deudas y saldarlas. Incluye lo que Splitwise cobra como premium, gratis. Meta doble: aprobar la materia y quedar como una PWA real que el equipo use y sume al portfolio de cada uno — no es solo un entregable académico, tratarlo con ese nivel de cuidado.
 
@@ -49,7 +49,7 @@ Colecciones: `usuarios`, `grupos`, `grupos/{id}/gastos`. Reglas de seguridad (`f
 
 ## Mecanismo de pago (saldar deuda)
 
-**No hay integración de pagos real: Splitwaisito no mueve dinero.** Flujo actual (desde el 02/11/2026): la pantalla "Saldar deuda" copia el alias del acreedor (o su e-mail si no tiene alias) y muestra el monto, para transferir desde cualquier banco o billetera. Después el deudor sube la foto o captura del comprobante y se registra un movimiento de tipo `pago` (pagado por el deudor, repartido solo con el acreedor) que el cálculo de deudas compensa; el comprobante queda guardado como foto del movimiento y el pago se puede deshacer desde el detalle del grupo.
+**No hay integración de pagos real: Junti no mueve dinero.** Flujo actual (desde el 02/11/2026): la pantalla "Saldar deuda" copia el alias del acreedor (o su e-mail si no tiene alias) y muestra el monto, para transferir desde cualquier banco o billetera. Después el deudor sube la foto o captura del comprobante y se registra un movimiento de tipo `pago` (pagado por el deudor, repartido solo con el acreedor) que el cálculo de deudas compensa; el comprobante queda guardado como foto del movimiento y el pago se puede deshacer desde el detalle del grupo.
 
 Verificación (desde el 02/11/2026): `mobile/src/services/comprobantes.ts` usa Firebase AI Logic (Gemini Developer API, plan Spark) para leer destinatario, alias, monto y fecha, y `compararComprobante.ts` los compara con la deuda. Si coincide, el pago se guarda `aprobado`; si no o si la IA no está disponible, `pendiente`, y lo aprueba o rechaza quien recibe el dinero (las reglas de Firestore solo le permiten a él cambiar el estado). Solo los pagos aprobados saldan la deuda. Límite conocido: la verificación corre en el cliente, así que no es a prueba de un usuario malicioso; hacerla en el servidor requeriría Cloud Functions (plan Blaze).
 
@@ -61,11 +61,11 @@ Flujo: rama (`feature/...` o `fix/...` desde `develop`) → commits → PR hacia
 
 ## Gestión del equipo
 
-Tablero Trello: https://trello.com/b/KnB9B2kP/splitwaisito (espacio "uni pilar") — 5 listas (Backlog → Asignada → En progreso → En revisión → Hecho), 25 tarjetas ya cargadas con historia, tamaño y dependencias, coloreadas por área. Cada uno se autoasigna arrastrando su tarjeta a "Asignada".
+Tablero Trello del equipo: https://trello.com/b/KnB9B2kP/splitwaisito (espacio "uni pilar") — 5 listas (Backlog → Asignada → En progreso → En revisión → Hecho), 25 tarjetas ya cargadas con historia, tamaño y dependencias, coloreadas por área. Cada uno se autoasigna arrastrando su tarjeta a "Asignada".
 
 ## Documentación de proceso (pedido explícito de la consigna)
 
-La consigna exige documentar y justificar el proceso de creación, incluyendo **todo uso de IA con su motivo** — no alcanza con "usamos IA". Hay una ficha técnica (`ficha-tecnica-splitwaisito.docx`) y una planilla de uso de IA (`planilla-uso-ia.xlsx`) ya armadas y en la carpeta del proyecto. **Cada vez que uses IA (Claude Code incluido) para algo no trivial — generar código, resolver un error, decidir un enfoque — sumá una fila a la planilla** (herramienta, finalidad, prompt clave, qué se usó). No hace falta registrar cada mensaje suelto, sí cada tarea concreta.
+La consigna exige documentar y justificar el proceso de creación, incluyendo **todo uso de IA con su motivo** — no alcanza con "usamos IA". Hay una ficha técnica (`docs/ficha-tecnica-junti.pdf`) y un informe de uso de IA; la planilla `planilla-uso-ia.xlsx` todavía no está en el repositorio. **Cada vez que uses IA para algo no trivial — generar código, resolver un error, decidir un enfoque — registralo** (herramienta, finalidad, prompt clave, qué se usó). No hace falta registrar cada mensaje suelto, sí cada tarea concreta.
 
 ## Primer paso
 
