@@ -164,3 +164,9 @@ Validación local no disponible porque el entorno no tiene Node.js/npm. La CI de
 | Herramienta | Finalidad | Prompt clave | Qué se usó |
 |---|---|---|---|
 | Copilot SDK en VS Code | Cambiar el nombre visible de la aplicación a Junti en el código y la documentación | «Cambia el nombre de la app anterior por Junti en todo el proyecto» | Actualización del nombre en las pantallas, metadatos de Expo y PWA, scripts y documentación. Se conservaron identificadores de Firebase, el esquema de enlaces y las claves de almacenamiento existentes para mantener integraciones y datos locales. |
+
+### Actualización del logotipo — 04/11/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Reemplazar el logotipo anterior por la imagen nueva proporcionada por el usuario en la app móvil y web | «Quiero agregar el logo para cambiarlo a uno nuevo quitando el anterior por este» | Se reemplazaron los logos de login, carga inicial, términos, barra lateral, icono de la app y favicons por el recurso gráfico adjunto. |

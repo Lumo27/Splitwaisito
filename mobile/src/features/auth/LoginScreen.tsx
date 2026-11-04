@@ -132,7 +132,7 @@ export function LoginScreen() {
     <Pantalla>
       <View className="items-center gap-4 py-8">
         <Image
-          source={require('../../../assets/images/icon.png')}
+          source={require('../../../assets/images/logo-junti.png')}
           style={{ width: 84, height: 84, borderRadius: 20 }}
           accessibilityLabel="Logotipo de Junti"
         />

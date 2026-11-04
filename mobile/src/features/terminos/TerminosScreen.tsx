@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   ActivityIndicator,
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -125,13 +126,11 @@ export function TerminosScreen() {
           style={{ maxWidth: 880, minHeight: height - 60, flexGrow: 1 }}
         >
           <View className="mb-4 flex-row items-center gap-3">
-            <View
-              accessible
+            <Image
+              source={require('../../../assets/images/logo-junti.png')}
+              style={{ width: 48, height: 48, borderRadius: 12 }}
               accessibilityLabel="Logotipo de Junti"
-              className="h-12 w-12 items-center justify-center rounded-2xl bg-primary"
-            >
-              <Text className="text-2xl font-black text-white">J</Text>
-            </View>
+            />
             <Text className="text-2xl font-extrabold tracking-tight text-slate-900">
               Junti
             </Text>

@@ -98,9 +98,11 @@ export function LoginScreen() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-xl font-black text-white">
-            $
-          </div>
+          <img
+            src="/logo-junti.png"
+            alt="Logotipo de Junti"
+            className="mx-auto mb-2 h-12 w-12 rounded-2xl object-cover"
+          />
           <h1 className="text-2xl font-bold text-text">Junti</h1>
           <p className="text-sm text-text-muted">
             Ingresá tus datos para gestionar las cuentas del grupo.
