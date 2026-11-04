@@ -33,6 +33,18 @@ Los datos mockeados existen solo en modo demo (`npm run start:seeds`); con `npm 
 
 Además: una solicitud de amistad pendiente (Sofi) y cuatro amigos.
 
+## Términos y Condiciones
+
+Las rutas de la app móvil y de la PWA web requieren aceptar los términos una sola vez por cuenta. La aceptación se guarda en `aceptacionesTerminos/{uid}` de Firestore con el UID, la versión aceptada, el estado y la fecha del servidor; las reglas de `firestore.rules` limitan lectura y escritura al titular y bloquean el acceso a grupos y amistades hasta aceptar. Una aceptación registrada no se invalida al cambiar la versión de los términos ni al cerrar sesión. La pantalla queda bloqueada si no se puede verificar el registro. En modo demo, sin autenticación ni backend, la aceptación se guarda solo para el usuario de ejemplo en el almacenamiento local.
+
+El contenido aceptado compartido por ambas plataformas está en `shared/features/terminos/terminos.ts`. Si cambian las cláusulas, actualizar `TERMINOS_VERSION` en ese archivo y la versión permitida en `firestore.rules`; esto registra la versión aceptada por nuevas cuentas, pero no vuelve a pedir aceptación a cuentas que ya aceptaron.
+
+## Ayuda interactiva
+
+El botón `?` aparece en las pantallas autenticadas de móvil y web, y abre un tutorial por contexto con pasos navegables. Los textos compartidos están en `shared/features/ayuda/tutoriales.ts`. El contexto se deriva de la ruta para cubrir grupos, gastos, detalle y comprobantes, saldos, amistades, perfil y configuración.
+
+Los módulos compartidos se mantienen fuera de `web/` y `mobile/` para que el build web no lea la configuración TypeScript de Expo. Metro incluye `shared/` como watch folder para poder empaquetar esos módulos en la app móvil.
+
 ## Acceso real
 
 Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso por e-mail/contraseña requiere habilitar ese proveedor en Firebase y un usuario existente. Las reglas de Firestore deben permitir las operaciones autorizadas. Para la verificación de comprobantes hay que habilitar Firebase AI Logic con la Gemini Developer API en la consola (Build > AI Logic); funciona en el plan Spark. No se verificó el flujo real con credenciales en esta migración.

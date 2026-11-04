@@ -26,8 +26,8 @@ export function CargarGastoScreen() {
   const [grupo, setGrupo] = useState<GrupoFirestore | null>(null)
   const [descripcion, setDescripcion] = useState('')
   const [monto, setMonto] = useState('')
-  const [pagadoPorId, setPagadoPorId] = useState('')
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [pagadorElegidoId, setPagadorElegidoId] = useState('')
+  const [selectedIds, setSelectedIds] = useState<string[] | null>(null)
   const [guardado, setGuardado] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [categoria, setCategoria] = useState<'Comida' | 'Transporte' | 'Alojamiento' | 'Otro'>('Comida')
@@ -46,15 +46,36 @@ export function CargarGastoScreen() {
       (miembroId) => conocidos.find((c) => c.id === miembroId) ?? { id: miembroId, nombre: 'Usuario' },
     )
   }, [amigos, grupo, usuarioActual])
+  const pagadoPorId = participantes.some(
+    (participante) => participante.id === pagadorElegidoId,
+  )
+    ? pagadorElegidoId
+    : (participantes[0]?.id ?? '')
+  const participantesSeleccionados =
+    selectedIds ?? participantes.map((participante) => participante.id)
 
   useEffect(() => {
     if (!usuarioActual || !grupoId) return
-    obtenerGruposDelUsuario(usuarioActual.id)
-      .then((gs) => setGrupo(gs.find((g) => g.id === grupoId) ?? null))
-      .catch(() => setGrupo(null))
-    obtenerGastosDelGrupo(grupoId)
+    const cargaGrupo = obtenerGruposDelUsuario(usuarioActual.id)
       .then((gs) => {
-        const conId = gs.flatMap((g) => (g.id ? [{ ...g, id: g.id }] : []))
+        const grupoEncontrado = gs.find((g) => g.id === grupoId) ?? null
+        setGrupo(grupoEncontrado)
+        return grupoEncontrado
+      })
+      .catch(() => {
+        setGrupo(null)
+        return null
+      })
+    const cargaGastos = obtenerGastosDelGrupo(grupoId)
+      .then((gastosDelGrupo) =>
+        gastosDelGrupo.flatMap((gasto) =>
+          gasto.id ? [{ ...gasto, id: gasto.id }] : [],
+        ),
+      )
+      .catch(() => [])
+
+    void Promise.all([cargaGrupo, cargaGastos]).then(
+      ([grupoEncontrado, conId]) => {
         reemplazarGastos(conId)
 
         // Paso 2: prellenar con lo que ya se cargo en el modal de GruposScreen
@@ -63,21 +84,24 @@ export function CargarGastoScreen() {
           setDescripcion(yaCargado.descripcion)
           setMonto(String(yaCargado.monto))
           setCategoria(yaCargado.categoria)
-          setPagadoPorId(yaCargado.pagadoPorId)
+          setPagadorElegidoId(yaCargado.pagadoPorId)
+          setSelectedIds(
+            yaCargado.participantes?.length
+              ? [...yaCargado.participantes]
+              : grupoEncontrado?.miembros ?? [],
+          )
         }
-      })
-      .catch(() => undefined)
+      },
+    )
   }, [gastoId, grupoId, reemplazarGastos, usuarioActual])
 
-  useEffect(() => {
-    setSelectedIds(participantes.map((p) => p.id))
-    if (participantes[0] && !participantes.some((p) => p.id === pagadoPorId)) {
-      setPagadoPorId(participantes[0].id)
-    }
-  }, [participantes, pagadoPorId])
-
   function toggleMember(id: string) {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+    setSelectedIds((actual) => {
+      const seleccion = actual ?? participantes.map((persona) => persona.id)
+      return seleccion.includes(id)
+        ? seleccion.filter((valor) => valor !== id)
+        : [...seleccion, id]
+    })
   }
 
   // La foto va a Firebase Storage; en modo seeds (sin backend) la guardamos como data URL
@@ -121,8 +145,8 @@ export function CargarGastoScreen() {
     if (!grupoId) return setError('Sin grupo seleccionado.')
     if (!descripcion.trim()) return setError('La descripción es obligatoria.')
     if (Number.isNaN(parsed) || parsed <= 0) return setError('El monto debe ser mayor que 0.')
-    if (!selectedIds.length) return setError('Selecciona al menos un participante.')
-    if (!selectedIds.includes(pagadoPorId)) return setError('El pagador debe estar en los participantes.')
+    if (!participantesSeleccionados.length) return setError('Selecciona al menos un participante.')
+    if (!participantesSeleccionados.includes(pagadoPorId)) return setError('El pagador debe estar en los participantes.')
     if (!foto) return setError('La foto del ticket es obligatoria.')
     if (foto.size > 2 * 1024 * 1024) return setError('La foto del ticket no puede superar los 2 MB.')
     if (!ubicacion) return setError('Marcá la ubicación del gasto en el mapa.')
@@ -144,7 +168,7 @@ export function CargarGastoScreen() {
       pagadoPorNombre: pagadorNombre,
       fotoUrl,
       ubicacion,
-      participantes: selectedIds,
+      participantes: participantesSeleccionados,
     }
 
     // Paso 2: el gasto ya se creo en el modal de GruposScreen y aca se completa
@@ -183,7 +207,7 @@ export function CargarGastoScreen() {
 
     setDescripcion('')
     setMonto('')
-    setSelectedIds(participantes.map((p) => p.id))
+    setSelectedIds(null)
     setFoto(null)
     setUbicacion(null)
     setResetFoto((n) => n + 1)
@@ -198,9 +222,12 @@ export function CargarGastoScreen() {
 
   // Seleccionar quien pago (el pagador siempre queda incluido en el reparto)
   function togglePagador(id: string) {
-    setPagadoPorId(id)
+    setPagadorElegidoId(id)
     // Asegurar que el pagador este seleccionado como participante
-    setSelectedIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+    setSelectedIds((actual) => {
+      const seleccion = actual ?? participantes.map((persona) => persona.id)
+      return seleccion.includes(id) ? seleccion : [...seleccion, id]
+    })
   }
 
   // Renderizado
@@ -300,14 +327,14 @@ export function CargarGastoScreen() {
                     key={member.id}
                     id={member.id}
                     name={member.nombre}
-                    selected={selectedIds.includes(member.id)}
+                    selected={participantesSeleccionados.includes(member.id)}
                     onToggle={toggleMember}
                   />
                 ))}
               </div>
-              {selectedIds.length > 0 && monto && (
+              {participantesSeleccionados.length > 0 && monto && (
                 <p className="mt-2 text-xs text-gray-600">
-                  Dividido en partes iguales · ${(Number(monto.replace(',', '.')) / selectedIds.length).toFixed(2)} c/u
+                  Dividido en partes iguales · ${(Number(monto.replace(',', '.')) / participantesSeleccionados.length).toFixed(2)} c/u
                 </p>
               )}
             </div>
@@ -355,4 +382,3 @@ export function CargarGastoScreen() {
     </div>
   )
 }
-

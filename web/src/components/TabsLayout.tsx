@@ -1,5 +1,6 @@
 import { Receipt, UserPlus, User, Settings } from 'lucide-react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { HelpAssistant } from '../features/ayuda/HelpAssistant'
 
 const tabs = [
   { to: '/grupos', label: 'Gastos', Icon: Receipt },
@@ -16,6 +17,8 @@ function tabClasses(isActive: boolean) {
 }
 
 export function TabsLayout() {
+  const { pathname } = useLocation()
+
   return (
     <div className="flex min-h-screen flex-col bg-background md:flex-row">
       {/* Sidebar Desktop */}
@@ -82,6 +85,7 @@ export function TabsLayout() {
           Config.
         </NavLink>
       </nav>
+      <HelpAssistant key={pathname} pathname={pathname} />
     </div>
   )
 }
