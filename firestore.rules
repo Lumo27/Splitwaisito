@@ -6,44 +6,82 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isGroupMember(groupId) {
+    function hasAcceptedCurrentTerms() {
       return authenticated()
+        && exists(/databases/$(database)/documents/aceptacionesTerminos/$(request.auth.uid))
+        && get(/databases/$(database)/documents/aceptacionesTerminos/$(request.auth.uid)).data.estado == 'aceptado';
+    }
+
+    function isGroupMember(groupId) {
+      return hasAcceptedCurrentTerms()
         && exists(/databases/$(database)/documents/grupos/$(groupId))
         && request.auth.uid in get(/databases/$(database)/documents/grupos/$(groupId)).data.miembros;
     }
 
     function isMemberOfCurrentGroup() {
-      return authenticated() && request.auth.uid in resource.data.miembros;
+      return hasAcceptedCurrentTerms()
+        && request.auth.uid in resource.data.miembros;
     }
 
     match /usuarios/{userId} {
       allow read, write: if authenticated() && request.auth.uid == userId;
     }
 
-    match /solicitudesAmistad/{solicitudId} {
+    match /aceptacionesTerminos/{userId} {
+      function acceptanceIsValid() {
+        return request.resource.data.keys().hasOnly([
+            'usuarioId',
+            'version',
+            'estado',
+            'acceptedAt'
+          ])
+          && request.resource.data.keys().hasAll([
+            'usuarioId',
+            'version',
+            'estado',
+            'acceptedAt'
+          ])
+          && request.resource.data.usuarioId == userId
+          && request.resource.data.version == '1.0.1'
+          && request.resource.data.estado == 'aceptado'
+          && request.resource.data.acceptedAt == request.time;
+      }
+
+      allow read: if authenticated() && request.auth.uid == userId;
       allow create: if authenticated()
+        && request.auth.uid == userId
+        && acceptanceIsValid();
+      allow update: if authenticated()
+        && request.auth.uid == userId
+        && acceptanceIsValid()
+        && resource.data.get('estado', '') != 'aceptado';
+      allow delete: if false;
+    }
+
+    match /solicitudesAmistad/{solicitudId} {
+      allow create: if hasAcceptedCurrentTerms()
         && request.auth.uid == request.resource.data.emisorId;
-      allow read: if authenticated()
+      allow read: if hasAcceptedCurrentTerms()
         && (request.auth.uid == resource.data.emisorId
           || request.auth.token.email == resource.data.destinatarioEmail);
-      allow update: if authenticated()
+      allow update: if hasAcceptedCurrentTerms()
         && request.auth.token.email == resource.data.destinatarioEmail;
-      allow delete: if authenticated()
+      allow delete: if hasAcceptedCurrentTerms()
         && (request.auth.uid == resource.data.emisorId
           || request.auth.token.email == resource.data.destinatarioEmail);
     }
 
     match /amistades/{amistadId} {
-      allow read: if authenticated()
+      allow read: if hasAcceptedCurrentTerms()
         && request.auth.uid in resource.data.miembros;
-      allow create: if authenticated()
+      allow create: if hasAcceptedCurrentTerms()
         && request.auth.uid in request.resource.data.miembros;
-      allow delete: if authenticated()
+      allow delete: if hasAcceptedCurrentTerms()
         && request.auth.uid in resource.data.miembros;
     }
 
     match /grupos/{groupId} {
-      allow create: if authenticated()
+      allow create: if hasAcceptedCurrentTerms()
         && request.auth.uid in request.resource.data.miembros;
       allow read: if isMemberOfCurrentGroup();
       allow update: if isMemberOfCurrentGroup();

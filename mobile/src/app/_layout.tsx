@@ -1,12 +1,16 @@
 import '../global.css'
 
-import { Stack } from 'expo-router'
+import { Stack, usePathname } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import * as SplashScreen from 'expo-splash-screen'
 
-import { AuthBootstrap } from '@/features/auth/AuthBootstrap'
+import {
+  AuthBootstrap,
+  useTerminosAcceptance,
+} from '@/features/auth/AuthBootstrap'
 import { colores } from '@/theme/colores'
 import { useAppStore } from '@/store/useAppStore'
+import { HelpAssistant } from '@/features/ayuda/HelpAssistant'
 
 export { ErrorBoundary } from 'expo-router'
 
@@ -15,9 +19,21 @@ void SplashScreen.preventAutoHideAsync().catch(() => {
 })
 
 export default function RootLayout() {
-  const usuario = useAppStore((state) => state.usuarioActual)
   return (
     <AuthBootstrap>
+      <AppNavigator />
+    </AuthBootstrap>
+  )
+}
+
+function AppNavigator() {
+  const usuario = useAppStore((state) => state.usuarioActual)
+  const { estado } = useTerminosAcceptance()
+  const pathname = usePathname()
+  const terminosAceptados = estado === 'aceptado'
+
+  return (
+    <>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{
@@ -30,7 +46,10 @@ export default function RootLayout() {
         <Stack.Protected guard={!usuario}>
           <Stack.Screen name="login" options={{ headerShown: false }} />
         </Stack.Protected>
-        <Stack.Protected guard={Boolean(usuario)}>
+        <Stack.Protected guard={Boolean(usuario) && !terminosAceptados}>
+          <Stack.Screen name="terminos" options={{ headerShown: false }} />
+        </Stack.Protected>
+        <Stack.Protected guard={Boolean(usuario) && terminosAceptados}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="grupos/[id]/index" options={{ title: 'Grupo' }} />
           <Stack.Screen
@@ -51,6 +70,9 @@ export default function RootLayout() {
           />
         </Stack.Protected>
       </Stack>
-    </AuthBootstrap>
+      {usuario && terminosAceptados && (
+        <HelpAssistant key={pathname} pathname={pathname} />
+      )}
+    </>
   )
 }

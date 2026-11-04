@@ -53,7 +53,12 @@ export function LoginScreen() {
 
     if (!emailLimpio) return
 
-    iniciarSesion(nombreLimpio, emailLimpio, aliasLimpio || nombreLimpio)
+    iniciarSesion(
+      nombreLimpio,
+      emailLimpio,
+      aliasLimpio || nombreLimpio,
+      `demo-${emailLimpio.toLowerCase()}`,
+    )
     navigate('/grupos', { replace: true })
   }
 
