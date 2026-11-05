@@ -42,7 +42,7 @@ service cloud.firestore {
             'acceptedAt'
           ])
           && request.resource.data.usuarioId == userId
-          && request.resource.data.version == '1.0.1'
+          && request.resource.data.version == '1.0.2'
           && request.resource.data.estado == 'aceptado'
           && request.resource.data.acceptedAt == request.time;
       }

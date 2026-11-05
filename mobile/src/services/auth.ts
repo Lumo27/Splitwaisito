@@ -2,6 +2,7 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithCredential,
   signInWithEmailAndPassword,
   signOut,
@@ -84,6 +85,11 @@ export function signOutUser() {
 export async function signInWithEmail(email: string, password: string) {
   if (!auth || MODO_SEEDS) throw new Error('Firebase no configurado.')
   return signInWithEmailAndPassword(auth, email.trim(), password)
+}
+
+export async function sendPasswordReset(email: string) {
+  if (!auth || MODO_SEEDS) throw new Error('Firebase no configurado.')
+  return sendPasswordResetEmail(auth, email.trim())
 }
 
 export async function signUpWithEmail(

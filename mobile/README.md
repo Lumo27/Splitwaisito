@@ -33,11 +33,15 @@ Los datos mockeados existen solo en modo demo (`npm run start:seeds`); con `npm 
 
 Además: una solicitud de amistad pendiente (Sofi) y cuatro amigos.
 
+## Inicio de sesión
+
+La pantalla de acceso mantiene la paleta verde y celeste de la app, con cabecera curva, campos con opción para mostrar la contraseña y animaciones de entrada y cambio entre acceso y registro. El correo se valida antes de enviar las credenciales; “¿Olvidaste tu contraseña?” usa el restablecimiento por correo de Firebase Authentication. El enlace “Leer Términos y Condiciones” abre el documento completo sin iniciar sesión. Google solo se muestra en builds nativos configurados; Expo Go ofrece demo y correo/contraseña. La pantalla se adapta al área segura y al teclado en iOS y Android.
+
 ## Términos y Condiciones
 
 Las rutas de la app móvil y de la PWA web requieren aceptar los términos una sola vez por cuenta. La aceptación se guarda en `aceptacionesTerminos/{uid}` de Firestore con el UID, la versión aceptada, el estado y la fecha del servidor; las reglas de `firestore.rules` limitan lectura y escritura al titular y bloquean el acceso a grupos y amistades hasta aceptar. Una aceptación registrada no se invalida al cambiar la versión de los términos ni al cerrar sesión. La pantalla queda bloqueada si no se puede verificar el registro. En modo demo, sin autenticación ni backend, la aceptación se guarda solo para el usuario de ejemplo en el almacenamiento local.
 
-El contenido aceptado compartido por ambas plataformas está en `shared/features/terminos/terminos.ts`. Si cambian las cláusulas, actualizar `TERMINOS_VERSION` en ese archivo y la versión permitida en `firestore.rules`; esto registra la versión aceptada por nuevas cuentas, pero no vuelve a pedir aceptación a cuentas que ya aceptaron.
+El contenido aceptado compartido por ambas plataformas está en `shared/features/terminos/terminos.ts`. La versión 1.0.2 está fechada el 4 de noviembre de 2026. Si cambian las cláusulas, actualizar `TERMINOS_VERSION` en ese archivo y la versión permitida en `firestore.rules`; esto registra la versión aceptada por nuevas cuentas, pero no vuelve a pedir aceptación a cuentas que ya aceptaron. Publicar las reglas actualizadas en Firebase para que acepte la nueva versión.
 
 ## Ayuda interactiva
 
@@ -47,7 +51,7 @@ Los módulos compartidos se mantienen fuera de `web/` y `mobile/` para que el bu
 
 ## Acceso real
 
-Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso por e-mail/contraseña requiere habilitar ese proveedor en Firebase y un usuario existente. Las reglas de Firestore deben permitir las operaciones autorizadas. Para la verificación de comprobantes hay que habilitar Firebase AI Logic con la Gemini Developer API en la consola (Build > AI Logic); funciona en el plan Spark. No se verificó el flujo real con credenciales en esta migración.
+Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso y el restablecimiento por e-mail requieren habilitar ese proveedor en Firebase Authentication; para crear una cuenta, el alta genera el usuario y su perfil. Las reglas de Firestore deben permitir las operaciones autorizadas. Para la verificación de comprobantes hay que habilitar Firebase AI Logic con la Gemini Developer API en la consola (Build > AI Logic); funciona en el plan Spark. No se verificó el flujo real con credenciales en esta migración.
 
 El inicio de sesión con Google usa `@react-native-google-signin/google-signin` y solo funciona en el APK (compilación propia); en Expo Go se usan demo o e-mail/contraseña.
 
