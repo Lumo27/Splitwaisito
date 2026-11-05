@@ -207,7 +207,7 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
     return (
       <View className="flex-1 items-center justify-center gap-4 bg-white p-6">
         <Image
-          source={require('../../../assets/images/icon.png')}
+          source={require('../../../assets/images/logo-junti.png')}
           style={{ width: 100, height: 100, borderRadius: 24 }}
           accessibilityLabel="Logotipo de Junti"
         />
