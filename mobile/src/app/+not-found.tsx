@@ -1,5 +1,5 @@
 import { router, Stack } from 'expo-router'
-import { Text } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { Boton, Pantalla, Tarjeta, Titulo } from '@/components/Formulario'
 
 export default function NotFound() {

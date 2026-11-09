@@ -1,4 +1,4 @@
-import { Text } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import type { MonedaCodigo } from '@/theme/moneda'
 import { useAppStore } from '@/store/useAppStore'
 import {

@@ -1,23 +1,26 @@
-import { useRef, useState } from 'react'
 import { router } from 'expo-router'
-import { ScrollView, Text, View } from 'react-native'
+import { useRef, useState } from 'react'
+import { ScrollView, View } from 'react-native'
 import {
   Bell,
   CircleUserRound,
   DollarSign,
-  FileText,
   Info,
-  LogOut,
-  RefreshCw,
+  Languages,
+  Palette,
+  Shield,
+  Accessibility,
 } from 'lucide-react-native'
-import { FilaConfig, Mensaje } from '@/components/Formulario'
-import { signOutUser } from '@/services/auth'
+import { Boton, FilaConfig, Mensaje } from '@/components/Formulario'
 import { MODO_SEEDS } from '@/services/firebase'
 import { getUsuarioPerfil } from '@/services/firestore'
+import { obtenerAmigosAceptados } from '@/services/amistades'
 import { restablecerSeeds } from '@/services/seedBackend'
 import { useAppStore } from '@/store/useAppStore'
-import { confirmar } from '@/utils/alerta'
 import { colores } from '@/theme/colores'
+import { Texto as Text } from '@/components/Texto'
+import { useTraduccion } from '@/i18n/translations'
+import { confirmar } from '@/utils/alerta'
 
 function SeccionTitulo({ texto }: { texto: string }) {
   return (
@@ -29,7 +32,7 @@ function SeccionTitulo({ texto }: { texto: string }) {
 
 function TarjetaSeccion({ children }: { children: React.ReactNode }) {
   return (
-    <View className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
+    <View className="overflow-hidden rounded-2xl border border-slate-100 bg-surface">
       {children}
     </View>
   )
@@ -37,54 +40,42 @@ function TarjetaSeccion({ children }: { children: React.ReactNode }) {
 
 export function ConfiguracionScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
-  const [ocupado, setOcupado] = useState(false)
-  const [error, setError] = useState('')
-  const [mensaje, setMensaje] = useState('')
+  const idioma = useAppStore((state) => state.preferencias.language)
+  const [restableciendo, setRestableciendo] = useState(false)
+  const [errorRestablecer, setErrorRestablecer] = useState('')
+  const [mensajeRestablecer, setMensajeRestablecer] = useState('')
   const mutacion = useRef(false)
+  const t = useTraduccion()
 
-  async function salir() {
-    if (mutacion.current) return
-    mutacion.current = true
-    setOcupado(true)
-    setError('')
-    try {
-      await signOutUser()
-      useAppStore.getState().cerrarSesion()
-      router.replace('/login')
-    } catch {
-      setError('No pudimos cerrar la sesión. Volvé a intentar.')
-    } finally {
-      mutacion.current = false
-      setOcupado(false)
-    }
-  }
-
-  async function reiniciar() {
+  async function reiniciarDemo() {
     if (mutacion.current || !MODO_SEEDS || !usuario) return
     mutacion.current = true
-    setOcupado(true)
-    setError('')
-    setMensaje('')
+    setRestableciendo(true)
+    setErrorRestablecer('')
+    setMensajeRestablecer('')
     try {
       await restablecerSeeds()
       const perfil = await getUsuarioPerfil(usuario.id)
-      if (perfil) {
-        useAppStore.getState().iniciarSesion(
-          perfil.nombre,
-          perfil.email,
-          perfil.alias,
-          perfil.id,
-          perfil.fotoUrl,
-          perfil.descripcion,
-          perfil.moneda,
-        )
-      }
-      setMensaje('Datos de ejemplo restablecidos.')
-    } catch {
-      setError('No pudimos restablecer los datos de ejemplo.')
+      if (!perfil) throw new Error('No se pudo recuperar el perfil demo.')
+      useAppStore.getState().iniciarSesion(
+        perfil.nombre,
+        perfil.email,
+        perfil.alias,
+        perfil.id,
+        perfil.fotoUrl,
+        perfil.descripcion,
+        perfil.moneda,
+      )
+      useAppStore
+        .getState()
+        .reemplazarAmigos(await obtenerAmigosAceptados(usuario.id))
+      setMensajeRestablecer(t('demo.resetSuccess'))
+    } catch (fallo) {
+      console.error('No se pudieron restablecer los datos de ejemplo.', fallo)
+      setErrorRestablecer(t('demo.resetError'))
     } finally {
       mutacion.current = false
-      setOcupado(false)
+      setRestableciendo(false)
     }
   }
 
@@ -93,97 +84,101 @@ export function ConfiguracionScreen() {
       className="flex-1 bg-background"
       contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
     >
-      <Mensaje texto={mensaje} />
-      <Mensaje texto={error} error />
+      <Mensaje texto={mensajeRestablecer} />
+      <Mensaje texto={errorRestablecer} error />
 
-      {/* ── Cuenta ── */}
-      <SeccionTitulo texto="Cuenta" />
+      <SeccionTitulo texto={t('settings.account')} />
       <TarjetaSeccion>
         <FilaConfig
           icono={<CircleUserRound size={18} color={colores.primary} />}
-          titulo={usuario?.nombre ?? 'Sin sesión activa'}
+          titulo={usuario?.nombre ?? t('settings.noSession')}
           descripcion={usuario?.email ?? ''}
-          derecha={<View />}
-        />
-        <FilaConfig
-          icono={<LogOut size={18} color="#E11D48" />}
-          titulo="Cerrar sesión"
-          descripcion="Salir de tu cuenta en este dispositivo"
-          deshabilitado={ocupado}
-          onPress={() =>
-            confirmar({
-              titulo: 'Cerrar sesión',
-              mensaje: '¿Querés salir de tu cuenta?',
-              textoConfirmar: 'Salir',
-              textoCancelar: 'Cancelar',
-              destructivo: false,
-              alConfirmar: () => {
-                void salir()
-              },
-            })
-          }
+          onPress={() => router.push('/configuracion/seguridad')}
         />
       </TarjetaSeccion>
 
-      {/* ── Preferencias ── */}
-      <SeccionTitulo texto="Preferencias" />
+      <SeccionTitulo texto={t('settings.preferences')} />
       <TarjetaSeccion>
         <FilaConfig
+          icono={<Palette size={18} color={colores.primary} />}
+          titulo={t('settings.appearance')}
+          descripcion={t('settings.appearanceDescription')}
+          onPress={() => router.push('/configuracion/apariencia')}
+        />
+        <FilaConfig
+          icono={<Languages size={18} color={colores.primary} />}
+          titulo={t('settings.language')}
+          descripcion={t(`language.${idioma}`)}
+          onPress={() => router.push('/configuracion/idioma')}
+        />
+        <FilaConfig
           icono={<Bell size={18} color={colores.primary} />}
-          titulo="Notificaciones"
-          descripcion="Recordatorios y actividad del grupo"
+          titulo={t('settings.notifications')}
+          descripcion={t('settings.notificationsDescription')}
           onPress={() => router.push('/configuracion/notificaciones')}
         />
         <FilaConfig
           icono={<DollarSign size={18} color={colores.primary} />}
-          titulo="Moneda preferida"
-          descripcion="Sugerencia al crear nuevos grupos"
+          titulo={t('settings.currency')}
+          descripcion={t('settings.currencyDescription')}
           onPress={() => router.push('/configuracion/moneda')}
         />
       </TarjetaSeccion>
 
-      {/* ── Información ── */}
-      <SeccionTitulo texto="Información" />
+      <SeccionTitulo texto={t('settings.privacySecurity')} />
       <TarjetaSeccion>
         <FilaConfig
-          icono={<FileText size={18} color={colores.textMuted} />}
-          titulo="Términos y condiciones"
-          descripcion="Leé los términos de uso de Junti"
-          onPress={() => router.push('/terminos')}
+          icono={<Shield size={18} color={colores.primary} />}
+          titulo={t('settings.privacy')}
+          descripcion={t('settings.privacyDescription')}
+          onPress={() => router.push('/configuracion/privacidad')}
+        />
+        <FilaConfig
+          icono={<CircleUserRound size={18} color={colores.primary} />}
+          titulo={t('settings.security')}
+          descripcion={t('settings.securityDescription')}
+          onPress={() => router.push('/configuracion/seguridad')}
         />
         <FilaConfig
           icono={<Info size={18} color={colores.textMuted} />}
-          titulo="Acerca de Junti"
-          descripcion="Versión 1.0.0"
-          derecha={<View />}
+          titulo={t('settings.about')}
+          descripcion={t('settings.aboutDescription')}
+          onPress={() => router.push('/configuracion/acerca')}
+        />
+        <FilaConfig
+          icono={<Accessibility size={18} color={colores.primary} />}
+          titulo={t('accessibility.title')}
+          descripcion={t('accessibility.highlightDescription')}
+          onPress={() => router.push('/configuracion/accesibilidad')}
         />
       </TarjetaSeccion>
 
-      {/* ── Modo demo ── */}
       {MODO_SEEDS && (
         <>
-          <SeccionTitulo texto="Modo demo" />
-          <TarjetaSeccion>
-            <FilaConfig
-              icono={<RefreshCw size={18} color="#D97706" />}
-              titulo="Restablecer datos de ejemplo"
-              descripcion="Vuelve al estado inicial del demo"
-              deshabilitado={ocupado}
+          <SeccionTitulo texto={t('demo.section')} />
+          <View className="gap-3 rounded-2xl border border-slate-100 bg-surface p-4">
+            <Text className="text-sm leading-5 text-textMuted">
+              {t('settings.demo')}
+            </Text>
+            <Boton
+              texto={t('demo.resetButton')}
+              peligro
+              disabled={restableciendo}
+              cargando={restableciendo}
               onPress={() =>
                 confirmar({
-                  titulo: 'Restablecer datos',
-                  mensaje:
-                    'Se borrarán los cambios realizados en el modo demo de este dispositivo. ¿Continuar?',
-                  textoConfirmar: 'Restablecer',
-                  textoCancelar: 'Cancelar',
+                  titulo: t('demo.resetTitle'),
+                  mensaje: t('demo.resetPrompt'),
+                  textoConfirmar: t('demo.resetConfirm'),
+                  textoCancelar: t('security.cancel'),
                   destructivo: true,
                   alConfirmar: () => {
-                    void reiniciar()
+                    void reiniciarDemo()
                   },
                 })
               }
             />
-          </TarjetaSeccion>
+          </View>
         </>
       )}
     </ScrollView>

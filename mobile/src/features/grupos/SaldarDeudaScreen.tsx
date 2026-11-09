@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
-import { ActivityIndicator, Image, Text, View } from 'react-native'
+import { ActivityIndicator, Image, View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import * as Clipboard from 'expo-clipboard'
 import {
   Boton,
@@ -43,6 +44,16 @@ export function SaldarDeudaScreen() {
   }>()
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
+  const recordatoriosHabilitados = useAppStore(
+    (state) => state.preferencias.notificacionesRecordatorios,
+  )
+  const notificacionesGenerales = useAppStore(
+    (state) => state.preferencias.notificacionesGenerales,
+  )
+  const puedeProgramarRecordatorio =
+    recordatoriosDisponibles &&
+    recordatoriosHabilitados &&
+    notificacionesGenerales
   const [grupo, setGrupo] = useState<GrupoFirestore | null>(null)
   const [gastos, setGastos] = useState<GastoFirestore[]>([])
   const [cargando, setCargando] = useState(true)
@@ -143,7 +154,7 @@ export function SaldarDeudaScreen() {
     }
   }
   async function compartirPorWhatsApp() {
-    if (!deuda) return
+    if (!deuda || !puedeProgramarRecordatorio) return
     const montoTexto = formatearMoneda(deuda.monto, moneda)
     const grupoNombre = grupo?.nombre ?? 'el grupo'
     const destinatarioNombre = acreedor?.nombre ?? 'compañero'
@@ -218,7 +229,7 @@ export function SaldarDeudaScreen() {
     }
   }
   async function recordarmePagar() {
-    if (!deuda) return
+    if (!deuda || !puedeProgramarRecordatorio) return
     try {
       const programado = await programarRecordatorioDePago(
         'Tenés una deuda pendiente',
@@ -321,7 +332,7 @@ export function SaldarDeudaScreen() {
           void copiar(String(deuda.monto), 'Monto copiado.')
         }}
       />
-      {recordatoriosDisponibles && (
+      {puedeProgramarRecordatorio && (
         <Boton
           texto="Recordarme pagar más tarde"
           secundario

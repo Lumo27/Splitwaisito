@@ -7,9 +7,9 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
-  Text,
   View,
 } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { Plus, Receipt, Trash2, UserPlus } from 'lucide-react-native'
 
 import {
@@ -33,8 +33,10 @@ import { GastosPorCategoria } from './GraficoGastosPorCategoria'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo, estadoDeudasGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
+import { usePaletaActual } from '@/theme/usePaletaActual'
 
 export function DetalleGrupoScreen() {
+  const tema = usePaletaActual()
   const { id: rawId } = useLocalSearchParams<{ id: string }>()
   const id =
     typeof rawId === 'string' ? rawId : Array.isArray(rawId) ? rawId[0] : ''
@@ -305,7 +307,7 @@ export function DetalleGrupoScreen() {
         <Plus color="#FFFFFF" size={20} />
         <Text className="font-bold text-white">Cargar gasto</Text>
       </Pressable>
-      <View className="mt-5 gap-3 rounded-2xl bg-white p-4">
+      <View className="mt-5 gap-3 rounded-2xl bg-surface p-4">
         <Text
           accessibilityRole="header"
           className="text-lg font-bold text-text"
@@ -338,7 +340,7 @@ export function DetalleGrupoScreen() {
               }}
               className="min-h-12 flex-row items-center gap-2 border-t border-slate-100 py-2"
             >
-              <UserPlus size={18} color={colores.primaryDark} />
+              <UserPlus size={18} color={tema.primaryDark} />
               <Text className="flex-1 text-sm text-primary-dark">
                 Agregar a {amigo.nombre}
               </Text>
@@ -346,7 +348,7 @@ export function DetalleGrupoScreen() {
           ))}
         {ocupado && <ActivityIndicator color={colores.primary} />}
       </View>
-      <View className="mt-5 gap-3 rounded-2xl bg-white p-4">
+      <View className="mt-5 gap-3 rounded-2xl bg-surface p-4">
         <Text
           accessibilityRole="header"
           className="text-lg font-bold text-text"
@@ -420,7 +422,7 @@ export function DetalleGrupoScreen() {
         return (
           <View
             key={gasto.id ?? String(index)}
-            className="mb-3 rounded-3xl bg-white shadow-sm"
+            className="mb-3 rounded-3xl bg-surface shadow-sm"
             style={{
               borderWidth: 1.5,
               borderColor: paleta ? `${paleta.primary}33` : '#E2E8F0',
@@ -540,7 +542,7 @@ export function DetalleGrupoScreen() {
           {pagos.map((pago, index) => (
             <View
               key={pago.id ?? String(index)}
-              className="mb-3 flex-row items-center gap-3 rounded-2xl bg-white p-4"
+              className="mb-3 flex-row items-center gap-3 rounded-2xl bg-surface p-4"
             >
               <Pressable
                 accessibilityRole="button"

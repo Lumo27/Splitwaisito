@@ -1,6 +1,12 @@
 import { useState } from 'react'
-import { Modal, Pressable, Text, View, useWindowDimensions } from 'react-native'
+import { Modal, Pressable, View, useWindowDimensions } from 'react-native'
+import { vars } from 'nativewind'
+import { Texto as Text } from '@/components/Texto'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react-native'
+import { useAppStore } from '@/store/useAppStore'
+import { useMovimientoReducidoSistema } from '@/hooks/useMovimientoReducido'
+import { usePaletaActual } from '@/theme/usePaletaActual'
+import { obtenerVariablesTema } from '@/theme/paleta'
 
 import { obtenerTutorial, TUTORIALES } from './tutoriales'
 
@@ -9,6 +15,13 @@ export function HelpAssistant({ pathname }: { pathname: string }) {
   const [pasoActual, setPasoActual] = useState(0)
   const [finalizado, setFinalizado] = useState(false)
   const { width } = useWindowDimensions()
+  const paleta = usePaletaActual()
+  const preferencias = useAppStore((state) => state.preferencias)
+  const movimientoReducidoSistema = useMovimientoReducidoSistema()
+  const reducirAnimaciones =
+    preferencias.reducedMotion ||
+    (preferencias.accessibilityOptions.respectSystemMotion &&
+      movimientoReducidoSistema)
   const tutorial = TUTORIALES[obtenerTutorial(pathname)]
   const paso = tutorial.steps[pasoActual]
 
@@ -33,11 +46,17 @@ export function HelpAssistant({ pathname }: { pathname: string }) {
       <Modal
         visible={abierto}
         transparent
-        animationType="fade"
+        animationType={reducirAnimaciones ? 'none' : 'fade'}
         onRequestClose={cerrar}
         statusBarTranslucent
       >
-        <View className="flex-1 items-center justify-center bg-slate-950/50 p-4">
+        <View
+          className="flex-1 items-center justify-center p-4"
+          style={[
+            vars(obtenerVariablesTema(paleta)),
+            { backgroundColor: 'rgba(0, 0, 0, 0.56)' },
+          ]}
+        >
           <Pressable
             accessibilityLabel="Cerrar ayuda"
             onPress={cerrar}
@@ -45,8 +64,13 @@ export function HelpAssistant({ pathname }: { pathname: string }) {
           />
           <View
             accessibilityRole="none"
-            className="w-full overflow-hidden rounded-3xl bg-white shadow-2xl"
-            style={{ maxWidth: 440, maxHeight: '85%', width: width - 32 }}
+            className="w-full overflow-hidden rounded-3xl shadow-2xl"
+            style={{
+              backgroundColor: paleta.surface,
+              maxWidth: 440,
+              maxHeight: '85%',
+              width: width - 32,
+            }}
           >
             <View className="flex-row items-start justify-between border-b border-primary-light px-5 py-4">
               <View className="flex-1 flex-row items-center gap-3 pr-3">
@@ -68,7 +92,7 @@ export function HelpAssistant({ pathname }: { pathname: string }) {
                 onPress={cerrar}
                 className="h-10 w-10 items-center justify-center rounded-full bg-slate-100"
               >
-                <X size={20} color="#475569" />
+                <X size={20} color={paleta.textMuted} />
               </Pressable>
             </View>
 
@@ -120,7 +144,7 @@ export function HelpAssistant({ pathname }: { pathname: string }) {
                     onPress={() => setPasoActual((actual) => actual - 1)}
                     className="min-h-12 flex-1 flex-row items-center justify-center gap-1 rounded-2xl border border-primary-light px-3 disabled:opacity-40"
                   >
-                    <ChevronLeft size={18} color="#2E7D57" />
+                    <ChevronLeft size={18} color={paleta.primaryDark} />
                     <Text className="font-semibold text-primary-dark">Anterior</Text>
                   </Pressable>
                   <Pressable

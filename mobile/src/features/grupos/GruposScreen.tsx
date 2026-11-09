@@ -4,9 +4,9 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  Text,
   View,
 } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { ChevronRight, Plus, Trash2, Users } from 'lucide-react-native'
 
 import {
@@ -16,9 +16,11 @@ import {
 } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
+import { usePaletaActual } from '@/theme/usePaletaActual'
 import { avisar, confirmar } from '@/utils/alerta'
 
 export function GruposScreen() {
+  const paleta = usePaletaActual()
   const usuarioId = useAppStore((state) => state.usuarioActual?.id)
   const [grupos, setGrupos] = useState<GrupoFirestore[]>([])
   const [cargando, setCargando] = useState(true)
@@ -160,8 +162,8 @@ export function GruposScreen() {
             <Text className="text-text-muted">Cargando tus grupos...</Text>
           </View>
         ) : !error ? (
-          <View className="items-center gap-3 rounded-3xl bg-white px-6 py-12">
-            <Users size={40} color={colores.primaryDark} />
+          <View className="items-center gap-3 rounded-3xl bg-surface px-6 py-12">
+            <Users size={40} color={paleta.primaryDark} />
             <Text className="text-lg font-bold text-text">
               Tu próximo plan empieza acá
             </Text>
@@ -173,7 +175,7 @@ export function GruposScreen() {
         ) : null
       }
       renderItem={({ item: grupo }) => (
-        <View className="flex-row items-center rounded-2xl border border-slate-100 bg-white p-2">
+        <View className="flex-row items-center rounded-2xl border border-slate-100 bg-surface p-2">
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={`Abrir ${grupo.nombre}, ${grupo.miembros.length} integrantes`}
@@ -186,7 +188,7 @@ export function GruposScreen() {
             }
           >
             <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary-light">
-              <Users size={23} color={colores.primaryDark} />
+              <Users size={23} color={paleta.primaryDark} />
             </View>
             <View className="flex-1 gap-1">
               <Text className="text-base font-bold text-text">
@@ -202,7 +204,7 @@ export function GruposScreen() {
                 </Text>
               ) : null}
             </View>
-            <ChevronRight size={18} color={colores.textMuted} />
+            <ChevronRight size={18} color={paleta.textMuted} />
           </Pressable>
           <Pressable
             accessibilityRole="button"
@@ -215,7 +217,7 @@ export function GruposScreen() {
             {eliminando === grupo.id ? (
               <ActivityIndicator color={colores.primary} />
             ) : (
-              <Trash2 size={19} color={colores.textMuted} />
+              <Trash2 size={19} color={paleta.textMuted} />
             )}
           </Pressable>
         </View>

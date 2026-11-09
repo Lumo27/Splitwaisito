@@ -40,7 +40,11 @@ export async function programarRecordatorioDePago(
   }
 
   await Notifications.scheduleNotificationAsync({
-    content: { title: titulo, body: cuerpo },
+    content: {
+      title: titulo,
+      body: cuerpo,
+      data: { tipo: 'recordatorio-deuda' },
+    },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: DEMORA_RECORDATORIO_SEGUNDOS,
@@ -48,4 +52,21 @@ export async function programarRecordatorioDePago(
     },
   })
   return true
+}
+
+export async function cancelarRecordatoriosDeuda(): Promise<void> {
+  if (!recordatoriosDisponibles) return
+
+  const programadas = await Notifications.getAllScheduledNotificationsAsync()
+  const recordatorios = programadas.filter(
+    ({ content }) =>
+      content.data?.tipo === 'recordatorio-deuda' ||
+      content.title === 'Tenés una deuda pendiente',
+  )
+
+  await Promise.all(
+    recordatorios.map(({ identifier }) =>
+      Notifications.cancelScheduledNotificationAsync(identifier),
+    ),
+  )
 }

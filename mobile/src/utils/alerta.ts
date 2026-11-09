@@ -1,4 +1,6 @@
 import { Alert, Platform } from 'react-native'
+import { useAppStore } from '@/store/useAppStore'
+import { traducirTexto } from '@/i18n/textos'
 
 export interface OpcionesConfirmacion {
   titulo: string
@@ -24,8 +26,20 @@ export function confirmar({
   alConfirmar,
   alCancelar,
 }: OpcionesConfirmacion) {
+  const idioma = useAppStore.getState().preferencias.language
+  const tituloTraducido = traducirTexto(idioma, titulo)
+  const mensajeTraducido = traducirTexto(idioma, mensaje)
+  const confirmarTraducido = textoConfirmar
+    ? traducirTexto(idioma, textoConfirmar)
+    : undefined
+  const cancelarTraducido = textoCancelar
+    ? traducirTexto(idioma, textoCancelar)
+    : undefined
+
   if (Platform.OS === 'web') {
-    const cuerpo = mensaje ? `${titulo}\n\n${mensaje}` : titulo
+    const cuerpo = mensajeTraducido
+      ? `${tituloTraducido}\n\n${mensajeTraducido}`
+      : tituloTraducido
     const host: Record<string, unknown> =
       typeof window !== 'undefined'
         ? (window as unknown as Record<string, unknown>)
@@ -48,12 +62,12 @@ export function confirmar({
 
   Alert.alert(titulo, mensaje, [
     {
-      text: textoCancelar,
+      text: cancelarTraducido,
       style: 'cancel',
       onPress: alCancelar,
     },
     {
-      text: textoConfirmar,
+      text: confirmarTraducido,
       style: destructivo ? 'destructive' : 'default',
       onPress: () => {
         void alConfirmar()
@@ -66,8 +80,14 @@ export function confirmar({
  * Mensaje de aviso simple multiplataforma.
  */
 export function avisar(titulo: string, mensaje?: string) {
+  const idioma = useAppStore.getState().preferencias.language
+  const tituloTraducido = traducirTexto(idioma, titulo)
+  const mensajeTraducido = mensaje ? traducirTexto(idioma, mensaje) : undefined
+
   if (Platform.OS === 'web') {
-    const texto = mensaje ? `${titulo}\n\n${mensaje}` : titulo
+    const texto = mensajeTraducido
+      ? `${tituloTraducido}\n\n${mensajeTraducido}`
+      : tituloTraducido
     const host: Record<string, unknown> =
       typeof window !== 'undefined'
         ? (window as unknown as Record<string, unknown>)
@@ -84,5 +104,5 @@ export function avisar(titulo: string, mensaje?: string) {
     return
   }
 
-  Alert.alert(titulo, mensaje)
+  Alert.alert(tituloTraducido, mensajeTraducido)
 }
