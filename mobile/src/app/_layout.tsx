@@ -68,6 +68,14 @@ function AppNavigator() {
             name="grupos/[id]/saldar"
             options={{ title: 'Saldar deuda', presentation: 'modal' }}
           />
+          <Stack.Screen
+            name="configuracion/notificaciones"
+            options={{ title: 'Notificaciones' }}
+          />
+          <Stack.Screen
+            name="configuracion/moneda"
+            options={{ title: 'Moneda preferida' }}
+          />
         </Stack.Protected>
       </Stack>
       {usuario && terminosAceptados && (

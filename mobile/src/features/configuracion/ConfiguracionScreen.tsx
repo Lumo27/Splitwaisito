@@ -1,19 +1,39 @@
 import { useRef, useState } from 'react'
 import { router } from 'expo-router'
-import { Text } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 import {
-  Boton,
-  Mensaje,
-  Pantalla,
-  Tarjeta,
-  Titulo,
-} from '@/components/Formulario'
+  Bell,
+  CircleUserRound,
+  DollarSign,
+  FileText,
+  Info,
+  LogOut,
+  RefreshCw,
+} from 'lucide-react-native'
+import { FilaConfig, Mensaje } from '@/components/Formulario'
 import { signOutUser } from '@/services/auth'
 import { MODO_SEEDS } from '@/services/firebase'
 import { getUsuarioPerfil } from '@/services/firestore'
 import { restablecerSeeds } from '@/services/seedBackend'
 import { useAppStore } from '@/store/useAppStore'
 import { confirmar } from '@/utils/alerta'
+import { colores } from '@/theme/colores'
+
+function SeccionTitulo({ texto }: { texto: string }) {
+  return (
+    <Text className="mb-1 mt-4 px-1 text-xs font-semibold uppercase tracking-widest text-textMuted">
+      {texto}
+    </Text>
+  )
+}
+
+function TarjetaSeccion({ children }: { children: React.ReactNode }) {
+  return (
+    <View className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
+      {children}
+    </View>
+  )
+}
 
 export function ConfiguracionScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
@@ -21,6 +41,7 @@ export function ConfiguracionScreen() {
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
   const mutacion = useRef(false)
+
   async function salir() {
     if (mutacion.current) return
     mutacion.current = true
@@ -37,6 +58,7 @@ export function ConfiguracionScreen() {
       setOcupado(false)
     }
   }
+
   async function reiniciar() {
     if (mutacion.current || !MODO_SEEDS || !usuario) return
     mutacion.current = true
@@ -65,28 +87,29 @@ export function ConfiguracionScreen() {
       setOcupado(false)
     }
   }
+
   return (
-    <Pantalla>
-      <Titulo>Ajustes de cuenta</Titulo>
-      <Text className="text-text-muted">
-        Gestioná tu sesión y el entorno de la aplicación.
-      </Text>
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
+    >
       <Mensaje texto={mensaje} />
       <Mensaje texto={error} error />
-      <Tarjeta>
-        <Text className="font-bold text-text">Sesión actual</Text>
-        <Text className="text-sm text-text-muted">
-          {usuario?.email || 'Sin sesión activa'}
-        </Text>
-        <Text className="text-xs text-text-muted">
-          {MODO_SEEDS
-            ? 'Modo demo activo (sin credenciales reales de Firebase).'
-            : 'Estás conectado a Firebase.'}
-        </Text>
-        <Boton
-          texto="Cerrar sesión"
-          secundario
-          disabled={ocupado}
+
+      {/* ── Cuenta ── */}
+      <SeccionTitulo texto="Cuenta" />
+      <TarjetaSeccion>
+        <FilaConfig
+          icono={<CircleUserRound size={18} color={colores.primary} />}
+          titulo={usuario?.nombre ?? 'Sin sesión activa'}
+          descripcion={usuario?.email ?? ''}
+          derecha={<View />}
+        />
+        <FilaConfig
+          icono={<LogOut size={18} color="#E11D48" />}
+          titulo="Cerrar sesión"
+          descripcion="Salir de tu cuenta en este dispositivo"
+          deshabilitado={ocupado}
           onPress={() =>
             confirmar({
               titulo: 'Cerrar sesión',
@@ -100,40 +123,69 @@ export function ConfiguracionScreen() {
             })
           }
         />
-      </Tarjeta>
+      </TarjetaSeccion>
+
+      {/* ── Preferencias ── */}
+      <SeccionTitulo texto="Preferencias" />
+      <TarjetaSeccion>
+        <FilaConfig
+          icono={<Bell size={18} color={colores.primary} />}
+          titulo="Notificaciones"
+          descripcion="Recordatorios y actividad del grupo"
+          onPress={() => router.push('/configuracion/notificaciones')}
+        />
+        <FilaConfig
+          icono={<DollarSign size={18} color={colores.primary} />}
+          titulo="Moneda preferida"
+          descripcion="Sugerencia al crear nuevos grupos"
+          onPress={() => router.push('/configuracion/moneda')}
+        />
+      </TarjetaSeccion>
+
+      {/* ── Información ── */}
+      <SeccionTitulo texto="Información" />
+      <TarjetaSeccion>
+        <FilaConfig
+          icono={<FileText size={18} color={colores.textMuted} />}
+          titulo="Términos y condiciones"
+          descripcion="Leé los términos de uso de Junti"
+          onPress={() => router.push('/terminos')}
+        />
+        <FilaConfig
+          icono={<Info size={18} color={colores.textMuted} />}
+          titulo="Acerca de Junti"
+          descripcion="Versión 1.0.0"
+          derecha={<View />}
+        />
+      </TarjetaSeccion>
+
+      {/* ── Modo demo ── */}
       {MODO_SEEDS && (
-        <Tarjeta>
-          <Text className="font-bold text-text">Datos de ejemplo</Text>
-          <Text className="text-sm leading-6 text-text-muted">
-            Restablecer reemplaza tus grupos, gastos, amigos y perfil de prueba
-            por los datos iniciales.
-          </Text>
-          <Boton
-            texto="Restablecer datos de ejemplo"
-            peligro
-            disabled={ocupado}
-            onPress={() =>
-              confirmar({
-                titulo: 'Restablecer datos',
-                mensaje:
-                  'Se borrarán los cambios realizados en el modo demo de este dispositivo. ¿Continuar?',
-                textoConfirmar: 'Restablecer',
-                textoCancelar: 'Cancelar',
-                destructivo: true,
-                alConfirmar: () => {
-                  void reiniciar()
-                },
-              })
-            }
-          />
-        </Tarjeta>
+        <>
+          <SeccionTitulo texto="Modo demo" />
+          <TarjetaSeccion>
+            <FilaConfig
+              icono={<RefreshCw size={18} color="#D97706" />}
+              titulo="Restablecer datos de ejemplo"
+              descripcion="Vuelve al estado inicial del demo"
+              deshabilitado={ocupado}
+              onPress={() =>
+                confirmar({
+                  titulo: 'Restablecer datos',
+                  mensaje:
+                    'Se borrarán los cambios realizados en el modo demo de este dispositivo. ¿Continuar?',
+                  textoConfirmar: 'Restablecer',
+                  textoCancelar: 'Cancelar',
+                  destructivo: true,
+                  alConfirmar: () => {
+                    void reiniciar()
+                  },
+                })
+              }
+            />
+          </TarjetaSeccion>
+        </>
       )}
-      <Tarjeta>
-        <Text className="font-bold text-text">Junti</Text>
-        <Text className="text-xs text-text-muted">
-          Versión 1.0.0 · Gastos compartidos simplificados
-        </Text>
-      </Tarjeta>
-    </Pantalla>
+    </ScrollView>
   )
 }

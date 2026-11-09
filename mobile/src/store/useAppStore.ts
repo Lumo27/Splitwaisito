@@ -5,6 +5,12 @@ import { MODO_SEEDS } from '@/services/firebase'
 import type { MonedaCodigo } from '@/theme/moneda'
 import type { CotizacionesPesos } from '@/services/equivalenciaPesos'
 
+export interface Preferencias {
+  notificacionesRecordatorios: boolean
+  notificacionesActividad: boolean
+  monedaPreferida: 'ARS' | 'USD' | 'BRL'
+}
+
 export interface Usuario {
   id: string
   nombre: string
@@ -33,6 +39,8 @@ interface AppState {
   amigos: Usuario[]
   gastos: Gasto[]
   cotizacionesPesos: CotizacionesPesos
+  preferencias: Preferencias
+  actualizarPreferencias: (cambios: Partial<Preferencias>) => void
   iniciarSesion: (
     nombre: string,
     email: string,
@@ -68,6 +76,16 @@ export const useAppStore = create<AppState>()(
       amigos: [],
       gastos: [],
       cotizacionesPesos: {},
+      preferencias: {
+        notificacionesRecordatorios: true,
+        notificacionesActividad: true,
+        monedaPreferida: 'ARS',
+      },
+
+      actualizarPreferencias: (cambios) =>
+        set((state) => ({
+          preferencias: { ...state.preferencias, ...cambios },
+        })),
 
       iniciarSesion: (nombre, email, alias, id = 'user-me', fotoUrl, descripcion, moneda) =>
         set((state) => ({

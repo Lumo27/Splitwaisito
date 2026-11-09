@@ -10,6 +10,7 @@ import {
   View,
   type TextInputProps,
 } from 'react-native'
+import { ChevronRight } from 'lucide-react-native'
 import { colores } from '@/theme/colores'
 
 export function Pantalla({ children }: { children: ReactNode }) {
@@ -147,6 +148,47 @@ export function Opcion({
         {elegida ? '✓ ' : ''}
         {texto}
       </Text>
+    </Pressable>
+  )
+}
+
+export function FilaConfig({
+  icono,
+  titulo,
+  descripcion,
+  onPress,
+  derecha,
+  deshabilitado = false,
+}: {
+  icono: ReactNode
+  titulo: string
+  descripcion?: string
+  onPress?: () => void
+  derecha?: ReactNode
+  deshabilitado?: boolean
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={titulo}
+      accessibilityState={{ disabled: deshabilitado }}
+      disabled={deshabilitado}
+      onPress={onPress}
+      style={({ pressed }) => ({ opacity: pressed || deshabilitado ? 0.7 : 1 })}
+      className="min-h-14 flex-row items-center gap-3 border-b border-slate-100 bg-white px-4 py-3 last:border-b-0"
+    >
+      <View className="h-9 w-9 items-center justify-center rounded-xl bg-slate-100">
+        {icono}
+      </View>
+      <View className="flex-1 gap-0.5">
+        <Text className="text-base font-medium text-text">{titulo}</Text>
+        {descripcion ? (
+          <Text className="text-xs leading-4 text-textMuted">{descripcion}</Text>
+        ) : null}
+      </View>
+      <View className="items-center justify-center">
+        {derecha ?? <ChevronRight size={18} color={colores.textMuted} />}
+      </View>
     </Pressable>
   )
 }
