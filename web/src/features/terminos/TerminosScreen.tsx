@@ -89,13 +89,11 @@ export function TerminosScreen() {
     <main className="min-h-screen overflow-y-auto bg-background px-4 py-6 sm:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-4xl flex-col">
         <div className="mb-4 flex items-center gap-3">
-          <div
-            role="img"
-            aria-label="Logotipo de Junti"
-            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-2xl font-black text-white"
-          >
-            J
-          </div>
+          <img
+            src="/logo-junti.png"
+            alt="Logotipo de Junti"
+            className="h-12 w-12 rounded-2xl object-cover"
+          />
           <span className="text-2xl font-extrabold tracking-tight text-slate-900">
             Junti
           </span>

@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
+import { ActivityIndicator, Image, Text, View } from 'react-native'
 import * as SplashScreen from 'expo-splash-screen'
 import { subscribeToAuthChanges } from '@/services/auth'
 import { isFirebaseAvailable, MODO_SEEDS } from '@/services/firebase'
@@ -206,13 +206,11 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
   if (!authReady || !hidratado)
     return (
       <View className="flex-1 items-center justify-center gap-4 bg-white p-6">
-        <View
-          accessible
+        <Image
+          source={require('../../../assets/images/logo-junti.png')}
+          style={{ width: 100, height: 100, borderRadius: 24 }}
           accessibilityLabel="Logotipo de Junti"
-          className="h-[100px] w-[100px] items-center justify-center rounded-3xl bg-primary"
-        >
-          <Text className="text-5xl font-black text-white">J</Text>
-        </View>
+        />
         <View className="items-center gap-1">
           <Text className="text-2xl font-bold text-text">Junti</Text>
           <Text className="text-center text-sm text-text-muted">

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   Animated,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -391,13 +392,11 @@ export function LoginScreen() {
                 className="w-full max-w-[500px] items-center px-6 pt-5"
               >
                 <View className="mb-5 flex-row items-center gap-3">
-                  <View
-                    accessible
+                  <Image
+                    source={require('../../../assets/images/logo-junti.png')}
+                    style={{ width: 58, height: 58, borderRadius: 20 }}
                     accessibilityLabel="Logotipo de Junti"
-                    className="h-[58px] w-[58px] items-center justify-center rounded-[20px] border border-primary-light bg-white"
-                  >
-                    <Text className="text-3xl font-black text-primary">J</Text>
-                  </View>
+                  />
                   <Text className="text-xl font-extrabold tracking-tight text-white">
                     Junti
                   </Text>

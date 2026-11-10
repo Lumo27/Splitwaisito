@@ -147,7 +147,7 @@ export function DetalleGrupoScreen() {
       ? ` al alias ${usuario.alias.trim()}`
       : ' a mi cuenta'
     const grupoNombre = grupo?.nombre ?? 'el grupo'
-    const texto = `¡Hola ${deudorNombre}! Te recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}". Podés transferirme${aliasUsuario}. ¡Muchas gracias!`
+    const texto = `¡Hola ${deudorNombre}! Te recuerdo que tenemos un saldo pendiente en Junti de ${montoTexto} en el grupo "${grupoNombre}". Podés transferirme${aliasUsuario}. ¡Muchas gracias!`
     void abrirWhatsApp(texto).catch(() => {
       avisar(
         'WhatsApp no disponible',
@@ -172,8 +172,8 @@ export function DetalleGrupoScreen() {
       ? ` al alias ${usuario.alias.trim()}`
       : ' a mi cuenta'
     const grupoNombre = grupo?.nombre ?? 'el grupo'
-    const asunto = `Saldo pendiente en Splitwaisito - ${grupoNombre}`
-    const texto = `¡Hola ${deudorNombre}!\n\nTe recuerdo que tenemos un saldo pendiente en Splitwaisito de ${montoTexto} en el grupo "${grupoNombre}".\n\nPodés transferirme${aliasUsuario}.\n\n¡Muchas gracias!`
+    const asunto = `Saldo pendiente en Junti - ${grupoNombre}`
+    const texto = `¡Hola ${deudorNombre}!\n\nTe recuerdo que tenemos un saldo pendiente en Junti de ${montoTexto} en el grupo "${grupoNombre}".\n\nPodés transferirme${aliasUsuario}.\n\n¡Muchas gracias!`
     const url = `mailto:${deudorEmail}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`
     void Linking.openURL(url).catch(() => {
       avisar(
