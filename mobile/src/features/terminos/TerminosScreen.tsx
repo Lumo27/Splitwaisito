@@ -12,7 +12,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { useTerminosAcceptance } from '@/features/auth/AuthBootstrap'
-import { TERMINOS_FECHA_ACTUALIZACION } from './terminos'
 import { ContenidoTerminos } from './ContenidoTerminos'
 
 export function TerminosScreen() {
@@ -79,9 +78,6 @@ export function TerminosScreen() {
             <View className="border-b border-slate-100 px-5 py-4">
               <Text className="text-sm font-bold uppercase tracking-wider text-primary-dark">
                 Términos y Condiciones de Uso
-              </Text>
-              <Text className="mt-1 text-xs text-slate-500">
-                Última actualización: {TERMINOS_FECHA_ACTUALIZACION}
               </Text>
             </View>
             <ScrollView

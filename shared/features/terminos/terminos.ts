@@ -3,7 +3,7 @@ export const TERMINOS_FECHA_ACTUALIZACION = '4 de noviembre de 2026'
 
 export const TERMINOS_DOCUMENTO = `# Términos y Condiciones de Uso de Junti
 
-**Última actualización:** 4 de noviembre de 2026
+**Última actualización:** ${TERMINOS_FECHA_ACTUALIZACION}
 
 Los presentes Términos y Condiciones de Uso (en adelante, los "Términos") regulan el acceso y la utilización de la aplicación móvil y/o web denominada **Junti** (en adelante, la "Aplicación"), operada por **[nombre completo del titular]**, persona física, con domicilio en [dirección] y correo de contacto Junti@gmail.com (en adelante, el "Operador").
 

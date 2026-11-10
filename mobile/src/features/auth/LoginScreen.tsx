@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   ActivityIndicator,
   Animated,
@@ -21,6 +21,7 @@ import {
   LockKeyhole,
   Mail,
   UserRound,
+  type LucideIcon,
 } from 'lucide-react-native'
 import Svg, { Circle, Path } from 'react-native-svg'
 
@@ -46,6 +47,27 @@ try {
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const CANTIDAD_ANIMACIONES = 9
 const USAR_DRIVER_NATIVO = Platform.OS !== 'web'
+
+/** Etiqueta + caja con ícono que envuelve cada campo del formulario de acceso. */
+function CampoAcceso({
+  etiqueta,
+  Icono,
+  children,
+}: {
+  etiqueta: string
+  Icono: LucideIcon
+  children: ReactNode
+}) {
+  return (
+    <>
+      <Text className="mb-2 text-sm font-semibold text-text">{etiqueta}</Text>
+      <View className="min-h-[54px] flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-background px-4">
+        <Icono size={19} color={colores.textMuted} />
+        {children}
+      </View>
+    </>
+  )
+}
 
 export function LoginScreen() {
   const [esRegistro, setEsRegistro] = useState(false)
@@ -402,10 +424,16 @@ export function LoginScreen() {
                   </Text>
                 </View>
                 <Text className="text-center text-[25px] font-bold leading-[32px] text-white">
-                  Qué bueno tenerte de vuelta
+                  {MODO_SEEDS
+                    ? 'Conocé Junti'
+                    : esRegistro
+                      ? 'Bienvenido a Junti'
+                      : 'Qué bueno tenerte de vuelta'}
                 </Text>
                 <Text className="mt-1 text-center text-sm leading-5 text-white/90">
-                  Tus planes y gastos compartidos te esperan.
+                  {esRegistro
+                    ? 'Creá tu cuenta y empezá a dividir gastos.'
+                    : 'Tus planes y gastos compartidos te esperan.'}
                 </Text>
               </Animated.View>
             </View>
@@ -498,11 +526,7 @@ export function LoginScreen() {
 
                     {esRegistro && (
                       <Animated.View style={estiloEntrada(2)}>
-                        <Text className="mb-2 text-sm font-semibold text-text">
-                          Nombre
-                        </Text>
-                        <View className="min-h-[54px] flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-background px-4">
-                          <UserRound size={19} color={colores.textMuted} />
+                        <CampoAcceso etiqueta="Nombre" Icono={UserRound}>
                           <TextInput
                             accessibilityLabel="Nombre"
                             value={nombre}
@@ -516,16 +540,12 @@ export function LoginScreen() {
                             onSubmitEditing={() => emailRef.current?.focus()}
                             className="min-h-[52px] flex-1 text-base text-text"
                           />
-                        </View>
+                        </CampoAcceso>
                       </Animated.View>
                     )}
 
                     <Animated.View style={estiloEntrada(3)}>
-                      <Text className="mb-2 text-sm font-semibold text-text">
-                        Correo electrónico
-                      </Text>
-                      <View className="min-h-[54px] flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-background px-4">
-                        <Mail size={19} color={colores.textMuted} />
+                      <CampoAcceso etiqueta="Correo electrónico" Icono={Mail}>
                         <TextInput
                           ref={emailRef}
                           accessibilityLabel="Correo electrónico"
@@ -543,15 +563,11 @@ export function LoginScreen() {
                           onSubmitEditing={() => claveRef.current?.focus()}
                           className="min-h-[52px] flex-1 text-base text-text"
                         />
-                      </View>
+                      </CampoAcceso>
                     </Animated.View>
 
                     <Animated.View style={estiloEntrada(4)}>
-                      <Text className="mb-2 text-sm font-semibold text-text">
-                        Contraseña
-                      </Text>
-                      <View className="min-h-[54px] flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-background px-4">
-                        <LockKeyhole size={19} color={colores.textMuted} />
+                      <CampoAcceso etiqueta="Contraseña" Icono={LockKeyhole}>
                         <TextInput
                           ref={claveRef}
                           accessibilityLabel="Contraseña"
@@ -583,7 +599,7 @@ export function LoginScreen() {
                             <Eye size={20} color={colores.textMuted} />
                           )}
                         </Pressable>
-                      </View>
+                      </CampoAcceso>
                     </Animated.View>
 
                     {!esRegistro && (
