@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTerminosAcceptance } from './TerminosContext'
-import { TERMINOS_DOCUMENTO } from './terminos'
+import {
+  TERMINOS_DOCUMENTO,
+} from './terminos'
 
 function textoEnriquecido(texto: string) {
   return texto.split(/(\*\*[^*]+\*\*)/g).map((parte, indice) => {
@@ -11,7 +13,7 @@ function textoEnriquecido(texto: string) {
   })
 }
 
-function ContenidoTerminos() {
+export function ContenidoTerminos() {
   return (
     <div className="space-y-3">
       {TERMINOS_DOCUMENTO.split('\n').map((linea, indice) => {
@@ -109,9 +111,6 @@ export function TerminosScreen() {
             <h2 className="text-sm font-bold uppercase tracking-wider text-primary-dark">
               Términos y Condiciones de Uso
             </h2>
-            <p className="mt-1 text-xs text-slate-500">
-              Última actualización: 02/11/2026
-            </p>
           </header>
           <div
             className="min-h-0 flex-1 overflow-y-auto px-5 py-4"

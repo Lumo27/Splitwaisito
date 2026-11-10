@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { Input } from '../../components/Input'
+import { ContenidoTerminos } from '../terminos/TerminosScreen'
 import { signInWithGoogle } from '../../services/auth'
 import { isFirebaseAvailable } from '../../services/firebase'
 import { useAppStore } from '../../store/useAppStore'
@@ -37,6 +38,7 @@ export function LoginScreen() {
   const [email, setEmail] = useState('')
   const [alias, setAlias] = useState('')
   const [googleError, setGoogleError] = useState('')
+  const [mostrarTerminos, setMostrarTerminos] = useState(false)
 
   useEffect(() => {
     if (usuarioActual) {
@@ -173,7 +175,43 @@ export function LoginScreen() {
             )}
           </form>
         )}
+        <button
+          type="button"
+          onClick={() => setMostrarTerminos(true)}
+          className="mt-4 w-full py-2 text-sm font-semibold text-primary-dark underline"
+        >
+          Leer Términos y Condiciones
+        </button>
       </Card>
+      {mostrarTerminos && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="login-terminos-titulo"
+        >
+          <section className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-xl">
+            <header className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+              <h2
+                id="login-terminos-titulo"
+                className="text-lg font-bold text-slate-900"
+              >
+                Términos y Condiciones
+              </h2>
+              <button
+                type="button"
+                onClick={() => setMostrarTerminos(false)}
+                className="rounded-full bg-primary-light px-4 py-2 font-semibold text-primary-dark"
+              >
+                Cerrar
+              </button>
+            </header>
+            <div className="overflow-y-auto px-5 py-6">
+              <ContenidoTerminos />
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   )
 }

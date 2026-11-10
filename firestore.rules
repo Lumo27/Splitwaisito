@@ -42,7 +42,10 @@ service cloud.firestore {
             'acceptedAt'
           ])
           && request.resource.data.usuarioId == userId
-          && request.resource.data.version == '1.0.1'
+          // Versiones que la app puede registrar. Al publicar una nueva, se
+          // agrega a la lista sin quitar la anterior, así las apps que todavía
+          // no se actualizaron pueden seguir aceptando.
+          && request.resource.data.version in ['1.0.1', '1.0.2']
           && request.resource.data.estado == 'aceptado'
           && request.resource.data.acceptedAt == request.time;
       }
