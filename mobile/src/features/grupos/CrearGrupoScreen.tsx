@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { router } from 'expo-router'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import {
   Boton,
   Campo,

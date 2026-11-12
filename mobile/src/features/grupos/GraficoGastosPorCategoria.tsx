@@ -1,4 +1,5 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import type { GastoFirestore } from '@/services/firestore'
 import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { formatearMoneda, type MonedaCodigo } from '@/theme/moneda'
@@ -15,7 +16,7 @@ export function GastosPorCategoria({
   const total = resumen.reduce((suma, item) => suma + item.monto, 0)
 
   return (
-    <View className="mt-5 gap-4 rounded-2xl bg-white p-4">
+    <View className="mt-5 gap-4 rounded-2xl bg-surface p-4">
       <View className="gap-1">
         <Text
           accessibilityRole="header"

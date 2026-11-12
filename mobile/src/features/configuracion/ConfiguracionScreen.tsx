@@ -1,139 +1,187 @@
-import { useRef, useState } from 'react'
 import { router } from 'expo-router'
-import { Text } from 'react-native'
+import { useRef, useState } from 'react'
+import { ScrollView, View } from 'react-native'
 import {
-  Boton,
-  Mensaje,
-  Pantalla,
-  Tarjeta,
-  Titulo,
-} from '@/components/Formulario'
-import { signOutUser } from '@/services/auth'
+  Bell,
+  CircleUserRound,
+  DollarSign,
+  Info,
+  Languages,
+  Palette,
+  Shield,
+  ShieldCheck,
+  Accessibility,
+} from 'lucide-react-native'
+import { Boton, FilaConfig, Mensaje } from '@/components/Formulario'
 import { MODO_SEEDS } from '@/services/firebase'
 import { getUsuarioPerfil } from '@/services/firestore'
+import { obtenerAmigosAceptados } from '@/services/amistades'
 import { restablecerSeeds } from '@/services/seedBackend'
 import { useAppStore } from '@/store/useAppStore'
+import { colores } from '@/theme/colores'
+import { Texto as Text } from '@/components/Texto'
+import { useTraduccion } from '@/i18n/translations'
 import { confirmar } from '@/utils/alerta'
+
+function SeccionTitulo({ texto }: { texto: string }) {
+  return (
+    <Text className="mb-1 mt-4 px-1 text-xs font-semibold uppercase tracking-widest text-textMuted">
+      {texto}
+    </Text>
+  )
+}
+
+function TarjetaSeccion({ children }: { children: React.ReactNode }) {
+  return (
+    <View className="overflow-hidden rounded-2xl border border-slate-100 bg-surface">
+      {children}
+    </View>
+  )
+}
 
 export function ConfiguracionScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
-  const [ocupado, setOcupado] = useState(false)
-  const [error, setError] = useState('')
-  const [mensaje, setMensaje] = useState('')
+  const idioma = useAppStore((state) => state.preferencias.language)
+  const [restableciendo, setRestableciendo] = useState(false)
+  const [errorRestablecer, setErrorRestablecer] = useState('')
+  const [mensajeRestablecer, setMensajeRestablecer] = useState('')
   const mutacion = useRef(false)
-  async function salir() {
-    if (mutacion.current) return
-    mutacion.current = true
-    setOcupado(true)
-    setError('')
-    try {
-      await signOutUser()
-      useAppStore.getState().cerrarSesion()
-      router.replace('/login')
-    } catch {
-      setError('No pudimos cerrar la sesión. Volvé a intentar.')
-    } finally {
-      mutacion.current = false
-      setOcupado(false)
-    }
-  }
-  async function reiniciar() {
+  const t = useTraduccion()
+
+  async function reiniciarDemo() {
     if (mutacion.current || !MODO_SEEDS || !usuario) return
     mutacion.current = true
-    setOcupado(true)
-    setError('')
-    setMensaje('')
+    setRestableciendo(true)
+    setErrorRestablecer('')
+    setMensajeRestablecer('')
     try {
       await restablecerSeeds()
       const perfil = await getUsuarioPerfil(usuario.id)
-      if (perfil) {
-        useAppStore.getState().iniciarSesion(
-          perfil.nombre,
-          perfil.email,
-          perfil.alias,
-          perfil.id,
-          perfil.fotoUrl,
-          perfil.descripcion,
-          perfil.moneda,
-        )
-      }
-      setMensaje('Datos de ejemplo restablecidos.')
-    } catch {
-      setError('No pudimos restablecer los datos de ejemplo.')
+      if (!perfil) throw new Error('No se pudo recuperar el perfil demo.')
+      useAppStore.getState().iniciarSesion(
+        perfil.nombre,
+        perfil.email,
+        perfil.alias,
+        perfil.id,
+        perfil.fotoUrl,
+        perfil.descripcion,
+        perfil.moneda,
+      )
+      useAppStore
+        .getState()
+        .reemplazarAmigos(await obtenerAmigosAceptados(usuario.id))
+      setMensajeRestablecer(t('demo.resetSuccess'))
+    } catch (fallo) {
+      console.error('No se pudieron restablecer los datos de ejemplo.', fallo)
+      setErrorRestablecer(t('demo.resetError'))
     } finally {
       mutacion.current = false
-      setOcupado(false)
+      setRestableciendo(false)
     }
   }
+
   return (
-    <Pantalla>
-      <Titulo>Ajustes de cuenta</Titulo>
-      <Text className="text-text-muted">
-        Gestioná tu sesión y el entorno de la aplicación.
-      </Text>
-      <Mensaje texto={mensaje} />
-      <Mensaje texto={error} error />
-      <Tarjeta>
-        <Text className="font-bold text-text">Sesión actual</Text>
-        <Text className="text-sm text-text-muted">
-          {usuario?.email || 'Sin sesión activa'}
-        </Text>
-        <Text className="text-xs text-text-muted">
-          {MODO_SEEDS
-            ? 'Modo demo activo (sin credenciales reales de Firebase).'
-            : 'Estás conectado a Firebase.'}
-        </Text>
-        <Boton
-          texto="Cerrar sesión"
-          secundario
-          disabled={ocupado}
-          onPress={() =>
-            confirmar({
-              titulo: 'Cerrar sesión',
-              mensaje: '¿Querés salir de tu cuenta?',
-              textoConfirmar: 'Salir',
-              textoCancelar: 'Cancelar',
-              destructivo: false,
-              alConfirmar: () => {
-                void salir()
-              },
-            })
-          }
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
+    >
+      <Mensaje texto={mensajeRestablecer} />
+      <Mensaje texto={errorRestablecer} error />
+
+      <SeccionTitulo texto={t('settings.account')} />
+      <TarjetaSeccion>
+        <FilaConfig
+          icono={<CircleUserRound size={18} color={colores.primary} />}
+          titulo={usuario?.nombre ?? t('settings.noSession')}
+          descripcion={usuario?.email ?? ''}
+          onPress={() => router.push('/perfil')}
         />
-      </Tarjeta>
+      </TarjetaSeccion>
+
+      <SeccionTitulo texto={t('settings.preferences')} />
+      <TarjetaSeccion>
+        <FilaConfig
+          icono={<Palette size={18} color={colores.primary} />}
+          titulo={t('settings.appearance')}
+          descripcion={t('settings.appearanceDescription')}
+          onPress={() => router.push('/configuracion/apariencia')}
+        />
+        <FilaConfig
+          icono={<Languages size={18} color={colores.primary} />}
+          titulo={t('settings.language')}
+          descripcion={t(`language.${idioma}`)}
+          onPress={() => router.push('/configuracion/idioma')}
+        />
+        <FilaConfig
+          icono={<Bell size={18} color={colores.primary} />}
+          titulo={t('settings.notifications')}
+          descripcion={t('settings.notificationsDescription')}
+          onPress={() => router.push('/configuracion/notificaciones')}
+        />
+        <FilaConfig
+          icono={<DollarSign size={18} color={colores.primary} />}
+          titulo={t('settings.currency')}
+          descripcion={t('settings.currencyDescription')}
+          onPress={() => router.push('/configuracion/moneda')}
+        />
+      </TarjetaSeccion>
+
+      <SeccionTitulo texto={t('settings.privacySecurity')} />
+      <TarjetaSeccion>
+        <FilaConfig
+          icono={<Shield size={18} color={colores.primary} />}
+          titulo={t('settings.privacy')}
+          descripcion={t('settings.privacyDescription')}
+          onPress={() => router.push('/configuracion/privacidad')}
+        />
+        <FilaConfig
+          icono={<ShieldCheck size={18} color={colores.primary} />}
+          titulo={t('settings.security')}
+          descripcion={t('settings.securityDescription')}
+          onPress={() => router.push('/configuracion/seguridad')}
+        />
+        <FilaConfig
+          icono={<Info size={18} color={colores.textMuted} />}
+          titulo={t('settings.about')}
+          descripcion={t('settings.aboutDescription')}
+          onPress={() => router.push('/configuracion/acerca')}
+        />
+        <FilaConfig
+          icono={<Accessibility size={18} color={colores.primary} />}
+          titulo={t('accessibility.title')}
+          descripcion={t('settings.accessibilityDescription')}
+          onPress={() => router.push('/configuracion/accesibilidad')}
+        />
+      </TarjetaSeccion>
+
       {MODO_SEEDS && (
-        <Tarjeta>
-          <Text className="font-bold text-text">Datos de ejemplo</Text>
-          <Text className="text-sm leading-6 text-text-muted">
-            Restablecer reemplaza tus grupos, gastos, amigos y perfil de prueba
-            por los datos iniciales.
-          </Text>
-          <Boton
-            texto="Restablecer datos de ejemplo"
-            peligro
-            disabled={ocupado}
-            onPress={() =>
-              confirmar({
-                titulo: 'Restablecer datos',
-                mensaje:
-                  'Se borrarán los cambios realizados en el modo demo de este dispositivo. ¿Continuar?',
-                textoConfirmar: 'Restablecer',
-                textoCancelar: 'Cancelar',
-                destructivo: true,
-                alConfirmar: () => {
-                  void reiniciar()
-                },
-              })
-            }
-          />
-        </Tarjeta>
+        <>
+          <SeccionTitulo texto={t('demo.section')} />
+          <View className="gap-3 rounded-2xl border border-slate-100 bg-surface p-4">
+            <Text className="text-sm leading-5 text-textMuted">
+              {t('settings.demo')}
+            </Text>
+            <Boton
+              texto={t('demo.resetButton')}
+              peligro
+              disabled={restableciendo}
+              cargando={restableciendo}
+              onPress={() =>
+                confirmar({
+                  titulo: t('demo.resetTitle'),
+                  mensaje: t('demo.resetPrompt'),
+                  textoConfirmar: t('demo.resetConfirm'),
+                  textoCancelar: t('security.cancel'),
+                  destructivo: true,
+                  alConfirmar: () => {
+                    void reiniciarDemo()
+                  },
+                })
+              }
+            />
+          </View>
+        </>
       )}
-      <Tarjeta>
-        <Text className="font-bold text-text">Junti</Text>
-        <Text className="text-xs text-text-muted">
-          Versión 1.0.0 · Gastos compartidos simplificados
-        </Text>
-      </Tarjeta>
-    </Pantalla>
+    </ScrollView>
   )
 }

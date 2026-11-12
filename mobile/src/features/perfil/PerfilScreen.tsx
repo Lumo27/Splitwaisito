@@ -4,9 +4,9 @@ import {
   ActivityIndicator,
   Image,
   Pressable,
-  Text,
   View,
 } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { Calendar, DollarSign, RefreshCw, TrendingUp } from 'lucide-react-native'
 
 import {

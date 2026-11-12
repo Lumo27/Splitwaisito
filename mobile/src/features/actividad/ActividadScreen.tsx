@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useFocusEffect } from 'expo-router'
-import { ActivityIndicator, Text } from 'react-native'
+import { ActivityIndicator } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import {
   Boton,
   Campo,

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
-import { ActivityIndicator, Image, Text, View } from 'react-native'
+import { ActivityIndicator, Image, View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import * as Location from 'expo-location'
 import {
   Boton,

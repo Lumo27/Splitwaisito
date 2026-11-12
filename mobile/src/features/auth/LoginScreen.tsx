@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Image, Pressable, Text, View } from 'react-native'
+import { Image, Pressable, View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import Constants, { ExecutionEnvironment } from 'expo-constants'
 import {
   Boton,
@@ -176,7 +177,7 @@ export function LoginScreen() {
                   onPress={() => {
                     void entrarConGoogle()
                   }}
-                  className="flex-row items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm active:bg-slate-50"
+                  className="flex-row items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-surface px-4 py-3.5 shadow-sm active:bg-slate-50"
                 >
                   <View className="h-6 w-6 items-center justify-center rounded-full bg-slate-100">
                     <Text className="text-sm font-extrabold text-[#4285F4]">G</Text>

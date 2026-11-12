@@ -5,14 +5,18 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  Text,
   View,
   useWindowDimensions,
 } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { useTerminosAcceptance } from '@/features/auth/AuthBootstrap'
 import { TERMINOS_DOCUMENTO } from './terminos'
+import { useAppStore } from '@/store/useAppStore'
+import { useMovimientoReducidoSistema } from '@/hooks/useMovimientoReducido'
+import { useTraduccion } from '@/i18n/translations'
+import { usePaletaActual } from '@/theme/usePaletaActual'
 
 function textoEnriquecido(texto: string) {
   return texto.split(/(\*\*[^*]+\*\*)/g).map((parte, indice) => {
@@ -91,11 +95,19 @@ function ContenidoTerminos() {
 }
 
 export function TerminosScreen() {
+  const paleta = usePaletaActual()
   const { height } = useWindowDimensions()
   const { estado, error, aceptar, reintentar } = useTerminosAcceptance()
   const [ocupado, setOcupado] = useState(false)
   const [errorAceptacion, setErrorAceptacion] = useState('')
   const [mostrarDocumento, setMostrarDocumento] = useState(false)
+  const preferencias = useAppStore((state) => state.preferencias)
+  const movimientoReducidoSistema = useMovimientoReducidoSistema()
+  const reducirAnimaciones =
+    preferencias.reducedMotion ||
+    (preferencias.accessibilityOptions.respectSystemMotion &&
+      movimientoReducidoSistema)
+  const t = useTraduccion()
   const verificando = estado === 'comprobando'
   const puedeAceptar = estado === 'requerido' && !ocupado
 
@@ -107,7 +119,7 @@ export function TerminosScreen() {
       await aceptar()
     } catch {
       setErrorAceptacion(
-        'No pudimos registrar tu aceptación. Revisá tu conexión e intentá nuevamente.',
+        t('terms.acceptError'),
       )
     } finally {
       setOcupado(false)
@@ -148,7 +160,7 @@ export function TerminosScreen() {
           </Text>
 
           <View
-            className="mt-5 min-h-0 flex-1 overflow-hidden rounded-3xl border border-primary-light bg-white shadow-sm"
+            className="mt-5 min-h-0 flex-1 overflow-hidden rounded-3xl border border-primary-light bg-surface shadow-sm"
             style={{ height: Math.min(Math.max(height * 0.4, 170), 560) }}
           >
             <View className="border-b border-slate-100 px-5 py-4">
@@ -170,7 +182,7 @@ export function TerminosScreen() {
 
           {verificando && (
             <View className="mt-3 flex-row items-center gap-2">
-              <ActivityIndicator size="small" color="#2E7D57" />
+              <ActivityIndicator size="small" color={paleta.primaryDark} />
               <Text className="text-sm text-slate-600">
                 Verificando tu aceptación...
               </Text>
@@ -240,10 +252,10 @@ export function TerminosScreen() {
 
       <Modal
         visible={mostrarDocumento}
-        animationType="slide"
+        animationType={reducirAnimaciones ? 'none' : 'slide'}
         onRequestClose={() => setMostrarDocumento(false)}
       >
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-background">
           <View className="flex-row items-center justify-between border-b border-slate-100 px-5 py-4">
             <Text className="text-lg font-bold text-slate-900">
               Términos y Condiciones de Uso

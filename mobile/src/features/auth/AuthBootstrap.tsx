@@ -6,7 +6,8 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { ActivityIndicator, Image, Text, View } from 'react-native'
+import { ActivityIndicator, Image, View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import * as SplashScreen from 'expo-splash-screen'
 import { subscribeToAuthChanges } from '@/services/auth'
 import { isFirebaseAvailable, MODO_SEEDS } from '@/services/firebase'
@@ -205,7 +206,7 @@ export function AuthBootstrap({ children }: { children: ReactNode }) {
 
   if (!authReady || !hidratado)
     return (
-      <View className="flex-1 items-center justify-center gap-4 bg-white p-6">
+      <View className="flex-1 items-center justify-center gap-4 bg-background p-6">
         <Image
           source={require('../../../assets/images/logo-junti.png')}
           style={{ width: 100, height: 100, borderRadius: 24 }}

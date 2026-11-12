@@ -5,9 +5,9 @@ import {
   Image,
   Linking,
   Pressable,
-  Text,
   View,
 } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { MapPin } from 'lucide-react-native'
 import {
   Boton,
