@@ -63,7 +63,7 @@ export function AparienciaScreen() {
         className="min-h-12 flex-row items-center gap-2 self-start rounded-xl px-2"
       >
         <ArrowLeft color={paleta.primaryDark} size={20} />
-        <Texto className="font-semibold text-primary-dark">Volver</Texto>
+        <Texto className="font-semibold text-primary-dark">{t('Volver')}</Texto>
       </Pressable>
 
       <View className="gap-3 rounded-2xl border border-slate-100 bg-surface p-4">

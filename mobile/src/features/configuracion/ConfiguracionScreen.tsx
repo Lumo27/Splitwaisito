@@ -9,6 +9,7 @@ import {
   Languages,
   Palette,
   Shield,
+  ShieldCheck,
   Accessibility,
 } from 'lucide-react-native'
 import { Boton, FilaConfig, Mensaje } from '@/components/Formulario'
@@ -93,7 +94,7 @@ export function ConfiguracionScreen() {
           icono={<CircleUserRound size={18} color={colores.primary} />}
           titulo={usuario?.nombre ?? t('settings.noSession')}
           descripcion={usuario?.email ?? ''}
-          onPress={() => router.push('/configuracion/seguridad')}
+          onPress={() => router.push('/perfil')}
         />
       </TarjetaSeccion>
 
@@ -134,7 +135,7 @@ export function ConfiguracionScreen() {
           onPress={() => router.push('/configuracion/privacidad')}
         />
         <FilaConfig
-          icono={<CircleUserRound size={18} color={colores.primary} />}
+          icono={<ShieldCheck size={18} color={colores.primary} />}
           titulo={t('settings.security')}
           descripcion={t('settings.securityDescription')}
           onPress={() => router.push('/configuracion/seguridad')}
@@ -148,7 +149,7 @@ export function ConfiguracionScreen() {
         <FilaConfig
           icono={<Accessibility size={18} color={colores.primary} />}
           titulo={t('accessibility.title')}
-          descripcion={t('accessibility.highlightDescription')}
+          descripcion={t('settings.accessibilityDescription')}
           onPress={() => router.push('/configuracion/accesibilidad')}
         />
       </TarjetaSeccion>
