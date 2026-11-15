@@ -1,11 +1,12 @@
-export const TERMINOS_VERSION = '1.0.2'
-export const TERMINOS_FECHA_ACTUALIZACION = '4 de noviembre de 2026'
+export const TERMINOS_VERSION = '1.0.3'
+export const TERMINOS_FECHA_ACTUALIZACION = '15 de noviembre de 2026'
+export const TERMINOS_CONTACTO = 'junti@gmail.com'
 
 export const TERMINOS_DOCUMENTO = `# Términos y Condiciones de Uso de Junti
 
 **Última actualización:** ${TERMINOS_FECHA_ACTUALIZACION}
 
-Los presentes Términos y Condiciones de Uso (en adelante, los "Términos") regulan el acceso y la utilización de la aplicación móvil y/o web denominada **Junti** (en adelante, la "Aplicación"), operada por **[nombre completo del titular]**, persona física, con domicilio en [dirección] y correo de contacto Junti@gmail.com (en adelante, el "Operador").
+Los presentes Términos y Condiciones de Uso (en adelante, los "Términos") regulan el acceso y la utilización de la aplicación móvil y/o web denominada **Junti** (en adelante, la "Aplicación"), operada por el equipo de desarrollo de Junti, integrado por estudiantes de la Universidad Nacional de Pilar, con correo de contacto ${TERMINOS_CONTACTO} (en adelante, el "Operador").
 
 Al crear una cuenta o utilizar la Aplicación, el usuario (en adelante, el "Usuario") manifiesta haber leído, comprendido y aceptado los presentes Términos. Si no está de acuerdo con ellos, deberá abstenerse de utilizar la Aplicación.
 
@@ -13,7 +14,7 @@ Al crear una cuenta o utilizar la Aplicación, el usuario (en adelante, el "Usua
 
 1.1. Junti es una herramienta tecnológica de gestión de gastos compartidos que permite a grupos de personas registrar gastos comunes, distribuirlos entre los participantes y mantener un registro actualizado de los saldos que cada integrante debe a los demás.
 
-1.2. La Aplicación es operada por una persona física y no por una sociedad ni otra persona jurídica. En consecuencia, las obligaciones y responsabilidades del Operador se asumen a título personal, en la medida permitida por la legislación aplicable.
+1.2. La Aplicación es un proyecto sin fines de lucro desarrollado por un equipo de personas físicas y no por una sociedad ni otra persona jurídica. Se ofrece en forma gratuita.
 
 ## 2. Naturaleza del servicio: ausencia de custodia de fondos
 
@@ -54,7 +55,7 @@ El Usuario se compromete a:
 
 6.1. Junti almacena la información necesaria para la prestación del servicio, que puede incluir datos de cuenta, registros de gastos, grupos, comprobantes y registros técnicos de acceso.
 
-6.2. La información almacenada se pondrá a disposición de las autoridades competentes cuando sea requerida mediante **orden judicial, mandato legal o requerimiento formal** emitido conforme a la legislación aplicable en [país/jurisdicción].
+6.2. La información almacenada se pondrá a disposición de las autoridades competentes cuando sea requerida mediante **orden judicial, mandato legal o requerimiento formal** emitido conforme a la legislación de la República Argentina.
 
 6.3. El Operador no entregará información personal a terceros sin un requerimiento legal válido, salvo consentimiento expreso del Usuario o cuando la ley así lo exija.
 
@@ -73,7 +74,7 @@ El tratamiento de datos personales se rige por la Política de Privacidad de Jun
 - Inexactitud de los datos ingresados por los Usuarios o de los comprobantes cargados.
 - Interrupciones del servicio, fallas técnicas o pérdida de datos ajenas a su control razonable.
 
-8.2. En la máxima medida permitida por la ley, la responsabilidad total del Operador frente al Usuario no excederá el monto efectivamente abonado por el Usuario por el servicio durante los últimos [12] meses o, si el servicio es gratuito, la suma de [monto].
+8.2. Dado que la Aplicación se ofrece en forma gratuita, y en la máxima medida permitida por la ley, el Operador no será responsable por daños indirectos, lucro cesante ni pérdida de datos derivados del uso de la Aplicación.
 
 8.3. Nada de lo dispuesto en esta sección limita derechos irrenunciables que la legislación aplicable reconozca al Usuario en su condición de consumidor.
 
@@ -85,7 +86,7 @@ El Operador procura mantener la Aplicación disponible de forma continua, pero n
 
 10.1. El Operador podrá suspender o cancelar cuentas que incumplan los presentes Términos, sin perjuicio de otras acciones legales que correspondan.
 
-10.2. El Usuario podrá solicitar la eliminación de su cuenta en cualquier momento desde la Aplicación o escribiendo a Junti@gmail.com. Determinados datos podrán conservarse durante los plazos que exija la ley, incluidos aquellos requeridos por autoridades competentes.
+10.2. El Usuario podrá solicitar la eliminación de su cuenta y de sus datos en cualquier momento escribiendo a ${TERMINOS_CONTACTO}. Determinados datos podrán conservarse durante los plazos que exija la ley, incluidos aquellos requeridos por autoridades competentes.
 
 ## 11. Propiedad intelectual
 
@@ -97,11 +98,11 @@ El Operador podrá modificar los presentes Términos. Las modificaciones sustanc
 
 ## 13. Ley aplicable y jurisdicción
 
-Los presentes Términos se rigen por las leyes de [país/jurisdicción]. Cualquier controversia derivada de los mismos se someterá a los tribunales competentes de [ciudad/país], sin perjuicio de los derechos que la ley aplicable reconozca al Usuario.
+Los presentes Términos se rigen por las leyes de la República Argentina. Cualquier controversia derivada de los mismos se someterá a los tribunales ordinarios competentes de la Provincia de Buenos Aires, sin perjuicio de los derechos que la ley aplicable reconozca al Usuario.
 
 ## 14. Contacto
 
-Para consultas, solicitudes o ejercicio de derechos relacionados con estos Términos, puede escribir a: Junti@gmail.com.`
+Para consultas, solicitudes o ejercicio de derechos relacionados con estos Términos, puede escribir a: ${TERMINOS_CONTACTO}.`
 
 export function tieneAceptacionRegistrada(aceptacion: unknown): boolean {
   if (!aceptacion || typeof aceptacion !== 'object') {

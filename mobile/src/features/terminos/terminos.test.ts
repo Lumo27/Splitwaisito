@@ -17,19 +17,22 @@ describe('términos de Junti', () => {
       '## 1. Objeto y descripción del servicio',
       '## 2. Naturaleza del servicio: ausencia de custodia de fondos',
       '## 14. Contacto',
-      '**Última actualización:** 4 de noviembre de 2026',
-      '[nombre completo del titular]',
-      '[dirección]',
-      'Junti@gmail.com',
+      '**Última actualización:** 15 de noviembre de 2026',
+      'estudiantes de la Universidad Nacional de Pilar',
+      'junti@gmail.com',
       'orden judicial, mandato legal o requerimiento formal',
-      '[país/jurisdicción]',
-      'los últimos [12] meses o, si el servicio es gratuito, la suma de [monto]',
-      '[ciudad/país]',
+      'leyes de la República Argentina',
+      'tribunales ordinarios competentes de la Provincia de Buenos Aires',
     ]) {
       expect(TERMINOS_DOCUMENTO).toContain(texto)
     }
-    expect(TERMINOS_FECHA_ACTUALIZACION).toBe('4 de noviembre de 2026')
-    expect(TERMINOS_VERSION).toBe('1.0.2')
+    expect(TERMINOS_FECHA_ACTUALIZACION).toBe('15 de noviembre de 2026')
+    expect(TERMINOS_VERSION).toBe('1.0.3')
+  })
+
+  it('no deja datos por completar ni promete funciones que la app no tiene', () => {
+    expect(TERMINOS_DOCUMENTO).not.toMatch(/\[[^\]]+\]/)
+    expect(TERMINOS_DOCUMENTO).not.toContain('desde la Aplicación')
   })
 
   it('conserva la aceptación aunque cambie la versión de los términos', () => {
