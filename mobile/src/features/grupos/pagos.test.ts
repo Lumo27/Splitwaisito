@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { situacionEnGasto } from './pagos'
+import { pagosParaRevisar, situacionEnGasto } from './pagos'
 
 const base = {
   descripcion: 'Movimiento',
@@ -45,5 +45,21 @@ describe('situacionEnGasto', () => {
       situacionEnGasto('cande', cena, [cena, pago('rechazado')], deudas).tipo,
     ).toBe('debe')
     expect(situacionEnGasto('cande', cena, [cena], []).tipo).toBe('al-dia')
+  })
+})
+
+describe('pagosParaRevisar', () => {
+  it('devuelve solo los pagos pendientes que recibe el usuario', () => {
+    const grupos = [
+      {
+        id: 'g',
+        nombre: 'Viaje',
+        movimientos: [cena, pago('pendiente'), pago('aprobado')],
+      },
+    ]
+    expect(pagosParaRevisar('lucas', grupos)).toEqual([
+      { grupoId: 'g', grupoNombre: 'Viaje', pago: pago('pendiente') },
+    ])
+    expect(pagosParaRevisar('cande', grupos)).toEqual([])
   })
 })

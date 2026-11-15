@@ -8,11 +8,12 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  Text,
   TextInput,
   View,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Texto as Text } from '@/components/Texto'
+import { usePaletaActual } from '@/theme/usePaletaActual'
 import Constants, { ExecutionEnvironment } from 'expo-constants'
 import {
   ArrowRight,
@@ -70,6 +71,7 @@ function CampoAcceso({
 }
 
 export function LoginScreen() {
+  const paleta = usePaletaActual()
   const [esRegistro, setEsRegistro] = useState(false)
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
@@ -442,6 +444,7 @@ export function LoginScreen() {
               <Animated.View
                 style={[
                   estilos.tarjeta,
+                  { backgroundColor: paleta.surface, borderColor: paleta.outline },
                   {
                     opacity: entradaFormulario,
                     transform: [{ translateY: desplazamientoFormulario }],
@@ -505,7 +508,7 @@ export function LoginScreen() {
                           accessibilityState={{ disabled: ocupado, busy: ocupado }}
                           disabled={ocupado}
                           onPress={() => void entrarConGoogle()}
-                          className="min-h-[52px] flex-row items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 active:bg-primary-light"
+                          className="min-h-[52px] flex-row items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-surface px-4 active:bg-primary-light"
                         >
                           <View className="h-7 w-7 items-center justify-center rounded-full bg-background">
                             <Text className="text-base font-extrabold text-[#4285F4]">G</Text>
@@ -738,9 +741,9 @@ export function LoginScreen() {
         animationType="slide"
         onRequestClose={() => setMostrarTerminos(false)}
       >
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView className="flex-1 bg-background">
           <View className="flex-row items-center justify-between border-b border-slate-100 px-5 py-4">
-            <Text className="text-lg font-bold text-slate-900">
+            <Text className="text-lg font-bold text-text">
               Términos y Condiciones
             </Text>
             <Pressable
@@ -769,8 +772,6 @@ const estilos = {
     gap: 18,
     borderRadius: 26,
     borderWidth: 1,
-    borderColor: '#E8EEF1',
-    backgroundColor: colores.surface,
     padding: 22,
     boxShadow: '0px 8px 18px rgba(46, 125, 87, 0.12)',
   },

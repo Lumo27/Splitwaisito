@@ -1,4 +1,5 @@
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 
 import { TERMINOS_DOCUMENTO } from './terminos'
 

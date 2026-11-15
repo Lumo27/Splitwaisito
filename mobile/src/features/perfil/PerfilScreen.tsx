@@ -4,9 +4,9 @@ import {
   ActivityIndicator,
   Image,
   Pressable,
-  Text,
   View,
 } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { Calendar, DollarSign, RefreshCw, TrendingUp } from 'lucide-react-native'
 
 import {
@@ -27,8 +27,10 @@ import { upsertUsuarioPerfil } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function PerfilScreen() {
+  const t = useTraduccion()
   const usuario = useAppStore((state) => state.usuarioActual)
   const actualizarAlias = useAppStore((state) => state.actualizarAlias)
   const actualizarDescripcion = useAppStore(
@@ -254,7 +256,7 @@ export function PerfilScreen() {
               <View className="mt-1 flex-row items-center gap-1">
                 <Calendar size={12} color={colores.textMuted} />
                 <Text className="text-[11px] text-text-muted">
-                  Actualizado: {fechaActualizacionDolar}
+                  {t('Actualizado: {fecha}', { fecha: fechaActualizacionDolar })}
                 </Text>
               </View>
             ) : null}

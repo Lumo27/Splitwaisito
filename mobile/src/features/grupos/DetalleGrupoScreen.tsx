@@ -7,9 +7,9 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
-  Text,
   View,
 } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { Plus, Receipt, Trash2, UserPlus } from 'lucide-react-native'
 
 import {
@@ -33,8 +33,12 @@ import { GastosPorCategoria } from './GraficoGastosPorCategoria'
 import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo, estadoDeudasGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
+import { usePaletaActual } from '@/theme/usePaletaActual'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function DetalleGrupoScreen() {
+  const t = useTraduccion()
+  const tema = usePaletaActual()
   const { id: rawId } = useLocalSearchParams<{ id: string }>()
   const id =
     typeof rawId === 'string' ? rawId : Array.isArray(rawId) ? rawId[0] : ''
@@ -125,13 +129,14 @@ export function DetalleGrupoScreen() {
     movimiento: GastoFirestore,
     titulo: string,
     mensaje: string,
+    textoConfirmar: string,
   ) {
     const movimientoId = movimiento.id
     if (!movimientoId) return
     confirmar({
       titulo,
       mensaje,
-      textoConfirmar: titulo.split(' ')[0],
+      textoConfirmar,
       alConfirmar: async () => {
         // Actualización optimista inmediata
         setGastos((prev) => prev.filter((item) => item.id !== movimientoId))
@@ -189,7 +194,10 @@ export function DetalleGrupoScreen() {
       const elegirWhatsApp =
         typeof window !== 'undefined'
           ? window.confirm(
-              `Recordar saldo a ${deudorNombre}\n\nPresioná Aceptar para enviar por WhatsApp o Cancelar para enviar por E-mail.`,
+              t(
+                'Recordar saldo a {nombre}\n\nPresioná Aceptar para enviar por WhatsApp o Cancelar para enviar por E-mail.',
+                { nombre: deudorNombre },
+              ),
             )
           : true
       if (elegirWhatsApp) {
@@ -201,7 +209,7 @@ export function DetalleGrupoScreen() {
     }
 
     confirmar({
-      titulo: `Recordar a ${deudorNombre}`,
+      titulo: t('Recordar a {nombre}', { nombre: deudorNombre }),
       mensaje:
         '¿Deseás abrir WhatsApp para enviar el recordatorio del saldo pendiente?',
       textoConfirmar: 'Abrir WhatsApp',
@@ -305,7 +313,7 @@ export function DetalleGrupoScreen() {
         <Plus color="#FFFFFF" size={20} />
         <Text className="font-bold text-white">Cargar gasto</Text>
       </Pressable>
-      <View className="mt-5 gap-3 rounded-2xl bg-white p-4">
+      <View className="mt-5 gap-3 rounded-2xl bg-surface p-4">
         <Text
           accessibilityRole="header"
           className="text-lg font-bold text-text"
@@ -331,22 +339,24 @@ export function DetalleGrupoScreen() {
             <Pressable
               key={amigo.id}
               accessibilityRole="button"
-              accessibilityLabel={`Agregar a ${amigo.nombre} al grupo`}
+              accessibilityLabel={t('Agregar a {nombre} al grupo', {
+                nombre: amigo.nombre,
+              })}
               disabled={ocupado}
               onPress={() => {
                 void ejecutar(() => agregarMiembroAlGrupo(id, amigo.id))
               }}
               className="min-h-12 flex-row items-center gap-2 border-t border-slate-100 py-2"
             >
-              <UserPlus size={18} color={colores.primaryDark} />
+              <UserPlus size={18} color={tema.primaryDark} />
               <Text className="flex-1 text-sm text-primary-dark">
-                Agregar a {amigo.nombre}
+                {t('Agregar a {nombre}', { nombre: amigo.nombre })}
               </Text>
             </Pressable>
           ))}
         {ocupado && <ActivityIndicator color={colores.primary} />}
       </View>
-      <View className="mt-5 gap-3 rounded-2xl bg-white p-4">
+      <View className="mt-5 gap-3 rounded-2xl bg-surface p-4">
         <Text
           accessibilityRole="header"
           className="text-lg font-bold text-text"
@@ -395,7 +405,7 @@ export function DetalleGrupoScreen() {
                   className="min-h-11 justify-center"
                 >
                   <Text className="font-bold text-primary-dark">
-                    Recordar a {nombre(deuda.de)}
+                    {t('Recordar a {nombre}', { nombre: nombre(deuda.de) })}
                   </Text>
                 </Pressable>
               )}
@@ -407,7 +417,7 @@ export function DetalleGrupoScreen() {
         accessibilityRole="header"
         className="mb-3 mt-6 text-lg font-bold text-text"
       >
-        Gastos ({soloGastos.length})
+        {t('Gastos ({cantidad})', { cantidad: soloGastos.length })}
       </Text>
       {!soloGastos.length && (
         <Text className="text-sm text-text-muted">
@@ -420,7 +430,7 @@ export function DetalleGrupoScreen() {
         return (
           <View
             key={gasto.id ?? String(index)}
-            className="mb-3 rounded-3xl bg-white shadow-sm"
+            className="mb-3 rounded-3xl bg-surface shadow-sm"
             style={{
               borderWidth: 1.5,
               borderColor: paleta ? `${paleta.primary}33` : '#E2E8F0',
@@ -432,7 +442,9 @@ export function DetalleGrupoScreen() {
             <View style={{ padding: 20 }}>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Ver detalle de ${gasto.descripcion}`}
+                accessibilityLabel={t('Ver detalle de {nombre}', {
+                  nombre: gasto.descripcion,
+                })}
                 disabled={!gasto.id}
                 onPress={() => verDetalle(gasto)}
               >
@@ -480,9 +492,10 @@ export function DetalleGrupoScreen() {
                 </Text>
 
                 <Text className="mt-0.5 text-xs text-text-muted">
-                  Pagó {gasto.pagadoPorNombre} · {formatearFecha(gasto.fecha)}
-                  {gasto.tieneFoto ? ' · Con foto' : ''}
-                  {gasto.ubicacion ? ' · Con ubicación' : ''}
+                  {t('Pagó {nombre}', { nombre: gasto.pagadoPorNombre })} ·{' '}
+                  {formatearFecha(gasto.fecha)}
+                  {gasto.tieneFoto ? ` · ${t('Con foto')}` : ''}
+                  {gasto.ubicacion ? ` · ${t('Con ubicación')}` : ''}
                 </Text>
               </Pressable>
 
@@ -516,7 +529,11 @@ export function DetalleGrupoScreen() {
                       eliminarMovimiento(
                         gasto,
                         'Eliminar gasto',
-                        `¿Eliminar “${gasto.descripcion}”? Esta acción no se puede deshacer.`,
+                        t(
+                          '¿Eliminar “{nombre}”? Esta acción no se puede deshacer.',
+                          { nombre: gasto.descripcion },
+                        ),
+                        t('Eliminar'),
                       )
                     }
                   >
@@ -535,16 +552,18 @@ export function DetalleGrupoScreen() {
             accessibilityRole="header"
             className="mb-3 mt-6 text-lg font-bold text-text"
           >
-            Pagos registrados ({pagos.length})
+            {t('Pagos registrados ({cantidad})', { cantidad: pagos.length })}
           </Text>
           {pagos.map((pago, index) => (
             <View
               key={pago.id ?? String(index)}
-              className="mb-3 flex-row items-center gap-3 rounded-2xl bg-white p-4"
+              className="mb-3 flex-row items-center gap-3 rounded-2xl bg-surface p-4"
             >
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Ver detalle de ${pago.descripcion}`}
+                accessibilityLabel={t('Ver detalle de {nombre}', {
+                  nombre: pago.descripcion,
+                })}
                 disabled={!pago.id}
                 onPress={() => verDetalle(pago)}
                 className="flex-1"
@@ -554,7 +573,7 @@ export function DetalleGrupoScreen() {
                 </Text>
                 <Text className="text-xs text-text-muted">
                   {formatearFecha(pago.fecha)}
-                  {pago.tieneFoto ? ' · Con comprobante' : ''}
+                  {pago.tieneFoto ? ` · ${t('Con comprobante')}` : ''}
                 </Text>
                 <Text
                   className="mt-1 text-xs font-bold"
@@ -578,7 +597,11 @@ export function DetalleGrupoScreen() {
                     eliminarMovimiento(
                       pago,
                       'Deshacer pago',
-                      `¿Deshacer “${pago.descripcion}”? Se borra el pago y su comprobante.`,
+                      t(
+                        '¿Deshacer “{nombre}”? Se borra el pago y su comprobante.',
+                        { nombre: pago.descripcion },
+                      ),
+                      t('Deshacer'),
                     )
                   }
                 >

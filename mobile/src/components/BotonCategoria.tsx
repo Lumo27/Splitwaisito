@@ -1,9 +1,10 @@
 import React from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { Check, Circle, Home, Package, Utensils, Car } from 'lucide-react-native'
 import { FondoCategoria } from './FondoCategoria'
 import { COLOR_CATEGORIAS, type CategoriaGasto } from '../theme/categorias'
-import { colores } from '../theme/colores'
+import { usePaletaActual } from '@/theme/usePaletaActual'
 
 interface BotonCategoriaProps {
   categoria: CategoriaGasto
@@ -27,6 +28,7 @@ export function BotonCategoria({
 }: BotonCategoriaProps) {
   const Icono = ICONOS[categoria] ?? Package
   const paleta = COLOR_CATEGORIAS[categoria] ?? COLOR_CATEGORIAS.Otro
+  const tema = usePaletaActual()
 
   return (
     <Pressable
@@ -38,8 +40,9 @@ export function BotonCategoria({
       style={({ pressed }) => [
         styles.boton,
         {
-          borderColor: elegida ? paleta.primary : '#E2E8F0',
+          borderColor: elegida ? paleta.primary : tema.outline,
           borderWidth: elegida ? 2.5 : 1.5,
+          backgroundColor: tema.surface,
           opacity: disabled ? 0.5 : pressed ? 0.85 : 1,
         },
       ]}
@@ -47,7 +50,7 @@ export function BotonCategoria({
       <FondoCategoria
         categoria={categoria}
         overlayOpacity={elegida ? 0.72 : 0.84}
-        overlayColor="#FFFFFF"
+        overlayColor={tema.surface}
         style={styles.fondo}
       >
         <View style={styles.contenido}>
@@ -55,12 +58,12 @@ export function BotonCategoria({
           <View
             style={[
               styles.iconoBadge,
-              { backgroundColor: elegida ? paleta.primary : '#F1F5F9' },
+              { backgroundColor: elegida ? paleta.primary : tema.subtle },
             ]}
           >
             <Icono
               size={18}
-              color={elegida ? '#FFFFFF' : colores.textMuted}
+              color={elegida ? '#FFFFFF' : tema.textMuted}
             />
           </View>
 
@@ -70,7 +73,7 @@ export function BotonCategoria({
               styles.texto,
               {
                 fontWeight: elegida ? '700' : '600',
-                color: elegida ? '#0F172A' : '#334155',
+                color: tema.text,
               },
             ]}
           >
@@ -89,7 +92,7 @@ export function BotonCategoria({
                 <Check size={14} color="#FFFFFF" strokeWidth={3} />
               </View>
             ) : (
-              <Circle size={20} color="#94A3B8" />
+              <Circle size={20} color={tema.outline} />
             )}
           </View>
         </View>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { router, useLocalSearchParams } from 'expo-router'
-import { ActivityIndicator, Image, Text, View } from 'react-native'
+import { ActivityIndicator, Image, View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import * as Location from 'expo-location'
 import {
   Boton,
@@ -32,8 +33,10 @@ import { formatearMoneda } from '@/theme/moneda'
 import { confirmar } from '@/utils/alerta'
 import { elegirImagen } from '@/utils/imagen'
 import { categorias, validarGasto } from './validarGasto'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function CargarGastoScreen() {
+  const t = useTraduccion()
   const { id: rawId, gastoId: rawGastoId } = useLocalSearchParams<{
     id: string
     gastoId?: string
@@ -278,7 +281,10 @@ export function CargarGastoScreen() {
     if (!id || !gastoId) return
     confirmar({
       titulo: 'Eliminar gasto',
-      mensaje: `¿Seguro que querés eliminar “${descripcion.trim() || 'este gasto'}”? Esta acción no se puede deshacer.`,
+      mensaje: t(
+        '¿Seguro que querés eliminar “{nombre}”? Esta acción no se puede deshacer.',
+        { nombre: descripcion.trim() || t('este gasto') },
+      ),
       textoConfirmar: 'Eliminar',
       textoCancelar: 'Cancelar',
       destructivo: true,
@@ -338,7 +344,7 @@ export function CargarGastoScreen() {
           editable={!ocupado}
         />
         <Campo
-          label={`Monto total (${moneda})`}
+          label={t('Monto total ({moneda})', { moneda })}
           value={monto}
           onChangeText={setMonto}
           placeholder="0,00"
@@ -385,7 +391,12 @@ export function CargarGastoScreen() {
         ))}
         <Text className="text-sm text-text-muted">
           {seleccion.length
-            ? `Cada participante: ${formatearMoneda((Number(monto.replace(',', '.')) / seleccion.length) || 0, moneda)}`
+            ? t('Cada participante: {monto}', {
+                monto: formatearMoneda(
+                  Number(monto.replace(',', '.')) / seleccion.length || 0,
+                  moneda,
+                ),
+              })
             : 'Elegí al menos un participante.'}
         </Text>
       </Tarjeta>
