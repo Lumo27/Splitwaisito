@@ -60,7 +60,7 @@ export function confirmar({
     return
   }
 
-  Alert.alert(titulo, mensaje, [
+  Alert.alert(tituloTraducido, mensajeTraducido, [
     {
       text: cancelarTraducido,
       style: 'cancel',

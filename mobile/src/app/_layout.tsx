@@ -25,7 +25,7 @@ import {
   obtenerFuente,
 } from '@/theme/paleta'
 import { useTraduccion } from '@/i18n/translations'
-import { useMovimientoReducidoSistema } from '@/hooks/useMovimientoReducido'
+import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
 import {
   cargarPreferenciasUsuario,
   guardarPreferenciasUsuario,
@@ -58,13 +58,9 @@ function AppNavigator() {
   const [usuarioConPreferenciasSincronizadas, setUsuarioConPreferenciasSincronizadas] =
     useState<string | null>(null)
   const usuarioSincronizado = useRef<string | null>(null)
-  const movimientoReducidoSistema = useMovimientoReducidoSistema()
   const terminosAceptados = estado === 'aceptado'
   const oscuro = temaOscuroPreferido(preferencias.theme, sistemaOscuro)
-  const reducirAnimaciones =
-    preferencias.reducedMotion ||
-    (preferencias.accessibilityOptions.respectSystemMotion &&
-      movimientoReducidoSistema)
+  const reducirAnimaciones = useReducirAnimaciones()
   const paleta = useMemo(
     () => obtenerPaleta(oscuro, preferencias.highContrast),
     [oscuro, preferencias.highContrast],

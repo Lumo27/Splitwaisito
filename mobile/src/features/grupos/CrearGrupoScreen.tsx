@@ -19,7 +19,11 @@ export function CrearGrupoScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
   const [nombre, setNombre] = useState('')
-  const [moneda, setMoneda] = useState<MonedaCodigo>('ARS')
+  // Arranca con la moneda elegida en Configuración > Moneda preferida.
+  const monedaPreferida = useAppStore(
+    (state) => state.preferencias.monedaPreferida,
+  )
+  const [moneda, setMoneda] = useState<MonedaCodigo>(monedaPreferida)
   const [elegidos, setElegidos] = useState<string[]>([])
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)

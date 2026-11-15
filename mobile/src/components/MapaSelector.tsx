@@ -3,8 +3,7 @@ import { Modal, Pressable, View } from 'react-native'
 import { Texto as Text } from '@/components/Texto'
 import { MapPin, X } from 'lucide-react-native'
 import { MapaLeaflet, type Coordenadas } from './MapaLeaflet'
-import { useAppStore } from '@/store/useAppStore'
-import { useMovimientoReducidoSistema } from '@/hooks/useMovimientoReducido'
+import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 
 interface Props {
@@ -23,13 +22,8 @@ export function MapaSelector({
   const [seleccion, setSeleccion] = useState<Coordenadas | null>(
     coordenadasIniciales ?? null,
   )
-  const preferencias = useAppStore((state) => state.preferencias)
   const paleta = usePaletaActual()
-  const movimientoReducidoSistema = useMovimientoReducidoSistema()
-  const reducirAnimaciones =
-    preferencias.reducedMotion ||
-    (preferencias.accessibilityOptions.respectSystemMotion &&
-      movimientoReducidoSistema)
+  const reducirAnimaciones = useReducirAnimaciones()
 
   return (
     <Modal

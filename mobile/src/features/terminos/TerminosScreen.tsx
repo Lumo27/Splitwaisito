@@ -13,8 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { useTerminosAcceptance } from '@/features/auth/AuthBootstrap'
 import { TERMINOS_DOCUMENTO } from './terminos'
-import { useAppStore } from '@/store/useAppStore'
-import { useMovimientoReducidoSistema } from '@/hooks/useMovimientoReducido'
+import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
 import { useTraduccion } from '@/i18n/translations'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 
@@ -101,12 +100,7 @@ export function TerminosScreen() {
   const [ocupado, setOcupado] = useState(false)
   const [errorAceptacion, setErrorAceptacion] = useState('')
   const [mostrarDocumento, setMostrarDocumento] = useState(false)
-  const preferencias = useAppStore((state) => state.preferencias)
-  const movimientoReducidoSistema = useMovimientoReducidoSistema()
-  const reducirAnimaciones =
-    preferencias.reducedMotion ||
-    (preferencias.accessibilityOptions.respectSystemMotion &&
-      movimientoReducidoSistema)
+  const reducirAnimaciones = useReducirAnimaciones()
   const t = useTraduccion()
   const verificando = estado === 'comprobando'
   const puedeAceptar = estado === 'requerido' && !ocupado

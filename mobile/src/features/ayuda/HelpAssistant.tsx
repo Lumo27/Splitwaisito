@@ -3,8 +3,7 @@ import { Modal, Pressable, View, useWindowDimensions } from 'react-native'
 import { vars } from 'nativewind'
 import { Texto as Text } from '@/components/Texto'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react-native'
-import { useAppStore } from '@/store/useAppStore'
-import { useMovimientoReducidoSistema } from '@/hooks/useMovimientoReducido'
+import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 import { obtenerVariablesTema } from '@/theme/paleta'
 
@@ -16,12 +15,7 @@ export function HelpAssistant({ pathname }: { pathname: string }) {
   const [finalizado, setFinalizado] = useState(false)
   const { width } = useWindowDimensions()
   const paleta = usePaletaActual()
-  const preferencias = useAppStore((state) => state.preferencias)
-  const movimientoReducidoSistema = useMovimientoReducidoSistema()
-  const reducirAnimaciones =
-    preferencias.reducedMotion ||
-    (preferencias.accessibilityOptions.respectSystemMotion &&
-      movimientoReducidoSistema)
+  const reducirAnimaciones = useReducirAnimaciones()
   const tutorial = TUTORIALES[obtenerTutorial(pathname)]
   const paso = tutorial.steps[pasoActual]
 
