@@ -165,6 +165,36 @@ Validación local no disponible porque el entorno no tiene Node.js/npm. La CI de
 |---|---|---|---|
 | Copilot SDK en VS Code | Cambiar el nombre visible de la aplicación a Junti en el código y la documentación | «Cambia el nombre de la app anterior por Junti en todo el proyecto» | Actualización del nombre en las pantallas, metadatos de Expo y PWA, scripts y documentación. Se conservaron identificadores de Firebase, el esquema de enlaces y las claves de almacenamiento existentes para mantener integraciones y datos locales. |
 
+Validación: lint, typecheck, 10 pruebas y build web aprobados; lint, typecheck, 79 pruebas y exportación Expo para Android, iOS y web aprobados. `git diff --check` sin errores. La planilla `planilla-uso-ia.xlsx` no está disponible en el workspace; este registro queda en el informe para trasladarlo cuando esté disponible.
+
+### Rediseño de inicio de sesión móvil — Copilot, 03/11/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Rediseñar y completar la pantalla de login móvil respetando la identidad visual existente | «Rediseñá e implementá la pantalla de inicio de sesión con cabecera curva, animaciones fluidas, validación, recuperación de contraseña y soporte Android/iOS, conservando estrictamente los colores y componentes nativos.» | Se mantuvieron el verde/celeste, la autenticación Firebase y el modo demo; se creó una cabecera curva adaptable, animaciones escalonadas de entrada y de cambio entre login/registro, botón con carga, visibilidad de contraseña y recuperación real con `sendPasswordResetEmail`. Se preservó Google solo donde está disponible en build nativo, con manejo del área segura y teclado. |
+
+Validación: `expo lint`, `tsc --noEmit`, 79 pruebas móviles y exportación Expo para Android, iOS y web aprobadas. La planilla `.xlsx` no está disponible en el workspace; el registro queda aquí para trasladarlo cuando esté disponible.
+
+### Corrección de permisos para aceptar términos — Copilot, 04/11/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Resolver el error «Missing or insufficient permissions» al verificar la aceptación de términos | «No me deja aceptar los términos y condiciones en usuario» | Se compararon las reglas activas de Firestore con `firestore.rules` y se publicaron en Firebase Console las reglas ya versionadas del proyecto `splitwaisito-a5879`. No se aceptaron los términos en nombre del usuario. |
+
+Validación: Firebase Console mostró una nueva versión de reglas publicada; en localhost la verificación dejó de mostrar el error y apareció habilitado «Aceptar y continuar». La aceptación queda pendiente de la acción explícita del usuario. La planilla `.xlsx` no está disponible en el workspace; este registro queda aquí para trasladarlo cuando esté disponible.
+
+### Actualización de marca en acceso — Copilot, 04/11/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Aplicar la nueva marca Junti al Login y a la restauración de sesión | «Actualiza el Splitwaisito del panel login a Junti y cambia el logo al correspondiente» | Se reemplazó el nombre y el icono anterior por la “J” sobre fondo verde, reutilizando la marca ya usada en la pantalla de términos. Se actualizó también el indicador de restauración de sesión para que no aparezca la marca anterior antes del Login. |
+
+### Términos accesibles desde el Login y actualización del documento — Copilot, 04/11/2026
+
+| Herramienta | Finalidad | Prompt clave | Qué se usó |
+|---|---|---|---|
+| Copilot SDK en VS Code | Permitir releer los Términos desde Login y actualizar el texto legal compartido | «Agregá una opción de Términos y Condiciones en el Login y reemplazá el texto por el documento actualizado de Junti.» | Se agregó un visor modal en Login móvil y web, se reemplazó el documento compartido con el texto proporcionado y se cambió la versión a 1.0.2. Las aceptaciones anteriores siguen vigentes por decisión de diseño ya existente. Los campos entre corchetes se conservaron como fueron enviados y deben completarse antes de presentar el texto como definitivo. |
+
 ### Actualización del logotipo — 04/11/2026
 
 | Herramienta | Finalidad | Prompt clave | Qué se usó |
