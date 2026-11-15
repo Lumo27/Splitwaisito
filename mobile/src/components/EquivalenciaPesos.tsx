@@ -6,7 +6,7 @@ import {
   cotizacionValida,
 } from '@/services/equivalenciaPesos'
 import { formatearMoneda } from '@/theme/moneda'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function EquivalenciaPesos({
   monto,

@@ -1,6 +1,6 @@
 import { ScrollView, Switch, View } from 'react-native'
 import { Texto } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { usePaletaActual } from '@/theme/usePaletaActual'

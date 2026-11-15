@@ -33,7 +33,7 @@ import { formatearMoneda } from '@/theme/moneda'
 import { confirmar } from '@/utils/alerta'
 import { elegirImagen } from '@/utils/imagen'
 import { categorias, validarGasto } from './validarGasto'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function CargarGastoScreen() {
   const t = useTraduccion()

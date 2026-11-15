@@ -20,7 +20,7 @@ import { restablecerSeeds } from '@/services/seedBackend'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { Texto as Text } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 import { confirmar } from '@/utils/alerta'
 
 function SeccionTitulo({ texto }: { texto: string }) {

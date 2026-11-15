@@ -24,7 +24,7 @@ import {
   FACTORES_TAMANO_TEXTO,
   obtenerFuente,
 } from '@/theme/paleta'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
 import {
   cargarPreferenciasUsuario,
@@ -166,7 +166,7 @@ function AppNavigator() {
         </Stack.Protected>
         <Stack.Protected guard={Boolean(usuario) && terminosAceptados}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="grupos/[id]/index" options={{ title: t('Gastos') }} />
+          <Stack.Screen name="grupos/[id]/index" options={{ title: t('Grupo') }} />
           <Stack.Screen
             name="grupos/nuevo"
             options={{ title: t('Crear grupo'), presentation: 'modal' }}

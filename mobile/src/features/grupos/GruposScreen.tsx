@@ -1,11 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { router, useFocusEffect } from 'expo-router'
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  View,
-} from 'react-native'
+import { ActivityIndicator, FlatList, Pressable, View } from 'react-native'
 import { Texto as Text } from '@/components/Texto'
 import { ChevronRight, Plus, Trash2, Users } from 'lucide-react-native'
 
@@ -18,10 +13,12 @@ import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 import { avisar, confirmar } from '@/utils/alerta'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
+import { usePagosParaRevisar } from './usePagosParaRevisar'
 
 export function GruposScreen() {
   const t = useTraduccion()
+  const pendientes = usePagosParaRevisar()
   const paleta = usePaletaActual()
   const usuarioId = useAppStore((state) => state.usuarioActual?.id)
   const [grupos, setGrupos] = useState<GrupoFirestore[]>([])
@@ -136,6 +133,37 @@ export function GruposScreen() {
             <Plus size={20} color="#FFFFFF" />
             <Text className="font-bold text-white">Crear grupo</Text>
           </Pressable>
+          {pendientes.length > 0 && (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => {
+                const [primero] = pendientes
+                if (!primero.pago.id) return
+                router.push({
+                  pathname: '/grupos/[id]/gasto/[gastoId]',
+                  params: { id: primero.grupoId, gastoId: primero.pago.id },
+                })
+              }}
+              className="gap-1 rounded-2xl border border-amber-300 bg-amber-50 p-4"
+            >
+              <Text className="font-bold text-amber-900">
+                {pendientes.length === 1
+                  ? t('Tenés un pago para revisar')
+                  : t('Tenés {cantidad} pagos para revisar', {
+                      cantidad: pendientes.length,
+                    })}
+              </Text>
+              <Text className="text-sm text-amber-900">
+                {t(
+                  '{nombre} subió un comprobante en "{grupo}". Tocá para revisarlo.',
+                  {
+                    nombre: pendientes[0].pago.pagadoPorNombre,
+                    grupo: pendientes[0].grupoNombre,
+                  },
+                )}
+              </Text>
+            </Pressable>
+          )}
           {error ? (
             <View
               accessibilityRole="alert"
@@ -203,7 +231,9 @@ export function GruposScreen() {
               </Text>
               <Text className="text-xs text-text-muted">
                 {grupo.miembros.length === 1
-                  ? t('1 integrante · {moneda}', { moneda: grupo.moneda ?? 'ARS' })
+                  ? t('1 integrante · {moneda}', {
+                      moneda: grupo.moneda ?? 'ARS',
+                    })
                   : t('{cantidad} integrantes · {moneda}', {
                       cantidad: grupo.miembros.length,
                       moneda: grupo.moneda ?? 'ARS',

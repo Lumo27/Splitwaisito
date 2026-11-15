@@ -1,7 +1,7 @@
 import { ScrollView, View } from 'react-native'
 import { Opcion } from '@/components/Formulario'
 import { Texto } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 import { useAppStore, type Preferencias } from '@/store/useAppStore'
 
 const IDIOMAS: { valor: Preferencias['language']; clave: string }[] = [

@@ -8,7 +8,7 @@ import { usePaletaActual } from '@/theme/usePaletaActual'
 import { obtenerVariablesTema } from '@/theme/paleta'
 
 import { obtenerTutorial, TUTORIALES } from './tutoriales'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function HelpAssistant({ pathname }: { pathname: string }) {
   const t = useTraduccion()

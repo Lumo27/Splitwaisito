@@ -27,7 +27,7 @@ import { upsertUsuarioPerfil } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { formatearMoneda } from '@/theme/moneda'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function PerfilScreen() {
   const t = useTraduccion()

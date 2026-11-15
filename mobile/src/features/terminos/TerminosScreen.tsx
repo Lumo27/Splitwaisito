@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { useTerminosAcceptance } from '@/features/auth/AuthBootstrap'
 import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 import { ContenidoTerminos } from './ContenidoTerminos'
 

@@ -41,7 +41,7 @@ import { formatearMoneda } from '@/theme/moneda'
 import { participantesDelGrupo } from '../grupos/deudas'
 import { deudasDelGrupo } from '../grupos/deudasDelGrupo'
 import { formatearFecha } from '../grupos/formatearFecha'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 const SITUACIONES: Record<
   SituacionEnGasto['tipo'],

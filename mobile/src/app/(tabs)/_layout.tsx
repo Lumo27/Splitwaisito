@@ -3,7 +3,7 @@ import { Receipt, Settings, User, UserPlus } from 'lucide-react-native'
 
 import { colores } from '@/theme/colores'
 import { useAppStore } from '@/store/useAppStore'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 import { useColorScheme } from 'nativewind'
 import { FACTORES_TAMANO_TEXTO } from '@/theme/paleta'
 

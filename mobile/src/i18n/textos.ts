@@ -1,6 +1,3 @@
-import { useCallback } from 'react'
-import { useAppStore } from '@/store/useAppStore'
-
 export type Idioma = 'es' | 'en' | 'pt'
 
 const textosEn: Record<string, string> = {
@@ -194,7 +191,6 @@ const textosEn: Record<string, string> = {
   'Alojamiento': 'Accommodation',
   'Otro': 'Other',
   'Pesos argentinos (ARS)': 'Argentine pesos (ARS)',
-  'Dólares estadounidenses (USD)': 'US dollars (USD)',
   'Reales brasileños (BRL)': 'Brazilian reals (BRL)',
   'Iniciá sesión para crear un grupo.': 'Sign in to create a group.',
   'Ingresá una descripción.': 'Enter a description.',
@@ -210,8 +206,6 @@ const textosEn: Record<string, string> = {
   'No pudimos cargar el grupo. Revisá la conexión y volvé a intentar.':
     'Could not load the group. Check your connection and try again.',
   'Iniciá sesión para editar tu perfil.': 'Sign in to edit your profile.',
-  'No pudimos copiar el dato. Podés volver a intentarlo.':
-    'Could not copy the information. You can try again.',
   'Alias:': 'Alias:',
   'E-mail:': 'Email:',
   'Le debés a': 'You owe',
@@ -245,23 +239,14 @@ const textosEn: Record<string, string> = {
   'Alias copiado.': 'Alias copied.',
   'No pudimos abrir WhatsApp. Verificá que esté instalado.':
     'Could not open WhatsApp. Check that it is installed.',
-  'Listo': 'Done',
   'Nombre': 'Name',
   'Aceptar': 'Accept',
   'Guardar': 'Save',
-  'Foto de perfil': 'Profile photo',
-  'Todavía no hay amigos. Enviá una solicitud para empezar.':
-    'You have no friends yet. Send a request to get started.',
   'Monto copiado.': 'Amount copied.',
   'Alias copiado': 'Alias copied',
   'Monto copiado': 'Amount copied',
   'No pudimos guardar el perfil. Tus datos anteriores se conservan; volvé a intentar.':
     'Could not save your profile. Your previous details are unchanged; please try again.',
-  'No pudimos obtener la ubicación.': 'Could not get your location.',
-  'No pudimos abrir la aplicación de correo.':
-    'Could not open your email app.',
-  'No tenemos registrado el e-mail de la persona.':
-    'We do not have this person’s email address.',
   'WhatsApp no disponible': 'WhatsApp unavailable',
   'No tenemos registrado el e-mail': 'We do not have the email address',
   'No pudimos abrir WhatsApp. Verificá que esté instalado en tu dispositivo.':
@@ -278,17 +263,9 @@ const textosEn: Record<string, string> = {
   'El gasto ya no está disponible.': 'This expense is no longer available.',
   'El grupo no está disponible.': 'This group is unavailable.',
   'Ya no sos integrante de este grupo.': 'You are no longer a member of this group.',
-  'No pudimos actualizar el perfil.': 'Could not update the profile.',
   'No pudimos eliminar el gasto. Volvé a intentar.':
     'Could not delete the expense. Please try again.',
-  'Ubicación actual': 'Current location',
-  'Otro integrante': 'Another member',
-  'Tu cuenta': 'Your account',
-  'Todos los derechos reservados.': 'All rights reserved.',
-  'Términos completos': 'Full terms',
   'Aceptar y continuar': 'Accept and continue',
-  'Debés aceptar los términos para continuar.':
-    'You must accept the terms to continue.',
   'No se pudo verificar la aceptación de los términos.':
     'Could not verify acceptance of the terms.',
   'Iniciá sesión para aceptar los términos.':
@@ -298,9 +275,6 @@ const textosEn: Record<string, string> = {
   'Cerrar términos completos': 'Close full terms',
   '¿Eliminar': 'Delete?',
   'No se pudo guardar': 'Could not save',
-  'No pudimos cargar el detalle del grupo.':
-    'Could not load the group details.',
-  'Recordatorio programado': 'Reminder scheduled',
   'No pudimos cancelar los recordatorios programados. Volvé a intentar.':
     'Could not cancel scheduled reminders. Please try again.',
   'La programación de notificaciones no está disponible en la versión web.':
@@ -494,7 +468,6 @@ const textosEn: Record<string, string> = {
   'Los recordatorios se programan localmente cuando elegís “Recordarme pagar más tarde”. Al desactivarlos se cancelan los recordatorios pendientes de la app.': 'Reminders are scheduled locally when you choose “Remind me to pay later”. Turning them off cancels the app’s pending reminders.',
   'Todas las opciones se guardan en este dispositivo.': 'All preferences are saved on this device.',
   'Estas preferencias no se sincronizan con otros dispositivos.': 'These preferences are not synced across devices.',
-  'Solo Recordatorios está conectado a una función de programación; no hay un servicio de envío para las demás alertas.': 'Only Reminders is connected to scheduling. Other alerts do not have a delivery service.',
   'Junti guarda los datos del perfil y la información de grupos, movimientos y comprobantes necesarios para sus funciones. Las preferencias de configuración y moneda se guardan en este dispositivo; no se sincronizan entre dispositivos.': 'Junti saves profile, group, transaction, and receipt information needed for its features. Settings and currency preferences are saved on this device and are not synced across devices.',
   'Revisá el documento y el tratamiento de datos': 'Review the document and data handling',
   'Datos del perfil': 'Profile details',
@@ -527,6 +500,255 @@ const textosEn: Record<string, string> = {
   '1 integrante · {moneda}': '1 member · {moneda}',
   '{cantidad} integrantes · {moneda}': '{cantidad} members · {moneda}',
   'Paso {actual} de {total}': 'Step {actual} of {total}',
+  // Completado de traducciones
+  'Página no encontrada':
+    'Page not found',
+  'No encontramos esta pantalla':
+    'We couldn\'t find this screen',
+  'El enlace puede haber cambiado. Volvé al inicio para continuar.':
+    'The link may have changed. Go back to the start to continue.',
+  'Volver al inicio':
+    'Back to start',
+  'dólar oficial':
+    'official dollar rate',
+  'real brasileño':
+    'Brazilian real',
+  'Mapa':
+    'Map',
+  'Cerrar mapa':
+    'Close map',
+  'Coordenadas: {lat}, {lng}':
+    'Coordinates: {lat}, {lng}',
+  'Solicitudes pendientes ({cantidad})':
+    'Pending requests ({cantidad})',
+  'Tus amigos ({cantidad})':
+    'Your friends ({cantidad})',
+  'Logotipo de Junti':
+    'Junti logo',
+  'Ingresá un correo electrónico válido.':
+    'Enter a valid email address.',
+  'Ingresá tu contraseña.':
+    'Enter your password.',
+  'Ingresá tu nombre para crear la cuenta.':
+    'Enter your name to create the account.',
+  'La contraseña debe tener al menos 6 caracteres.':
+    'Password must be at least 6 characters.',
+  'No pudimos conectarnos. Revisá tu conexión a internet.':
+    'We couldn\'t connect. Check your internet connection.',
+  'Ese correo ya está registrado. Probá iniciando sesión.':
+    'That email is already registered. Try signing in.',
+  'El formato del correo electrónico no es válido.':
+    'The email format is not valid.',
+  'Datos incorrectos. Revisá tu correo y contraseña o registrate.':
+    'Incorrect details. Check your email and password or sign up.',
+  'La contraseña es muy débil. Usá al menos 6 caracteres.':
+    'The password is too weak. Use at least 6 characters.',
+  'Ingresá un correo válido para enviarte el enlace.':
+    'Enter a valid email so we can send you the link.',
+  'La recuperación por correo no está configurada en este entorno.':
+    'Email recovery is not configured in this environment.',
+  'Si el correo está registrado, vas a recibir un enlace para restablecer tu contraseña.':
+    'If the email is registered, you\'ll receive a link to reset your password.',
+  'No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.':
+    'We couldn\'t connect. Check your connection and try again.',
+  'Hubo demasiados intentos. Esperá un momento y volvé a probar.':
+    'Too many attempts. Wait a moment and try again.',
+  'No pudimos enviar el enlace. Revisá el correo e intentá de nuevo.':
+    'We couldn\'t send the link. Check the email and try again.',
+  'Conocé Junti':
+    'Meet Junti',
+  'Bienvenido a Junti':
+    'Welcome to Junti',
+  'Qué bueno tenerte de vuelta':
+    'Good to have you back',
+  'Creá tu cuenta y empezá a dividir gastos.':
+    'Create your account and start splitting expenses.',
+  'Tus planes y gastos compartidos te esperan.':
+    'Your shared plans and expenses are waiting.',
+  'Empezá a organizar los gastos de tus planes.':
+    'Start organizing the expenses of your plans.',
+  'Ingresá para continuar con tus grupos.':
+    'Sign in to continue with your groups.',
+  'Ej: Germán Morales':
+    'e.g. Alex Smith',
+  'Correo electrónico':
+    'Email',
+  'Tu contraseña':
+    'Your password',
+  'Ocultar contraseña':
+    'Hide password',
+  'Mostrar contraseña':
+    'Show password',
+  'Enviando enlace…':
+    'Sending link…',
+  '¿Olvidaste tu contraseña?':
+    'Forgot your password?',
+  'Un momento…':
+    'One moment…',
+  '¿Ya tenés una cuenta? ':
+    'Already have an account? ',
+  '¿No tenés una cuenta? ':
+    'Don\'t have an account? ',
+  'Iniciá sesión':
+    'Sign in',
+  'Registrate':
+    'Sign up',
+  'Leer Términos y Condiciones':
+    'Read Terms and Conditions',
+  'Términos y Condiciones':
+    'Terms and Conditions',
+  'Cerrar términos y condiciones':
+    'Close terms and conditions',
+  'Abrir ayuda: {titulo}':
+    'Open help: {titulo}',
+  'Cerrar ayuda':
+    'Close help',
+  'Cerrar tutorial':
+    'Close tutorial',
+  'No disponible':
+    'Not available',
+  'No se pudo recuperar el perfil demo.':
+    'Could not restore the demo profile.',
+  'Iniciá sesión para cargar gastos.':
+    'Sign in to add expenses.',
+  'Permití el acceso a la ubicación para detectar tu posición actual.':
+    'Allow location access to detect your current position.',
+  'Eliminar gasto':
+    'Delete expense',
+  'este gasto':
+    'this expense',
+  'Monto total ({moneda})':
+    'Total amount ({moneda})',
+  'Pagó el total':
+    'Paid the total',
+  'Ya pagó su parte':
+    'Already paid their share',
+  'Todavía debe':
+    'Still owes',
+  'Al día':
+    'All settled',
+  'quien recibe':
+    'the recipient',
+  'Aprobado por {nombre}':
+    'Approved by {nombre}',
+  'Dividido entre {cantidad}':
+    'Split between {cantidad}',
+  'Ej: Viaje a la costa':
+    'e.g. Beach trip',
+  'Sesión o grupo ausente':
+    'Missing session or group',
+  'Correo no disponible':
+    'Email unavailable',
+  'Recordar saldo a {nombre}\n\nPresioná Aceptar para enviar por WhatsApp o Cancelar para enviar por E-mail.':
+    'Remind {nombre} about the balance\n\nPress OK to send via WhatsApp or Cancel to send by email.',
+  'Agregar a {nombre}':
+    'Add {nombre}',
+  'Gastos ({cantidad})':
+    'Expenses ({cantidad})',
+  'Ver detalle de {nombre}':
+    'View details of {nombre}',
+  'Pagó {nombre}':
+    'Paid by {nombre}',
+  'Con foto':
+    'With photo',
+  'Con ubicación':
+    'With location',
+  'Pagos registrados ({cantidad})':
+    'Recorded payments ({cantidad})',
+  'Con comprobante':
+    'With receipt',
+  'Deshacer':
+    'Undo',
+  'Gastos por categoría':
+    'Expenses by category',
+  'Distribución de gastos · {moneda}':
+    'Expense breakdown · {moneda}',
+  'Todavía no hay gastos para mostrar.':
+    'There are no expenses to show yet.',
+  'Crear un nuevo grupo':
+    'Create a new group',
+  'Elegí una deuda tuya desde el detalle del grupo.':
+    'Choose one of your debts from the group details.',
+  'No pudimos cargar la deuda.':
+    'We couldn\'t load the debt.',
+  'otro integrante':
+    'another member',
+  '{nombre} tiene que revisar el comprobante y aprobarlo.':
+    '{nombre} needs to review the receipt and approve it.',
+  'Le debés {monto} a {nombre} por "{grupo}".':
+    'You owe {nombre} {monto} for "{grupo}".',
+  'Te vamos a avisar en {segundos} segundos.':
+    'We\'ll remind you in {segundos} seconds.',
+  'Te vamos a avisar en una hora.':
+    'We\'ll remind you in an hour.',
+  'el grupo':
+    'the group',
+  'Le debés a {nombre}':
+    'You owe {nombre}',
+  '1 gasto':
+    '1 expense',
+  '{cantidad} gastos':
+    '{cantidad} expenses',
+  'Alias: {alias}':
+    'Alias: {alias}',
+  'Ya subiste un comprobante para esta deuda. {nombre} lo tiene que aprobar desde el detalle del pago.':
+    'You already uploaded a receipt for this debt. {nombre} needs to approve it from the payment details.',
+  'El acreedor':
+    'The creditor',
+  'Avisar por WhatsApp':
+    'Notify via WhatsApp',
+  'No se pudo leer a quién se le transfirió.':
+    'Could not read who received the transfer.',
+  'No se pudo leer el monto.':
+    'Could not read the amount.',
+  'No se pudo leer la fecha.':
+    'Could not read the date.',
+  'La fecha del comprobante es futura.':
+    'The receipt date is in the future.',
+  'Actualizado: {fecha}':
+    'Updated: {fecha}',
+  'Antes de comenzar':
+    'Before you start',
+  'Para utilizar Junti, necesitamos que leas y aceptes nuestros Términos y Condiciones de Uso':
+    'To use Junti, please read and accept our Terms and Conditions of Use',
+  'Términos y Condiciones de Uso':
+    'Terms and Conditions of Use',
+  'Verificando tu aceptación...':
+    'Checking your acceptance...',
+  'Reintentar verificación':
+    'Retry verification',
+  'Consultar los términos completos':
+    'View the full terms',
+  'Firebase no está configurado.':
+    'Firebase is not configured.',
+  'No hay una sesión autenticada para consultar los términos.':
+    'There is no signed-in session to check the terms.',
+  'Iniciá sesión para registrar la aceptación de los términos.':
+    'Sign in to record your acceptance of the terms.',
+  'Permití el acceso a la cámara para tomar la foto.':
+    'Allow camera access to take the photo.',
+  'Permití el acceso a tus fotos para elegir una imagen.':
+    'Allow access to your photos to choose an image.',
+  // Pagos para revisar
+  'Si la apagás, Junti no muestra ninguna notificación.':
+    'If you turn this off, Junti will not show any notifications.',
+  'Pagos para revisar':
+    'Payments to review',
+  'Te avisa cuando alguien sube un comprobante que tenés que aprobar.':
+    'Lets you know when someone uploads a receipt you need to approve.',
+  'Tenés un pago para revisar':
+    'You have a payment to review',
+  'Tenés {cantidad} pagos para revisar':
+    'You have {cantidad} payments to review',
+  '{nombre} subió un comprobante en "{grupo}". Tocá para revisarlo.':
+    '{nombre} uploaded a receipt in "{grupo}". Tap to review it.',
+  '{nombre} subió un comprobante de {monto} en "{grupo}".':
+    '{nombre} uploaded a receipt for {monto} in "{grupo}".',
+  'Tenés {cantidad} comprobantes para aprobar.':
+    'You have {cantidad} receipts to approve.',
+  'Grupo': 'Group',
+  'Los pagos para revisar se avisan cuando abrís la app.':
+    'We let you know about payments to review when you open the app.',
 }
 const textosPt: Record<string, string> = {
   'Compartí los planes, organizá los gastos.': 'Compartilhe planos e organize despesas.',
@@ -922,7 +1144,6 @@ const textosPt: Record<string, string> = {
   'Los recordatorios se programan localmente cuando elegís “Recordarme pagar más tarde”. Al desactivarlos se cancelan los recordatorios pendientes de la app.': 'Os lembretes são programados localmente quando você escolhe “Lembrar de pagar mais tarde”. Desativá-los cancela os lembretes pendentes do app.',
   'Todas las opciones se guardan en este dispositivo.': 'Todas as opções são salvas neste dispositivo.',
   'Estas preferencias no se sincronizan con otros dispositivos.': 'Estas preferências não são sincronizadas entre dispositivos.',
-  'Solo Recordatorios está conectado a una función de programación; no hay un servicio de envío para las demás alertas.': 'Somente Lembretes está conectado a uma função de programação; os outros alertas não têm serviço de envio.',
   'Información que guarda la app': 'Informações salvas pelo app',
   'Junti guarda los datos del perfil y la información de grupos, movimientos y comprobantes necesarios para sus funciones. Las preferencias de configuración y moneda se guardan en este dispositivo; no se sincronizan entre dispositivos.': 'O Junti salva os dados do perfil e as informações de grupos, transações e comprovantes necessários para suas funções. As preferências são salvas neste dispositivo e não são sincronizadas entre dispositivos.',
   'Revisá el documento y el tratamiento de datos': 'Consulte o documento e o tratamento de dados',
@@ -972,6 +1193,331 @@ const textosPt: Record<string, string> = {
   '1 integrante · {moneda}': '1 participante · {moneda}',
   '{cantidad} integrantes · {moneda}': '{cantidad} participantes · {moneda}',
   'Paso {actual} de {total}': 'Etapa {actual} de {total}',
+  // Completado de traducciones
+  'Monto total':
+    'Valor total',
+  'Dividir entre':
+    'Dividir entre',
+  'Cargando':
+    'Carregando',
+  'Paso':
+    'Etapa',
+  'Alias:':
+    'Alias:',
+  'Foto de':
+    'Foto de',
+  'Agregar':
+    'Adicionar',
+  'E-mail copiado.':
+    'E-mail copiado.',
+  'Controles':
+    'Controles',
+  'Fuente: © OpenStreetMap, © CARTO.':
+    'Dados do mapa: © OpenStreetMap, © CARTO.',
+  'Nombre':
+    'Nome',
+  'Aceptar':
+    'Aceitar',
+  'Guardar':
+    'Salvar',
+  'Alias copiado':
+    'Alias copiado',
+  'Monto copiado':
+    'Valor copiado',
+  'WhatsApp no disponible':
+    'WhatsApp indisponível',
+  'No tenemos registrado el e-mail':
+    'Não temos o e-mail registrado',
+  'No pudimos abrir WhatsApp. Verificá que esté instalado en tu dispositivo.':
+    'Não foi possível abrir o WhatsApp. Verifique se ele está instalado no seu dispositivo.',
+  'No pudimos abrir tu aplicación de correo.':
+    'Não foi possível abrir seu aplicativo de e-mail.',
+  'E-mail no disponible':
+    'E-mail indisponível',
+  'No pudimos cargar el formulario.':
+    'Não foi possível carregar o formulário.',
+  'No pudimos cargar el movimiento.':
+    'Não foi possível carregar a movimentação.',
+  'El movimiento ya no existe.':
+    'Esta movimentação não existe mais.',
+  'El gasto ya no está disponible.':
+    'Esta despesa não está mais disponível.',
+  'El grupo no está disponible.':
+    'Este grupo não está disponível.',
+  'Ya no sos integrante de este grupo.':
+    'Você não faz mais parte deste grupo.',
+  'Aceptar y continuar':
+    'Aceitar e continuar',
+  'No se pudo verificar la aceptación de los términos.':
+    'Não foi possível verificar a aceitação dos termos.',
+  'Iniciá sesión para aceptar los términos.':
+    'Entre para aceitar os termos.',
+  'La sesión cambió antes de registrar la aceptación.':
+    'A sessão mudou antes de registrar a aceitação.',
+  'Cerrar términos completos':
+    'Fechar termos completos',
+  '¿Eliminar':
+    'Excluir?',
+  'No se pudo guardar':
+    'Não foi possível salvar',
+  'Las preferencias de configuración y moneda se guardan en este dispositivo; no se sincronizan entre dispositivos.':
+    'As preferências de configuração e moeda são salvas neste dispositivo e não são sincronizadas entre dispositivos.',
+  'No se muestran opciones que prometan esos controles.':
+    'O app não mostra controles para recursos indisponíveis.',
+  'Usá las pestañas para ir a Gastos, Amigos, Perfil y Configuración.':
+    'Use as abas para ir a Despesas, Amigos, Perfil e Configurações.',
+  'Creá un grupo, sumá integrantes y registrá los gastos que quieran dividir.':
+    'Crie um grupo, adicione participantes e registre as despesas que querem dividir.',
+  'Los saldos resumen los gastos y pagos registrados. Las transferencias se hacen fuera de Junti.':
+    'Os saldos resumem as despesas e pagamentos registrados. As transferências são feitas fora do Junti.',
+  'Página no encontrada':
+    'Página não encontrada',
+  'No encontramos esta pantalla':
+    'Não encontramos esta tela',
+  'El enlace puede haber cambiado. Volvé al inicio para continuar.':
+    'O link pode ter mudado. Volte ao início para continuar.',
+  'Volver al inicio':
+    'Voltar ao início',
+  'dólar oficial':
+    'dólar oficial',
+  'real brasileño':
+    'real brasileiro',
+  'Mapa':
+    'Mapa',
+  'Cerrar mapa':
+    'Fechar mapa',
+  'Coordenadas: {lat}, {lng}':
+    'Coordenadas: {lat}, {lng}',
+  'Solicitudes pendientes ({cantidad})':
+    'Solicitações pendentes ({cantidad})',
+  'Tus amigos ({cantidad})':
+    'Seus amigos ({cantidad})',
+  'Logotipo de Junti':
+    'Logotipo do Junti',
+  'Ingresá un correo electrónico válido.':
+    'Informe um e-mail válido.',
+  'Ingresá tu contraseña.':
+    'Informe sua senha.',
+  'Ingresá tu nombre para crear la cuenta.':
+    'Informe seu nome para criar a conta.',
+  'La contraseña debe tener al menos 6 caracteres.':
+    'A senha deve ter pelo menos 6 caracteres.',
+  'No pudimos conectarnos. Revisá tu conexión a internet.':
+    'Não foi possível conectar. Verifique sua conexão com a internet.',
+  'Ese correo ya está registrado. Probá iniciando sesión.':
+    'Esse e-mail já está cadastrado. Tente entrar.',
+  'El formato del correo electrónico no es válido.':
+    'O formato do e-mail não é válido.',
+  'Datos incorrectos. Revisá tu correo y contraseña o registrate.':
+    'Dados incorretos. Verifique seu e-mail e senha ou cadastre-se.',
+  'La contraseña es muy débil. Usá al menos 6 caracteres.':
+    'A senha é muito fraca. Use pelo menos 6 caracteres.',
+  'Ingresá un correo válido para enviarte el enlace.':
+    'Informe um e-mail válido para enviarmos o link.',
+  'La recuperación por correo no está configurada en este entorno.':
+    'A recuperação por e-mail não está configurada neste ambiente.',
+  'Si el correo está registrado, vas a recibir un enlace para restablecer tu contraseña.':
+    'Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha.',
+  'No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.':
+    'Não foi possível conectar. Verifique sua conexão e tente novamente.',
+  'Hubo demasiados intentos. Esperá un momento y volvé a probar.':
+    'Muitas tentativas. Aguarde um momento e tente novamente.',
+  'No pudimos enviar el enlace. Revisá el correo e intentá de nuevo.':
+    'Não foi possível enviar o link. Verifique o e-mail e tente novamente.',
+  'Conocé Junti':
+    'Conheça o Junti',
+  'Bienvenido a Junti':
+    'Boas-vindas ao Junti',
+  'Qué bueno tenerte de vuelta':
+    'Que bom ter você de volta',
+  'Creá tu cuenta y empezá a dividir gastos.':
+    'Crie sua conta e comece a dividir despesas.',
+  'Tus planes y gastos compartidos te esperan.':
+    'Seus planos e despesas compartilhadas esperam por você.',
+  'Empezá a organizar los gastos de tus planes.':
+    'Comece a organizar as despesas dos seus planos.',
+  'Ingresá para continuar con tus grupos.':
+    'Entre para continuar com seus grupos.',
+  'Ej: Germán Morales':
+    'Ex.: Ana Souza',
+  'Correo electrónico':
+    'E-mail',
+  'Tu contraseña':
+    'Sua senha',
+  'Ocultar contraseña':
+    'Ocultar senha',
+  'Mostrar contraseña':
+    'Mostrar senha',
+  'Enviando enlace…':
+    'Enviando link…',
+  '¿Olvidaste tu contraseña?':
+    'Esqueceu sua senha?',
+  'Un momento…':
+    'Um momento…',
+  '¿Ya tenés una cuenta? ':
+    'Já tem uma conta? ',
+  '¿No tenés una cuenta? ':
+    'Não tem uma conta? ',
+  'Iniciá sesión':
+    'Entrar',
+  'Registrate':
+    'Cadastre-se',
+  'Leer Términos y Condiciones':
+    'Ler Termos e Condições',
+  'Términos y Condiciones':
+    'Termos e Condições',
+  'Cerrar términos y condiciones':
+    'Fechar termos e condições',
+  'Abrir ayuda: {titulo}':
+    'Abrir ajuda: {titulo}',
+  'Cerrar ayuda':
+    'Fechar ajuda',
+  'Cerrar tutorial':
+    'Fechar tutorial',
+  'No disponible':
+    'Indisponível',
+  'No se pudo recuperar el perfil demo.':
+    'Não foi possível restaurar o perfil de demonstração.',
+  'Iniciá sesión para cargar gastos.':
+    'Entre para adicionar despesas.',
+  'Permití el acceso a la ubicación para detectar tu posición actual.':
+    'Permita o acesso à localização para detectar sua posição atual.',
+  'Eliminar gasto':
+    'Excluir despesa',
+  'este gasto':
+    'esta despesa',
+  'Monto total ({moneda})':
+    'Valor total ({moneda})',
+  'Pagó el total':
+    'Pagou o total',
+  'Ya pagó su parte':
+    'Já pagou sua parte',
+  'Todavía debe':
+    'Ainda deve',
+  'Al día':
+    'Em dia',
+  'quien recibe':
+    'quem recebe',
+  'Aprobado por {nombre}':
+    'Aprovado por {nombre}',
+  'Dividido entre {cantidad}':
+    'Dividido entre {cantidad}',
+  'Ej: Viaje a la costa':
+    'Ex.: Viagem para a praia',
+  'Sesión o grupo ausente':
+    'Sessão ou grupo ausente',
+  'Correo no disponible':
+    'E-mail indisponível',
+  'Recordar saldo a {nombre}\n\nPresioná Aceptar para enviar por WhatsApp o Cancelar para enviar por E-mail.':
+    'Lembrar {nombre} do saldo\n\nToque em OK para enviar pelo WhatsApp ou em Cancelar para enviar por e-mail.',
+  'Agregar a {nombre}':
+    'Adicionar {nombre}',
+  'Gastos ({cantidad})':
+    'Despesas ({cantidad})',
+  'Ver detalle de {nombre}':
+    'Ver detalhes de {nombre}',
+  'Pagó {nombre}':
+    'Pago por {nombre}',
+  'Con foto':
+    'Com foto',
+  'Con ubicación':
+    'Com localização',
+  'Pagos registrados ({cantidad})':
+    'Pagamentos registrados ({cantidad})',
+  'Con comprobante':
+    'Com comprovante',
+  'Deshacer':
+    'Desfazer',
+  'Gastos por categoría':
+    'Despesas por categoria',
+  'Distribución de gastos · {moneda}':
+    'Distribuição de despesas · {moneda}',
+  'Todavía no hay gastos para mostrar.':
+    'Ainda não há despesas para mostrar.',
+  'Crear un nuevo grupo':
+    'Criar um novo grupo',
+  'Elegí una deuda tuya desde el detalle del grupo.':
+    'Escolha uma de suas dívidas nos detalhes do grupo.',
+  'No pudimos cargar la deuda.':
+    'Não foi possível carregar a dívida.',
+  'otro integrante':
+    'outro participante',
+  '{nombre} tiene que revisar el comprobante y aprobarlo.':
+    '{nombre} precisa revisar o comprovante e aprová-lo.',
+  'Le debés {monto} a {nombre} por "{grupo}".':
+    'Você deve {monto} a {nombre} em "{grupo}".',
+  'Te vamos a avisar en {segundos} segundos.':
+    'Vamos avisar em {segundos} segundos.',
+  'Te vamos a avisar en una hora.':
+    'Vamos avisar em uma hora.',
+  'el grupo':
+    'o grupo',
+  'Le debés a {nombre}':
+    'Você deve a {nombre}',
+  '1 gasto':
+    '1 despesa',
+  '{cantidad} gastos':
+    '{cantidad} despesas',
+  'Alias: {alias}':
+    'Alias: {alias}',
+  'Ya subiste un comprobante para esta deuda. {nombre} lo tiene que aprobar desde el detalle del pago.':
+    'Você já enviou um comprovante para esta dívida. {nombre} precisa aprová-lo nos detalhes do pagamento.',
+  'El acreedor':
+    'O credor',
+  'Avisar por WhatsApp':
+    'Avisar pelo WhatsApp',
+  'No se pudo leer a quién se le transfirió.':
+    'Não foi possível ler quem recebeu a transferência.',
+  'No se pudo leer el monto.':
+    'Não foi possível ler o valor.',
+  'No se pudo leer la fecha.':
+    'Não foi possível ler a data.',
+  'La fecha del comprobante es futura.':
+    'A data do comprovante é futura.',
+  'Actualizado: {fecha}':
+    'Atualizado: {fecha}',
+  'Antes de comenzar':
+    'Antes de começar',
+  'Para utilizar Junti, necesitamos que leas y aceptes nuestros Términos y Condiciones de Uso':
+    'Para usar o Junti, precisamos que você leia e aceite nossos Termos e Condições de Uso',
+  'Términos y Condiciones de Uso':
+    'Termos e Condições de Uso',
+  'Verificando tu aceptación...':
+    'Verificando sua aceitação...',
+  'Reintentar verificación':
+    'Tentar verificar novamente',
+  'Consultar los términos completos':
+    'Consultar os termos completos',
+  'Firebase no está configurado.':
+    'O Firebase não está configurado.',
+  'No hay una sesión autenticada para consultar los términos.':
+    'Não há uma sessão autenticada para consultar os termos.',
+  'Iniciá sesión para registrar la aceptación de los términos.':
+    'Entre para registrar a aceitação dos termos.',
+  'Permití el acceso a la cámara para tomar la foto.':
+    'Permita o acesso à câmera para tirar a foto.',
+  'Permití el acceso a tus fotos para elegir una imagen.':
+    'Permita o acesso às suas fotos para escolher uma imagem.',
+  // Pagos para revisar
+  'Si la apagás, Junti no muestra ninguna notificación.':
+    'Se você desativar, o Junti não mostrará nenhuma notificação.',
+  'Pagos para revisar':
+    'Pagamentos para revisar',
+  'Te avisa cuando alguien sube un comprobante que tenés que aprobar.':
+    'Avisa quando alguém envia um comprovante que você precisa aprovar.',
+  'Tenés un pago para revisar':
+    'Você tem um pagamento para revisar',
+  'Tenés {cantidad} pagos para revisar':
+    'Você tem {cantidad} pagamentos para revisar',
+  '{nombre} subió un comprobante en "{grupo}". Tocá para revisarlo.':
+    '{nombre} enviou um comprovante em "{grupo}". Toque para revisar.',
+  '{nombre} subió un comprobante de {monto} en "{grupo}".':
+    '{nombre} enviou um comprovante de {monto} em "{grupo}".',
+  'Tenés {cantidad} comprobantes para aprobar.':
+    'Você tem {cantidad} comprovantes para aprovar.',
+  'Grupo': 'Grupo',
+  'Los pagos para revisar se avisan cuando abrís la app.':
+    'Os pagamentos para revisar são avisados quando você abre o app.',
 }
 
 const textosAyudaEn: Record<string, string> = {
@@ -1068,7 +1614,7 @@ const textosAyudaPt: Record<string, string> = {
   'Consultá tus saldos': 'Consulte seus saldos',
 }
 
-type Valores = Record<string, string | number>
+export type Valores = Record<string, string | number>
 
 function interpolar(texto: string, valores?: Valores) {
   if (!valores) return texto
@@ -1082,22 +1628,17 @@ function interpolar(texto: string, valores?: Valores) {
  * diccionario; las partes variables se escriben como {nombre} y se completan
  * con `valores`. Si no hay traducción, se usa el español.
  */
+/** Diccionarios por idioma, exportados para verificarlos en los tests. */
+export const DICCIONARIOS = {
+  en: { ...textosEn, ...textosAyudaEn },
+  pt: { ...textosPt, ...textosAyudaPt },
+}
+
 export function traducirTexto(
   idioma: Idioma,
   texto: string,
   valores?: Valores,
 ): string {
   if (idioma === 'es') return interpolar(texto, valores)
-  const traducciones = idioma === 'en' ? textosEn : textosPt
-  const ayuda = idioma === 'en' ? textosAyudaEn : textosAyudaPt
-  return interpolar(traducciones[texto] ?? ayuda[texto] ?? texto, valores)
-}
-
-/** Devuelve `t(texto, valores?)` en el idioma elegido por el usuario. */
-export function useTraduccion() {
-  const idioma = useAppStore((state) => state.preferencias.language)
-  return useCallback(
-    (texto: string, valores?: Valores) => traducirTexto(idioma, texto, valores),
-    [idioma],
-  )
+  return interpolar(DICCIONARIOS[idioma][texto] ?? texto, valores)
 }

@@ -34,7 +34,7 @@ import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo, estadoDeudasGrupo } from './deudasDelGrupo'
 import { formatearFecha } from './formatearFecha'
 import { usePaletaActual } from '@/theme/usePaletaActual'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function DetalleGrupoScreen() {
   const t = useTraduccion()

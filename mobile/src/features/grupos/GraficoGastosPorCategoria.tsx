@@ -4,7 +4,7 @@ import type { GastoFirestore } from '@/services/firestore'
 import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { formatearMoneda, type MonedaCodigo } from '@/theme/moneda'
 import { resumirGastosPorCategoria } from './gastosPorCategoria'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function GastosPorCategoria({
   gastos,

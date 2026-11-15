@@ -36,6 +36,6 @@ describe('preferencias predeterminadas de cuenta', () => {
 
     expect(preferencias.theme).toBe('light')
     expect(preferencias.language).toBe('es')
-    expect(preferencias.notificacionesNovedades).toBe(false)
+    expect(preferencias.notificacionesPagos).toBe(true)
   })
 })

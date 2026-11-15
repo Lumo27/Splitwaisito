@@ -4,7 +4,7 @@ import { FileText, UserRound } from 'lucide-react-native'
 import { FilaConfig } from '@/components/Formulario'
 import { colores } from '@/theme/colores'
 import { Texto as Text } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function PrivacidadScreen() {
   const t = useTraduccion()

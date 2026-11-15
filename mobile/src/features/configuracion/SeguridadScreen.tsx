@@ -10,7 +10,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { confirmar } from '@/utils/alerta'
 import { Texto as Text } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function SeguridadScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)

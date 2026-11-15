@@ -3,7 +3,7 @@ import { Opcion } from '@/components/Formulario'
 import { Texto as Text } from '@/components/Texto'
 import { useAppStore } from '@/store/useAppStore'
 import type { Preferencias } from '@/store/useAppStore'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 type MonedaPreferida = Preferencias['monedaPreferida']
 

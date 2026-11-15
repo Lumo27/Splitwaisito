@@ -5,17 +5,13 @@ import { cancelarRecordatoriosDeuda, recordatoriosDisponibles } from '@/services
 import { useAppStore, type Preferencias } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { Texto as Text } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 
 type ClaveNotificacion =
   | 'notificacionesGenerales'
-  | 'notificacionesCuenta'
   | 'notificacionesRecordatorios'
-  | 'notificacionesActividad'
-  | 'notificacionesNovedades'
-  | 'notificacionesActualizaciones'
-  | 'notificacionesAlertas'
+  | 'notificacionesPagos'
 
 const OPCIONES: {
   clave: ClaveNotificacion
@@ -25,12 +21,7 @@ const OPCIONES: {
   {
     clave: 'notificacionesGenerales',
     titulo: 'Notificaciones generales',
-    descripcion: 'Preferencia guardada para futuras notificaciones.',
-  },
-  {
-    clave: 'notificacionesCuenta',
-    titulo: 'Actividad de la cuenta',
-    descripcion: 'Preferencia guardada para futuras alertas de cuenta.',
+    descripcion: 'Si la apagás, Junti no muestra ninguna notificación.',
   },
   {
     clave: 'notificacionesRecordatorios',
@@ -38,24 +29,10 @@ const OPCIONES: {
     descripcion: 'Permite programar recordatorios de pago en este dispositivo.',
   },
   {
-    clave: 'notificacionesActividad',
-    titulo: 'Actividad del grupo',
-    descripcion: 'Preferencia guardada para futuras alertas de grupos.',
-  },
-  {
-    clave: 'notificacionesNovedades',
-    titulo: 'Novedades',
-    descripcion: 'Preferencia guardada para futuras novedades.',
-  },
-  {
-    clave: 'notificacionesActualizaciones',
-    titulo: 'Actualizaciones',
-    descripcion: 'Preferencia guardada para futuras actualizaciones.',
-  },
-  {
-    clave: 'notificacionesAlertas',
-    titulo: 'Alertas importantes',
-    descripcion: 'Preferencia guardada para futuras alertas.',
+    clave: 'notificacionesPagos',
+    titulo: 'Pagos para revisar',
+    descripcion:
+      'Te avisa cuando alguien sube un comprobante que tenés que aprobar.',
   },
 ]
 
@@ -64,16 +41,10 @@ const CAMBIOS_PREFERENCIA: Record<
   (valor: boolean) => Partial<Preferencias>
 > = {
   notificacionesGenerales: (valor) => ({ notificacionesGenerales: valor }),
-  notificacionesCuenta: (valor) => ({ notificacionesCuenta: valor }),
   notificacionesRecordatorios: (valor) => ({
     notificacionesRecordatorios: valor,
   }),
-  notificacionesActividad: (valor) => ({ notificacionesActividad: valor }),
-  notificacionesNovedades: (valor) => ({ notificacionesNovedades: valor }),
-  notificacionesActualizaciones: (valor) => ({
-    notificacionesActualizaciones: valor,
-  }),
-  notificacionesAlertas: (valor) => ({ notificacionesAlertas: valor }),
+  notificacionesPagos: (valor) => ({ notificacionesPagos: valor }),
 }
 
 function FilaNotificacion({
@@ -168,7 +139,8 @@ export function NotificacionesScreen() {
           ? t('Los recordatorios se programan localmente cuando elegís “Recordarme pagar más tarde”. Al desactivarlos se cancelan los recordatorios pendientes de la app.')
           : t('La programación de notificaciones no está disponible en la versión web.')}
         {' '}
-        {t('Todas las opciones se guardan en este dispositivo.')} {t('Solo Recordatorios está conectado a una función de programación; no hay un servicio de envío para las demás alertas.')}
+        {t('Todas las opciones se guardan en este dispositivo.')}{' '}
+        {t('Los pagos para revisar se avisan cuando abrís la app.')}
       </Text>
       {Platform.OS === 'web' && (
         <Text className="mt-2 px-1 text-xs leading-5 text-textMuted">

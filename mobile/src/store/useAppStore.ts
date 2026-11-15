@@ -19,12 +19,9 @@ export interface Preferencias {
     largeTouchTargets: boolean
   }
   notificacionesGenerales: boolean
-  notificacionesCuenta: boolean
   notificacionesRecordatorios: boolean
-  notificacionesActividad: boolean
-  notificacionesNovedades: boolean
-  notificacionesActualizaciones: boolean
-  notificacionesAlertas: boolean
+  /** Avisar cuando alguien sube un comprobante que me toca aprobar. */
+  notificacionesPagos: boolean
   monedaPreferida: 'ARS' | 'USD' | 'BRL'
 }
 
@@ -42,12 +39,8 @@ export const PREFERENCIAS_PREDETERMINADAS: Preferencias = {
     largeTouchTargets: false,
   },
   notificacionesGenerales: true,
-  notificacionesCuenta: true,
   notificacionesRecordatorios: true,
-  notificacionesActividad: true,
-  notificacionesNovedades: false,
-  notificacionesActualizaciones: true,
-  notificacionesAlertas: true,
+  notificacionesPagos: true,
   monedaPreferida: 'ARS',
 }
 

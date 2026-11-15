@@ -65,12 +65,8 @@ function leerPreferencias(valor: unknown): Partial<Preferencias> | null {
 
   const booleanos = [
     'notificacionesGenerales',
-    'notificacionesCuenta',
     'notificacionesRecordatorios',
-    'notificacionesActividad',
-    'notificacionesNovedades',
-    'notificacionesActualizaciones',
-    'notificacionesAlertas',
+    'notificacionesPagos',
   ] as const
   for (const clave of booleanos) {
     if (esBooleano(datos[clave])) preferencias[clave] = datos[clave]

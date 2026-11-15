@@ -5,7 +5,7 @@ import { MapPin, X } from 'lucide-react-native'
 import { MapaLeaflet, type Coordenadas } from './MapaLeaflet'
 import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
 import { usePaletaActual } from '@/theme/usePaletaActual'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 interface Props {
   visible: boolean

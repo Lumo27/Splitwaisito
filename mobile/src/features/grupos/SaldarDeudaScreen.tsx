@@ -35,7 +35,7 @@ import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
 import { useActualizarCotizacionPesos } from '@/hooks/useActualizarCotizacionPesos'
-import { useTraduccion } from '@/i18n/textos'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function SaldarDeudaScreen() {
   const t = useTraduccion()
