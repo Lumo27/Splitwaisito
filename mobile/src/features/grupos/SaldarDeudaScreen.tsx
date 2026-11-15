@@ -35,8 +35,10 @@ import { participantesDelGrupo } from './deudas'
 import { deudasDelGrupo } from './deudasDelGrupo'
 import { EquivalenciaPesos } from '@/components/EquivalenciaPesos'
 import { useActualizarCotizacionPesos } from '@/hooks/useActualizarCotizacionPesos'
+import { useTraduccion } from '@/i18n/textos'
 
 export function SaldarDeudaScreen() {
+  const t = useTraduccion()
   const { id, de, a } = useLocalSearchParams<{
     id: string
     de: string
@@ -128,21 +130,22 @@ export function SaldarDeudaScreen() {
   useEffect(() => {
     let vigente = true
     if (!datoParaTransferir || cargando) return
-    const que = alias ? 'Alias' : 'E-mail'
     void Clipboard.setStringAsync(datoParaTransferir)
       .then(() => {
-        if (vigente) setCopiado(`${que} copiado.`)
+        if (vigente) setCopiado(alias ? t('Alias copiado.') : t('E-mail copiado.'))
       })
       .catch(() => {
         if (vigente)
           setError(
-            `No pudimos copiar el ${que.toLowerCase()}. Podés volver a intentarlo.`,
+            alias
+              ? t('No pudimos copiar el alias. Podés volver a intentarlo.')
+              : t('No pudimos copiar el e-mail. Podés volver a intentarlo.'),
           )
       })
     return () => {
       vigente = false
     }
-  }, [datoParaTransferir, alias, cargando])
+  }, [datoParaTransferir, alias, cargando, t])
 
   async function copiar(valor: string, mensaje: string) {
     try {
@@ -187,7 +190,7 @@ export function SaldarDeudaScreen() {
   }
   async function registrarConComprobante() {
     if (!deuda || !usuario || !id || !comprobante) return
-    const acreedorNombre = acreedor?.nombre ?? 'otro integrante'
+    const acreedorNombre = acreedor?.nombre ?? t('otro integrante')
     setRegistrando(true)
     setError('')
     try {
@@ -219,7 +222,12 @@ export function SaldarDeudaScreen() {
           : 'Pago pendiente de aprobación',
         verificacion.coincide
           ? 'El comprobante coincide con la deuda: quedó saldada.'
-          : `${acreedorNombre} tiene que revisar el comprobante y aprobarlo. ${verificacion.motivos.join(' ')}`,
+          : [
+              t('{nombre} tiene que revisar el comprobante y aprobarlo.', {
+                nombre: acreedorNombre,
+              }),
+              ...verificacion.motivos.map((motivo) => t(motivo)),
+            ].join(' '),
       )
       volver()
     } catch {
@@ -232,15 +240,21 @@ export function SaldarDeudaScreen() {
     if (!deuda || !puedeProgramarRecordatorio) return
     try {
       const programado = await programarRecordatorioDePago(
-        'Tenés una deuda pendiente',
-        `Le debés ${formatearMoneda(deuda.monto, moneda)} a ${acreedor?.nombre ?? 'otro integrante'} por "${grupo?.nombre ?? 'el grupo'}".`,
+        t('Tenés una deuda pendiente'),
+        t('Le debés {monto} a {nombre} por "{grupo}".', {
+          monto: formatearMoneda(deuda.monto, moneda),
+          nombre: acreedor?.nombre ?? t('otro integrante'),
+          grupo: grupo?.nombre ?? t('el grupo'),
+        }),
       )
       if (programado) {
-        const cuando =
+        setCopiado(
           DEMORA_RECORDATORIO_SEGUNDOS < 60
-            ? `en ${DEMORA_RECORDATORIO_SEGUNDOS} segundos`
-            : 'en una hora'
-        setCopiado(`Te vamos a avisar ${cuando}.`)
+            ? t('Te vamos a avisar en {segundos} segundos.', {
+                segundos: DEMORA_RECORDATORIO_SEGUNDOS,
+              })
+            : t('Te vamos a avisar en una hora.'),
+        )
         setError('')
       } else {
         setError('Activá las notificaciones para recibir el recordatorio.')
@@ -284,19 +298,23 @@ export function SaldarDeudaScreen() {
       <Titulo>Saldar deuda</Titulo>
       <Tarjeta>
         <Text className="text-text-muted">
-          Le debés a {acreedor?.nombre ?? 'otro integrante'}
+          {t('Le debés a {nombre}', {
+            nombre: acreedor?.nombre ?? t('otro integrante'),
+          })}
         </Text>
         <Text className="text-4xl font-bold text-primary-dark">
           {formatearMoneda(deuda.monto, moneda)}
         </Text>
         <EquivalenciaPesos monto={deuda.monto} moneda={moneda} />
         <Text className="text-sm text-text-muted">
-          {grupo?.nombre} · {cantidadGastos} gasto
-          {cantidadGastos === 1 ? '' : 's'}
+          {grupo?.nombre} ·{' '}
+          {cantidadGastos === 1
+            ? t('1 gasto')
+            : t('{cantidad} gastos', { cantidad: cantidadGastos })}
         </Text>
         {alias ? (
           <Text selectable className="text-text">
-            Alias: {alias}
+            {t('Alias: {alias}', { alias })}
           </Text>
         ) : null}
         {email ? (
@@ -345,9 +363,10 @@ export function SaldarDeudaScreen() {
         <Tarjeta>
           <Text className="font-bold text-text">Pago en revisión</Text>
           <Text className="text-sm text-text-muted">
-            Ya subiste un comprobante para esta deuda.{' '}
-            {acreedor?.nombre ?? 'El acreedor'} lo tiene que aprobar desde el
-            detalle del pago.
+            {t(
+              'Ya subiste un comprobante para esta deuda. {nombre} lo tiene que aprobar desde el detalle del pago.',
+              { nombre: acreedor?.nombre ?? t('El acreedor') },
+            )}
           </Text>
         </Tarjeta>
       ) : (

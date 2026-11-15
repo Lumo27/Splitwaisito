@@ -1,3 +1,6 @@
+import { useCallback } from 'react'
+import { useAppStore } from '@/store/useAppStore'
+
 export type Idioma = 'es' | 'en' | 'pt'
 
 const textosEn: Record<string, string> = {
@@ -409,6 +412,121 @@ const textosEn: Record<string, string> = {
   'Marcar ubicación en el mapa': 'Mark a location on the map',
   'Tocá cualquier punto del mapa para posicionar el marcador.':
     'Tap anywhere on the map to place the marker.',
+  // Centro de configuración
+  'Gastos': 'Expenses',
+  'Perfil': 'Profile',
+  'Configuración': 'Settings',
+  'Detalle del movimiento': 'Transaction details',
+  'Cuenta': 'Account',
+  'Preferencias': 'Preferences',
+  'Información y protección': 'Information and protection',
+  'Apariencia': 'Appearance',
+  'Tema, fuente y tamaño de texto': 'Theme, font, and text size',
+  'Idioma': 'Language',
+  'Notificaciones': 'Notifications',
+  'Administrá tus preferencias': 'Manage your preferences',
+  'Moneda preferida': 'Preferred currency',
+  'Sugerencia al crear nuevos grupos': 'Suggestion when creating groups',
+  'Privacidad': 'Privacy',
+  'Datos, visibilidad y consentimientos': 'Data, visibility, and consent',
+  'Seguridad': 'Security',
+  'Sesión, contraseña y acceso a la cuenta': 'Session, password, and account access',
+  'Contraste, animaciones y legibilidad': 'Contrast, animations, and readability',
+  'Acerca de Junti': 'About Junti',
+  'Versión, documentos e información': 'Version, documents, and information',
+  'Estás usando el modo demo. Tus preferencias se guardan en este dispositivo.': 'You are using demo mode. Preferences are saved on this device.',
+  'Modo demo': 'Demo mode',
+  'Restablecer datos de ejemplo': 'Reset sample data',
+  'Restablecer datos': 'Reset data',
+  'Se borrarán los cambios realizados en el modo demo de este dispositivo. ¿Continuar?': 'Changes made to demo data on this device will be erased. Continue?',
+  'Restablecer': 'Reset',
+  'Datos de ejemplo restablecidos.': 'Sample data has been reset.',
+  'No pudimos restablecer los datos de ejemplo.': 'Could not reset sample data.',
+  'Tema': 'Theme',
+  'Claro': 'Light',
+  'Oscuro': 'Dark',
+  'Automático': 'Automatic',
+  'Usa la preferencia del dispositivo': 'Use your device preference',
+  'Tipografía': 'Font',
+  'Predeterminada del sistema': 'System default',
+  'Serif': 'Serif',
+  'Monoespaciada': 'Monospace',
+  'Vista previa: Gastos compartidos': 'Preview: Shared expenses',
+  'Tamaño del texto': 'Text size',
+  'Muy pequeño': 'Very small',
+  'Pequeño': 'Small',
+  'Normal': 'Normal',
+  'Grande': 'Large',
+  'Muy grande': 'Very large',
+  'Restablecer tamaño': 'Reset text size',
+  'Accesibilidad': 'Accessibility',
+  'Aumentar contraste': 'Increase contrast',
+  'Refuerza el contraste de textos, bordes y superficies.': 'Improve contrast for text, borders, and surfaces.',
+  'Reducir animaciones': 'Reduce motion',
+  'Desactiva las transiciones de navegación de la app.': 'Turn off app navigation transitions.',
+  'Respetar el sistema': 'Respect system setting',
+  'Reduce las animaciones cuando el dispositivo lo indique.': 'Reduce motion when requested by your device.',
+  'Mejorar legibilidad': 'Improve readability',
+  'Usa texto más legible y aumenta el espacio de línea.': 'Use more readable text and increase line spacing.',
+  'Destacar controles': 'Highlight controls',
+  'Marca con claridad los elementos interactivos.': 'Make interactive elements easier to identify.',
+  'Controles más grandes': 'Larger controls',
+  'Aumenta el área táctil de botones y filas.': 'Increase the touch area of buttons and rows.',
+  'Los controles mantienen un indicador de foco visible al navegar con teclado.': 'Controls keep a visible focus indicator when using a keyboard.',
+  'Español': 'Español',
+  'English': 'English',
+  'Português': 'Português',
+  'Los textos sin traducción disponible se muestran en español.': 'Text without an available translation is shown in Spanish.',
+  'Notificaciones generales': 'General notifications',
+  'Actividad de la cuenta': 'Account activity',
+  'Recordatorios': 'Reminders',
+  'Actividad del grupo': 'Group activity',
+  'Novedades': 'News',
+  'Actualizaciones': 'Updates',
+  'Alertas importantes': 'Important alerts',
+  'Preferencia guardada para futuras notificaciones.': 'Preference saved for future notifications.',
+  'Preferencia guardada para futuras alertas de cuenta.': 'Preference saved for future account alerts.',
+  'Permite programar recordatorios de pago en este dispositivo.': 'Allows payment reminders to be scheduled on this device.',
+  'Preferencia guardada para futuras alertas de grupos.': 'Preference saved for future group alerts.',
+  'Preferencia guardada para futuras novedades.': 'Preference saved for future news.',
+  'Preferencia guardada para futuras actualizaciones.': 'Preference saved for future updates.',
+  'Preferencia guardada para futuras alertas.': 'Preference saved for future alerts.',
+  'Los recordatorios se programan localmente cuando elegís “Recordarme pagar más tarde”. Al desactivarlos se cancelan los recordatorios pendientes de la app.': 'Reminders are scheduled locally when you choose “Remind me to pay later”. Turning them off cancels the app’s pending reminders.',
+  'Todas las opciones se guardan en este dispositivo.': 'All preferences are saved on this device.',
+  'Estas preferencias no se sincronizan con otros dispositivos.': 'These preferences are not synced across devices.',
+  'Solo Recordatorios está conectado a una función de programación; no hay un servicio de envío para las demás alertas.': 'Only Reminders is connected to scheduling. Other alerts do not have a delivery service.',
+  'Junti guarda los datos del perfil y la información de grupos, movimientos y comprobantes necesarios para sus funciones. Las preferencias de configuración y moneda se guardan en este dispositivo; no se sincronizan entre dispositivos.': 'Junti saves profile, group, transaction, and receipt information needed for its features. Settings and currency preferences are saved on this device and are not synced across devices.',
+  'Revisá el documento y el tratamiento de datos': 'Review the document and data handling',
+  'Datos del perfil': 'Profile details',
+  'El perfil se administra desde la pestaña Perfil': 'Manage your profile from the Profile tab',
+  'Actualmente no hay controles para cambiar la visibilidad del perfil, exportar o borrar todos los datos, administrar sesiones remotas ni revocar la aceptación de los términos desde la app. No se muestran opciones que prometan esos controles.': 'The app currently cannot change profile visibility, export or erase all data, manage remote sessions, or revoke acceptance of the terms. No controls are shown for features that are not available.',
+  'Sesión actual': 'Current session',
+  'Sesiones y métodos de acceso': 'Sessions and sign-in methods',
+  'Enviamos un enlace para restablecer la contraseña a {email}.': 'We sent a password reset link to {email}.',
+  'Salir': 'Sign out',
+  'Versión {version}': 'Version {version}',
+  'Sin sesión activa': 'No active session',
+  'Dólares (USD)': 'US dollars (USD)',
+  'No pudimos registrar tu aceptación. Revisá tu conexión e intentá nuevamente.': 'We could not record your acceptance. Check your connection and try again.',
+  // Textos con variables
+  '¿Eliminar a {nombre} de tus amigos?': 'Remove {nombre} from your friends?',
+  'Eliminar a {nombre}': 'Remove {nombre}',
+  'Agregar a {nombre} al grupo': 'Add {nombre} to the group',
+  '¿Eliminar “{nombre}” y todos sus gastos? Esta acción no se puede deshacer.':
+    'Delete “{nombre}” and all its expenses? This cannot be undone.',
+  '¿Eliminar “{nombre}”? Esta acción no se puede deshacer.':
+    'Delete “{nombre}”? This cannot be undone.',
+  '¿Seguro que querés eliminar “{nombre}”? Esta acción no se puede deshacer.':
+    'Delete “{nombre}”? This cannot be undone.',
+  '¿Deshacer “{nombre}”? Se borra el pago y su comprobante.':
+    'Undo “{nombre}”? The payment and its receipt will be deleted.',
+  'Recordar a {nombre}': 'Remind {nombre}',
+  'Cada participante: {monto}': 'Each participant: {monto}',
+  '1 grupo': '1 group',
+  '{cantidad} grupos': '{cantidad} groups',
+  '1 integrante · {moneda}': '1 member · {moneda}',
+  '{cantidad} integrantes · {moneda}': '{cantidad} members · {moneda}',
+  'Paso {actual} de {total}': 'Step {actual} of {total}',
 }
 const textosPt: Record<string, string> = {
   'Compartí los planes, organizá los gastos.': 'Compartilhe planos e organize despesas.',
@@ -720,6 +838,140 @@ const textosPt: Record<string, string> = {
   'Marcar ubicación en el mapa': 'Marcar local no mapa',
   'Tocá cualquier punto del mapa para posicionar el marcador.':
     'Toque em qualquer ponto do mapa para posicionar o marcador.',
+  // Centro de configuración
+  'Gastos': 'Despesas',
+  'Perfil': 'Perfil',
+  'Configuración': 'Configurações',
+  'Detalle del movimiento': 'Detalhes da movimentação',
+  'Cuenta': 'Conta',
+  'Preferencias': 'Preferências',
+  'Información y protección': 'Informações e proteção',
+  'Apariencia': 'Aparência',
+  'Tema, fuente y tamaño de texto': 'Tema, fonte e tamanho do texto',
+  'Idioma': 'Idioma',
+  'Notificaciones': 'Notificações',
+  'Administrá tus preferencias': 'Gerencie suas preferências',
+  'Moneda preferida': 'Moeda preferida',
+  'Sugerencia al crear nuevos grupos': 'Sugestão ao criar novos grupos',
+  'Privacidad': 'Privacidade',
+  'Datos, visibilidad y consentimientos': 'Dados, visibilidade e consentimentos',
+  'Seguridad': 'Segurança',
+  'Sesión, contraseña y acceso a la cuenta': 'Sessão, senha e acesso à conta',
+  'Contraste, animaciones y legibilidad': 'Contraste, animações e legibilidade',
+  'Acerca de Junti': 'Sobre o Junti',
+  'Versión, documentos e información': 'Versão, documentos e informações',
+  'Estás usando el modo demo. Tus preferencias se guardan en este dispositivo.': 'Você está usando o modo de demonstração. As preferências são salvas neste dispositivo.',
+  'Modo demo': 'Modo de demonstração',
+  'Restablecer datos de ejemplo': 'Restaurar dados de exemplo',
+  'Restablecer datos': 'Restaurar dados',
+  'Se borrarán los cambios realizados en el modo demo de este dispositivo. ¿Continuar?': 'As alterações feitas nos dados de demonstração deste dispositivo serão apagadas. Continuar?',
+  'Restablecer': 'Restaurar',
+  'Datos de ejemplo restablecidos.': 'Os dados de exemplo foram restaurados.',
+  'No pudimos restablecer los datos de ejemplo.': 'Não foi possível restaurar os dados de exemplo.',
+  'Tema': 'Tema',
+  'Claro': 'Claro',
+  'Oscuro': 'Escuro',
+  'Automático': 'Automático',
+  'Usa la preferencia del dispositivo': 'Usa a preferência do dispositivo',
+  'Tipografía': 'Tipografia',
+  'Predeterminada del sistema': 'Padrão do sistema',
+  'Serif': 'Serifada',
+  'Monoespaciada': 'Monoespaçada',
+  'Vista previa: Gastos compartidos': 'Prévia: Despesas compartilhadas',
+  'Tamaño del texto': 'Tamanho do texto',
+  'Muy pequeño': 'Muito pequeno',
+  'Pequeño': 'Pequeno',
+  'Normal': 'Normal',
+  'Grande': 'Grande',
+  'Muy grande': 'Muito grande',
+  'Restablecer tamaño': 'Restaurar tamanho',
+  'Accesibilidad': 'Acessibilidade',
+  'Aumentar contraste': 'Aumentar contraste',
+  'Refuerza el contraste de textos, bordes y superficies.': 'Aumenta o contraste de textos, bordas e superfícies.',
+  'Reducir animaciones': 'Reduzir animações',
+  'Desactiva las transiciones de navegación de la app.': 'Desativa as transições de navegação do app.',
+  'Respetar el sistema': 'Respeitar o sistema',
+  'Reduce las animaciones cuando el dispositivo lo indique.': 'Reduz animações quando o dispositivo solicitar.',
+  'Mejorar legibilidad': 'Melhorar legibilidade',
+  'Usa texto más legible y aumenta el espacio de línea.': 'Usa texto mais legível e aumenta o espaçamento entre linhas.',
+  'Destacar controles': 'Destacar controles',
+  'Marca con claridad los elementos interactivos.': 'Destaca os elementos interativos.',
+  'Controles más grandes': 'Controles maiores',
+  'Aumenta el área táctil de botones y filas.': 'Aumenta a área de toque de botões e linhas.',
+  'Los controles mantienen un indicador de foco visible al navegar con teclado.': 'Os controles mantêm um indicador de foco visível ao navegar com o teclado.',
+  'Español': 'Español',
+  'English': 'English',
+  'Português': 'Português',
+  'Los textos sin traducción disponible se muestran en español.': 'Os textos sem tradução disponível são exibidos em espanhol.',
+  'Notificaciones generales': 'Notificações gerais',
+  'Actividad de la cuenta': 'Atividade da conta',
+  'Recordatorios': 'Lembretes',
+  'Actividad del grupo': 'Atividade do grupo',
+  'Novedades': 'Novidades',
+  'Actualizaciones': 'Atualizações',
+  'Alertas importantes': 'Alertas importantes',
+  'Preferencia guardada para futuras notificaciones.': 'Preferência salva para futuras notificações.',
+  'Preferencia guardada para futuras alertas de cuenta.': 'Preferência salva para futuros alertas da conta.',
+  'Permite programar recordatorios de pago en este dispositivo.': 'Permite programar lembretes de pagamento neste dispositivo.',
+  'Preferencia guardada para futuras alertas de grupos.': 'Preferência salva para futuros alertas dos grupos.',
+  'Preferencia guardada para futuras novedades.': 'Preferência salva para futuras novidades.',
+  'Preferencia guardada para futuras actualizaciones.': 'Preferência salva para futuras atualizações.',
+  'Preferencia guardada para futuras alertas.': 'Preferência salva para futuros alertas.',
+  'No pudimos cancelar los recordatorios programados. Volvé a intentar.': 'Não foi possível cancelar os lembretes programados. Tente novamente.',
+  'La programación de notificaciones no está disponible en la versión web.': 'A programação de notificações não está disponível na versão web.',
+  'Los recordatorios se programan localmente cuando elegís “Recordarme pagar más tarde”. Al desactivarlos se cancelan los recordatorios pendientes de la app.': 'Os lembretes são programados localmente quando você escolhe “Lembrar de pagar mais tarde”. Desativá-los cancela os lembretes pendentes do app.',
+  'Todas las opciones se guardan en este dispositivo.': 'Todas as opções são salvas neste dispositivo.',
+  'Estas preferencias no se sincronizan con otros dispositivos.': 'Estas preferências não são sincronizadas entre dispositivos.',
+  'Solo Recordatorios está conectado a una función de programación; no hay un servicio de envío para las demás alertas.': 'Somente Lembretes está conectado a uma função de programação; os outros alertas não têm serviço de envio.',
+  'Información que guarda la app': 'Informações salvas pelo app',
+  'Junti guarda los datos del perfil y la información de grupos, movimientos y comprobantes necesarios para sus funciones. Las preferencias de configuración y moneda se guardan en este dispositivo; no se sincronizan entre dispositivos.': 'O Junti salva os dados do perfil e as informações de grupos, transações e comprovantes necessários para suas funções. As preferências são salvas neste dispositivo e não são sincronizadas entre dispositivos.',
+  'Revisá el documento y el tratamiento de datos': 'Consulte o documento e o tratamento de dados',
+  'Datos del perfil': 'Dados do perfil',
+  'El perfil se administra desde la pestaña Perfil': 'Gerencie o perfil na aba Perfil',
+  'Controles disponibles': 'Controles disponíveis',
+  'Actualmente no hay controles para cambiar la visibilidad del perfil, exportar o borrar todos los datos, administrar sesiones remotas ni revocar la aceptación de los términos desde la app. No se muestran opciones que prometan esos controles.': 'Atualmente, o app não permite alterar a visibilidade do perfil, exportar ou apagar todos os dados, gerenciar sessões remotas ou revogar a aceitação dos termos. Não são exibidos controles para recursos indisponíveis.',
+  'Sesión de demostración': 'Sessão de demonstração',
+  'Sesión actual': 'Sessão atual',
+  'Sin correo disponible': 'Nenhum e-mail disponível',
+  'Restablecer contraseña': 'Redefinir senha',
+  'Enviaremos un enlace a tu correo': 'Enviaremos um link para seu e-mail',
+  'Disponible para cuentas con e-mail y contraseña': 'Disponível para contas com e-mail e senha',
+  'Sesiones y métodos de acceso': 'Sessões e métodos de acesso',
+  'La app muestra y cierra la sesión de este dispositivo. La administración de sesiones remotas no está disponible. Si ingresaste con Google, la contraseña se administra desde tu cuenta de Google.': 'O app mostra e encerra a sessão deste dispositivo. O gerenciamento de sessões remotas não está disponível. Se você entrou com o Google, gerencie a senha na sua conta Google.',
+  'Cerrar sesión': 'Sair da conta',
+  'Enviamos un enlace para restablecer la contraseña a {email}.': 'Enviamos um link para redefinir a senha para {email}.',
+  'No pudimos enviar el enlace. Revisá tu conexión e intentá otra vez.': 'Não foi possível enviar o link. Verifique a conexão e tente novamente.',
+  'No pudimos cerrar la sesión. Volvé a intentar.': 'Não foi possível sair da conta. Tente novamente.',
+  '¿Querés salir de tu cuenta en este dispositivo?': 'Quer sair da sua conta neste dispositivo?',
+  'Salir': 'Sair',
+  'Aplicación para organizar gastos compartidos y consultar saldos.': 'Aplicativo para organizar despesas compartilhadas e consultar saldos.',
+  'Versión {version}': 'Versão {version}',
+  'Datos y controles disponibles': 'Dados e controles disponíveis',
+  'Sin sesión activa': 'Nenhuma sessão ativa',
+  'Pesos argentinos (ARS)': 'Pesos argentinos (ARS)',
+  'Dólares (USD)': 'Dólares americanos (USD)',
+  'Reales brasileños (BRL)': 'Reais brasileiros (BRL)',
+  'La moneda preferida se usa como sugerencia al crear nuevos grupos. Los grupos existentes no se modifican.': 'A moeda preferida é sugerida ao criar novos grupos. Os grupos existentes não são alterados.',
+  'No pudimos registrar tu aceptación. Revisá tu conexión e intentá nuevamente.': 'Não foi possível registrar sua aceitação. Verifique sua conexão e tente novamente.',
+  // Textos com variáveis
+  '¿Eliminar a {nombre} de tus amigos?': 'Remover {nombre} dos seus amigos?',
+  'Eliminar a {nombre}': 'Remover {nombre}',
+  'Agregar a {nombre} al grupo': 'Adicionar {nombre} ao grupo',
+  '¿Eliminar “{nombre}” y todos sus gastos? Esta acción no se puede deshacer.':
+    'Excluir “{nombre}” e todas as despesas? Esta ação não pode ser desfeita.',
+  '¿Eliminar “{nombre}”? Esta acción no se puede deshacer.':
+    'Excluir “{nombre}”? Esta ação não pode ser desfeita.',
+  '¿Seguro que querés eliminar “{nombre}”? Esta acción no se puede deshacer.':
+    'Excluir “{nombre}”? Esta ação não pode ser desfeita.',
+  '¿Deshacer “{nombre}”? Se borra el pago y su comprobante.':
+    'Desfazer “{nombre}”? O pagamento e o comprovante serão excluídos.',
+  'Recordar a {nombre}': 'Lembrar {nombre}',
+  'Cada participante: {monto}': 'Cada participante: {monto}',
+  '1 grupo': '1 grupo',
+  '{cantidad} grupos': '{cantidad} grupos',
+  '1 integrante · {moneda}': '1 participante · {moneda}',
+  '{cantidad} integrantes · {moneda}': '{cantidad} participantes · {moneda}',
+  'Paso {actual} de {total}': 'Etapa {actual} de {total}',
 }
 
 const textosAyudaEn: Record<string, string> = {
@@ -816,90 +1068,36 @@ const textosAyudaPt: Record<string, string> = {
   'Consultá tus saldos': 'Consulte seus saldos',
 }
 
-export function traducirTexto(idioma: Idioma, texto: string): string {
-  if (idioma === 'es') return texto
+type Valores = Record<string, string | number>
 
+function interpolar(texto: string, valores?: Valores) {
+  if (!valores) return texto
+  return texto.replace(/\{(\w+)\}/g, (marca, nombre: string) =>
+    nombre in valores ? String(valores[nombre]) : marca,
+  )
+}
+
+/**
+ * Traduce un texto escrito en español. La frase en español es la clave del
+ * diccionario; las partes variables se escriben como {nombre} y se completan
+ * con `valores`. Si no hay traducción, se usa el español.
+ */
+export function traducirTexto(
+  idioma: Idioma,
+  texto: string,
+  valores?: Valores,
+): string {
+  if (idioma === 'es') return interpolar(texto, valores)
   const traducciones = idioma === 'en' ? textosEn : textosPt
   const ayuda = idioma === 'en' ? textosAyudaEn : textosAyudaPt
-  const exacta = traducciones[texto] ?? ayuda[texto]
-  if (exacta) return exacta
+  return interpolar(traducciones[texto] ?? ayuda[texto] ?? texto, valores)
+}
 
-  const eliminarAmigo = texto.match(/^¿Eliminar a (.+) de tus amigos\?$/)
-  if (eliminarAmigo) {
-    return idioma === 'en'
-      ? `Remove ${eliminarAmigo[1]} from your friends?`
-      : `Remover ${eliminarAmigo[1]} dos seus amigos?`
-  }
-
-  const eliminarAmigoEtiqueta = texto.match(/^Eliminar a (.+)$/)
-  if (eliminarAmigoEtiqueta) {
-    return idioma === 'en'
-      ? `Remove ${eliminarAmigoEtiqueta[1]}`
-      : `Remover ${eliminarAmigoEtiqueta[1]}`
-  }
-
-  const agregarIntegrante = texto.match(/^Agregar a (.+) al grupo$/)
-  if (agregarIntegrante) {
-    return idioma === 'en'
-      ? `Add ${agregarIntegrante[1]} to the group`
-      : `Adicionar ${agregarIntegrante[1]} ao grupo`
-  }
-
-  const eliminarNombre = texto.match(/^¿Eliminar “(.+)” y todos sus gastos\? Esta acción no se puede deshacer\.$/)
-  if (eliminarNombre) {
-    return idioma === 'en'
-      ? `Delete “${eliminarNombre[1]}” and all its expenses? This cannot be undone.`
-      : `Excluir “${eliminarNombre[1]}” e todas as despesas? Esta ação não pode ser desfeita.`
-  }
-
-  const eliminarGasto = texto.match(/^¿(?:Seguro que querés )?eliminar “(.+)”\? Esta acción no se puede deshacer\.$/)
-  if (eliminarGasto) {
-    return idioma === 'en'
-      ? `Delete “${eliminarGasto[1]}”? This cannot be undone.`
-      : `Excluir “${eliminarGasto[1]}”? Esta ação não pode ser desfeita.`
-  }
-
-  const deshacerPago = texto.match(/^¿Deshacer “(.+)”\? Se borra el pago y su comprobante\.$/)
-  if (deshacerPago) {
-    return idioma === 'en'
-      ? `Undo “${deshacerPago[1]}”? The payment and its receipt will be deleted.`
-      : `Desfazer “${deshacerPago[1]}”? O pagamento e o comprovante serão excluídos.`
-  }
-
-  const recordarA = texto.match(/^Recordar a (.+)$/)
-  if (recordarA) {
-    return idioma === 'en'
-      ? `Remind ${recordarA[1]}`
-      : `Lembrar ${recordarA[1]}`
-  }
-
-  const participante = texto.match(/^Cada participante: (.+)$/)
-  if (participante) {
-    return idioma === 'en'
-      ? `Each participant: ${participante[1]}`
-      : `Cada participante: ${participante[1]}`
-  }
-
-  const cantidadGrupos = texto.match(/^(\d+) grupo(s?)$/)
-  if (cantidadGrupos) {
-    return idioma === 'en'
-      ? `${cantidadGrupos[1]} group${Number(cantidadGrupos[1]) === 1 ? '' : 's'}`
-      : `${cantidadGrupos[1]} grupo${Number(cantidadGrupos[1]) === 1 ? '' : 's'}`
-  }
-
-  const cantidadIntegrantes = texto.match(/^(\d+) integrante(s?) · (.+)$/)
-  if (cantidadIntegrantes) {
-    return idioma === 'en'
-      ? `${cantidadIntegrantes[1]} member${Number(cantidadIntegrantes[1]) === 1 ? '' : 's'} · ${cantidadIntegrantes[3]}`
-      : `${cantidadIntegrantes[1]} participante${Number(cantidadIntegrantes[1]) === 1 ? '' : 's'} · ${cantidadIntegrantes[3]}`
-  }
-
-  const paso = texto.match(/^Paso (\d+) de (\d+)$/)
-  if (paso) {
-    return idioma === 'en'
-      ? `Step ${paso[1]} of ${paso[2]}`
-      : `Etapa ${paso[1]} de ${paso[2]}`
-  }
-
-  return texto
+/** Devuelve `t(texto, valores?)` en el idioma elegido por el usuario. */
+export function useTraduccion() {
+  const idioma = useAppStore((state) => state.preferencias.language)
+  return useCallback(
+    (texto: string, valores?: Valores) => traducirTexto(idioma, texto, valores),
+    [idioma],
+  )
 }

@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react-native'
 import { Pressable, ScrollView, View } from 'react-native'
 import { Boton, Opcion } from '@/components/Formulario'
 import { Texto } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 import { useAppStore, type Preferencias } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { usePaletaActual } from '@/theme/usePaletaActual'
@@ -19,23 +19,23 @@ const TAMANOS: { valor: Preferencias['fontSize']; porcentaje: number }[] = [
 ]
 
 const ETIQUETAS_TEMA: Record<Preferencias['theme'], string> = {
-  light: 'appearance.light',
-  dark: 'appearance.dark',
-  system: 'appearance.system',
+  light: 'Claro',
+  dark: 'Oscuro',
+  system: 'Automático',
 }
 
 const ETIQUETAS_FUENTE: Record<Preferencias['fontFamily'], string> = {
-  system: 'appearance.fontSystem',
-  serif: 'appearance.fontSerif',
-  monospace: 'appearance.fontMonospace',
+  system: 'Predeterminada del sistema',
+  serif: 'Serif',
+  monospace: 'Monoespaciada',
 }
 
 const ETIQUETAS_TAMANO: Record<Preferencias['fontSize'], string> = {
-  verySmall: 'appearance.verySmall',
-  small: 'appearance.small',
-  normal: 'appearance.normal',
-  large: 'appearance.large',
-  veryLarge: 'appearance.veryLarge',
+  verySmall: 'Muy pequeño',
+  small: 'Pequeño',
+  normal: 'Normal',
+  large: 'Grande',
+  veryLarge: 'Muy grande',
 }
 
 export function AparienciaScreen() {
@@ -68,10 +68,10 @@ export function AparienciaScreen() {
 
       <View className="gap-3 rounded-2xl border border-slate-100 bg-surface p-4">
         <Texto className="text-base font-semibold text-text">
-          {t('appearance.theme')}
+          {t('Tema')}
         </Texto>
         <Texto className="text-sm leading-6 text-textMuted">
-          {t('appearance.systemDescription')}
+          {t('Usa la preferencia del dispositivo')}
         </Texto>
         {TEMAS.map((tema) => (
           <Opcion
@@ -85,7 +85,7 @@ export function AparienciaScreen() {
 
       <View className="gap-3 rounded-2xl border border-slate-100 bg-surface p-4">
         <Texto className="text-base font-semibold text-text">
-          {t('appearance.font')}
+          {t('Tipografía')}
         </Texto>
         {FUENTES.map((fuente) => (
           <Opcion
@@ -97,7 +97,7 @@ export function AparienciaScreen() {
         ))}
         <View className="rounded-xl bg-subtle p-3">
           <Texto className="text-base text-text">
-            {t('appearance.preview')}
+            {t('Vista previa: Gastos compartidos')}
           </Texto>
         </View>
       </View>
@@ -105,7 +105,7 @@ export function AparienciaScreen() {
       <View className="gap-3 rounded-2xl border border-slate-100 bg-surface p-4">
         <View className="flex-row items-center justify-between gap-2">
           <Texto className="flex-1 text-base font-semibold text-text">
-            {t('appearance.fontSize')}
+            {t('Tamaño del texto')}
           </Texto>
           <Texto
             accessibilityLiveRegion="polite"
@@ -125,7 +125,7 @@ export function AparienciaScreen() {
           />
         ))}
         <Boton
-          texto={t('appearance.reset')}
+          texto={t('Restablecer tamaño')}
           secundario
           onPress={() => actualizarPreferencias({ fontSize: 'normal' })}
         />

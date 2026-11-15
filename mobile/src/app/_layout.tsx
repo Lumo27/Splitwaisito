@@ -24,7 +24,7 @@ import {
   FACTORES_TAMANO_TEXTO,
   obtenerFuente,
 } from '@/theme/paleta'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
 import {
   cargarPreferenciasUsuario,
@@ -166,57 +166,57 @@ function AppNavigator() {
         </Stack.Protected>
         <Stack.Protected guard={Boolean(usuario) && terminosAceptados}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="grupos/[id]/index" options={{ title: t('nav.groups') }} />
+          <Stack.Screen name="grupos/[id]/index" options={{ title: t('Gastos') }} />
           <Stack.Screen
             name="grupos/nuevo"
-            options={{ title: t('groups.create'), presentation: 'modal' }}
+            options={{ title: t('Crear grupo'), presentation: 'modal' }}
           />
           <Stack.Screen
             name="grupos/[id]/cargar-gasto"
-            options={{ title: t('expenses.create'), presentation: 'modal' }}
+            options={{ title: t('Cargar gasto'), presentation: 'modal' }}
           />
           <Stack.Screen
             name="grupos/[id]/gasto/[gastoId]"
-            options={{ title: t('expenses.details') }}
+            options={{ title: t('Detalle del movimiento') }}
           />
           <Stack.Screen
             name="grupos/[id]/saldar"
-            options={{ title: t('debts.settle'), presentation: 'modal' }}
+            options={{ title: t('Saldar deuda'), presentation: 'modal' }}
           />
           <Stack.Screen
             name="configuracion/accesibilidad"
-            options={{ title: t('accessibility.title') }}
+            options={{ title: t('Accesibilidad') }}
           />
           <Stack.Screen
             name="configuracion/apariencia"
             options={{
-              title: t('settings.appearance'),
+              title: t('Apariencia'),
               headerBackVisible: false,
             }}
           />
           <Stack.Screen
             name="configuracion/idioma"
-            options={{ title: t('settings.language') }}
+            options={{ title: t('Idioma') }}
           />
           <Stack.Screen
             name="configuracion/notificaciones"
-            options={{ title: t('settings.notifications') }}
+            options={{ title: t('Notificaciones') }}
           />
           <Stack.Screen
             name="configuracion/moneda"
-            options={{ title: t('settings.currency') }}
+            options={{ title: t('Moneda preferida') }}
           />
           <Stack.Screen
             name="configuracion/privacidad"
-            options={{ title: t('settings.privacy') }}
+            options={{ title: t('Privacidad') }}
           />
           <Stack.Screen
             name="configuracion/seguridad"
-            options={{ title: t('settings.security') }}
+            options={{ title: t('Seguridad') }}
           />
           <Stack.Screen
             name="configuracion/acerca"
-            options={{ title: t('settings.about') }}
+            options={{ title: t('Acerca de Junti') }}
           />
         </Stack.Protected>
       </Stack>

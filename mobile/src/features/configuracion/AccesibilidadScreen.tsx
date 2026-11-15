@@ -1,6 +1,6 @@
 import { ScrollView, Switch, View } from 'react-native'
 import { Texto } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { usePaletaActual } from '@/theme/usePaletaActual'
@@ -20,33 +20,33 @@ const OPCIONES: {
 }[] = [
   {
     clave: 'highContrast',
-    etiqueta: 'accessibility.highContrast',
-    descripcion: 'accessibility.highContrastDescription',
+    etiqueta: 'Aumentar contraste',
+    descripcion: 'Refuerza el contraste de textos, bordes y superficies.',
   },
   {
     clave: 'reducedMotion',
-    etiqueta: 'accessibility.reducedMotion',
-    descripcion: 'accessibility.reducedMotionDescription',
+    etiqueta: 'Reducir animaciones',
+    descripcion: 'Desactiva las transiciones de navegación de la app.',
   },
   {
     clave: 'respectSystemMotion',
-    etiqueta: 'accessibility.respectMotion',
-    descripcion: 'accessibility.respectMotionDescription',
+    etiqueta: 'Respetar el sistema',
+    descripcion: 'Reduce las animaciones cuando el dispositivo lo indique.',
   },
   {
     clave: 'improveReadability',
-    etiqueta: 'accessibility.readability',
-    descripcion: 'accessibility.readabilityDescription',
+    etiqueta: 'Mejorar legibilidad',
+    descripcion: 'Usa texto más legible y aumenta el espacio de línea.',
   },
   {
     clave: 'highlightInteractive',
-    etiqueta: 'accessibility.highlight',
-    descripcion: 'accessibility.highlightDescription',
+    etiqueta: 'Destacar controles',
+    descripcion: 'Marca con claridad los elementos interactivos.',
   },
   {
     clave: 'largeTouchTargets',
-    etiqueta: 'accessibility.touchTargets',
-    descripcion: 'accessibility.touchTargetsDescription',
+    etiqueta: 'Controles más grandes',
+    descripcion: 'Aumenta el área táctil de botones y filas.',
   },
 ]
 
@@ -114,7 +114,7 @@ export function AccesibilidadScreen() {
         ))}
       </View>
       <Texto className="px-1 text-xs leading-5 text-textMuted">
-        {t('accessibility.focus')}
+        {t('Los controles mantienen un indicador de foco visible al navegar con teclado.')}
       </Texto>
     </ScrollView>
   )

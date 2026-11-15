@@ -8,8 +8,10 @@ import { usePaletaActual } from '@/theme/usePaletaActual'
 import { obtenerVariablesTema } from '@/theme/paleta'
 
 import { obtenerTutorial, TUTORIALES } from './tutoriales'
+import { useTraduccion } from '@/i18n/textos'
 
 export function HelpAssistant({ pathname }: { pathname: string }) {
+  const t = useTraduccion()
   const [abierto, setAbierto] = useState(false)
   const [pasoActual, setPasoActual] = useState(0)
   const [finalizado, setFinalizado] = useState(false)
@@ -29,7 +31,7 @@ export function HelpAssistant({ pathname }: { pathname: string }) {
     <>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Abrir ayuda: ${tutorial.title}`}
+        accessibilityLabel={t('Abrir ayuda: {titulo}', { titulo: t(tutorial.title) })}
         onPress={() => setAbierto(true)}
         className="absolute right-5 z-40 h-12 w-12 items-center justify-center rounded-full bg-primary shadow-lg active:bg-primary-dark"
         style={{ top: 56 }}
@@ -123,7 +125,10 @@ export function HelpAssistant({ pathname }: { pathname: string }) {
                   ))}
                 </View>
                 <Text className="text-xs font-bold uppercase tracking-wide text-primary-dark">
-                  Paso {pasoActual + 1} de {tutorial.steps.length}
+                  {t('Paso {actual} de {total}', {
+                    actual: pasoActual + 1,
+                    total: tutorial.steps.length,
+                  })}
                 </Text>
                 <Text className="mt-2 text-2xl font-bold text-text">
                   {paso.title}

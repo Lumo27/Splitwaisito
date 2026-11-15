@@ -3,14 +3,14 @@ import { Opcion } from '@/components/Formulario'
 import { Texto as Text } from '@/components/Texto'
 import { useAppStore } from '@/store/useAppStore'
 import type { Preferencias } from '@/store/useAppStore'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 
 type MonedaPreferida = Preferencias['monedaPreferida']
 
 const OPCIONES: { valor: MonedaPreferida; clave: string }[] = [
-  { valor: 'ARS', clave: 'currency.ars' },
-  { valor: 'USD', clave: 'currency.usd' },
-  { valor: 'BRL', clave: 'currency.brl' },
+  { valor: 'ARS', clave: 'Pesos argentinos (ARS)' },
+  { valor: 'USD', clave: 'Dólares (USD)' },
+  { valor: 'BRL', clave: 'Reales brasileños (BRL)' },
 ]
 
 export function MonedaScreen() {
@@ -35,7 +35,7 @@ export function MonedaScreen() {
       </View>
 
       <Text className="mt-2 px-1 text-xs leading-5 text-textMuted">
-        {t('currency.description')}
+        {t('La moneda preferida se usa como sugerencia al crear nuevos grupos. Los grupos existentes no se modifican.')}
       </Text>
     </ScrollView>
   )

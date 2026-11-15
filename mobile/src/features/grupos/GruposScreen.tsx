@@ -18,8 +18,10 @@ import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 import { avisar, confirmar } from '@/utils/alerta'
+import { useTraduccion } from '@/i18n/textos'
 
 export function GruposScreen() {
+  const t = useTraduccion()
   const paleta = usePaletaActual()
   const usuarioId = useAppStore((state) => state.usuarioActual?.id)
   const [grupos, setGrupos] = useState<GrupoFirestore[]>([])
@@ -65,7 +67,10 @@ export function GruposScreen() {
   function confirmarEliminar(grupo: GrupoFirestore) {
     confirmar({
       titulo: 'Eliminar grupo',
-      mensaje: `¿Eliminar “${grupo.nombre}” y todos sus gastos? Esta acción no se puede deshacer.`,
+      mensaje: t(
+        '¿Eliminar “{nombre}” y todos sus gastos? Esta acción no se puede deshacer.',
+        { nombre: grupo.nombre },
+      ),
       textoConfirmar: 'Eliminar',
       textoCancelar: 'Cancelar',
       destructivo: true,
@@ -151,7 +156,9 @@ export function GruposScreen() {
             </View>
           ) : null}
           <Text className="text-sm font-semibold text-text-muted">
-            {grupos.length} grupo{grupos.length === 1 ? '' : 's'}
+            {grupos.length === 1
+              ? t('1 grupo')
+              : t('{cantidad} grupos', { cantidad: grupos.length })}
           </Text>
         </View>
       }
@@ -195,8 +202,12 @@ export function GruposScreen() {
                 {grupo.nombre}
               </Text>
               <Text className="text-xs text-text-muted">
-                {grupo.miembros.length} integrante
-                {grupo.miembros.length === 1 ? '' : 's'} · {grupo.moneda ?? 'ARS'}
+                {grupo.miembros.length === 1
+                  ? t('1 integrante · {moneda}', { moneda: grupo.moneda ?? 'ARS' })
+                  : t('{cantidad} integrantes · {moneda}', {
+                      cantidad: grupo.miembros.length,
+                      moneda: grupo.moneda ?? 'ARS',
+                    })}
               </Text>
               {grupo.descripcion ? (
                 <Text numberOfLines={2} className="text-xs text-text-muted">

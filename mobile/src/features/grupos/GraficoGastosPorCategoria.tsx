@@ -4,6 +4,7 @@ import type { GastoFirestore } from '@/services/firestore'
 import { COLOR_CATEGORIAS } from '@/theme/categorias'
 import { formatearMoneda, type MonedaCodigo } from '@/theme/moneda'
 import { resumirGastosPorCategoria } from './gastosPorCategoria'
+import { useTraduccion } from '@/i18n/textos'
 
 export function GastosPorCategoria({
   gastos,
@@ -12,6 +13,7 @@ export function GastosPorCategoria({
   gastos: GastoFirestore[]
   moneda: MonedaCodigo
 }) {
+  const t = useTraduccion()
   const resumen = resumirGastosPorCategoria(gastos)
   const total = resumen.reduce((suma, item) => suma + item.monto, 0)
 
@@ -25,7 +27,7 @@ export function GastosPorCategoria({
           Gastos por categoría
         </Text>
         <Text className="text-sm text-text-muted">
-          Distribución de gastos · {moneda}
+          {t('Distribución de gastos · {moneda}', { moneda })}
         </Text>
       </View>
       {total === 0 ? (

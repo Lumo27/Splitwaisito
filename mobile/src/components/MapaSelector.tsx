@@ -5,6 +5,7 @@ import { MapPin, X } from 'lucide-react-native'
 import { MapaLeaflet, type Coordenadas } from './MapaLeaflet'
 import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
 import { usePaletaActual } from '@/theme/usePaletaActual'
+import { useTraduccion } from '@/i18n/textos'
 
 interface Props {
   visible: boolean
@@ -19,6 +20,7 @@ export function MapaSelector({
   coordenadasIniciales,
   onSeleccionar,
 }: Props) {
+  const t = useTraduccion()
   const [seleccion, setSeleccion] = useState<Coordenadas | null>(
     coordenadasIniciales ?? null,
   )
@@ -59,7 +61,10 @@ export function MapaSelector({
           </Text>
           {seleccion ? (
             <Text className="mb-3 text-sm font-semibold text-primary-dark">
-              Coordenadas: {seleccion.lat.toFixed(5)}, {seleccion.lng.toFixed(5)}
+              {t('Coordenadas: {lat}, {lng}', {
+                lat: seleccion.lat.toFixed(5),
+                lng: seleccion.lng.toFixed(5),
+              })}
             </Text>
           ) : (
             <Text className="mb-3 text-sm text-text-muted">

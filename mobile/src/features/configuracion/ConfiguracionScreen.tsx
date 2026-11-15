@@ -20,7 +20,7 @@ import { restablecerSeeds } from '@/services/seedBackend'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { Texto as Text } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 import { confirmar } from '@/utils/alerta'
 
 function SeccionTitulo({ texto }: { texto: string }) {
@@ -70,10 +70,10 @@ export function ConfiguracionScreen() {
       useAppStore
         .getState()
         .reemplazarAmigos(await obtenerAmigosAceptados(usuario.id))
-      setMensajeRestablecer(t('demo.resetSuccess'))
+      setMensajeRestablecer(t('Datos de ejemplo restablecidos.'))
     } catch (fallo) {
       console.error('No se pudieron restablecer los datos de ejemplo.', fallo)
-      setErrorRestablecer(t('demo.resetError'))
+      setErrorRestablecer(t('No pudimos restablecer los datos de ejemplo.'))
     } finally {
       mutacion.current = false
       setRestableciendo(false)
@@ -88,90 +88,90 @@ export function ConfiguracionScreen() {
       <Mensaje texto={mensajeRestablecer} />
       <Mensaje texto={errorRestablecer} error />
 
-      <SeccionTitulo texto={t('settings.account')} />
+      <SeccionTitulo texto={t('Cuenta')} />
       <TarjetaSeccion>
         <FilaConfig
           icono={<CircleUserRound size={18} color={colores.primary} />}
-          titulo={usuario?.nombre ?? t('settings.noSession')}
+          titulo={usuario?.nombre ?? t('Sin sesión activa')}
           descripcion={usuario?.email ?? ''}
           onPress={() => router.push('/perfil')}
         />
       </TarjetaSeccion>
 
-      <SeccionTitulo texto={t('settings.preferences')} />
+      <SeccionTitulo texto={t('Preferencias')} />
       <TarjetaSeccion>
         <FilaConfig
           icono={<Palette size={18} color={colores.primary} />}
-          titulo={t('settings.appearance')}
-          descripcion={t('settings.appearanceDescription')}
+          titulo={t('Apariencia')}
+          descripcion={t('Tema, fuente y tamaño de texto')}
           onPress={() => router.push('/configuracion/apariencia')}
         />
         <FilaConfig
           icono={<Languages size={18} color={colores.primary} />}
-          titulo={t('settings.language')}
+          titulo={t('Idioma')}
           descripcion={t(`language.${idioma}`)}
           onPress={() => router.push('/configuracion/idioma')}
         />
         <FilaConfig
           icono={<Bell size={18} color={colores.primary} />}
-          titulo={t('settings.notifications')}
-          descripcion={t('settings.notificationsDescription')}
+          titulo={t('Notificaciones')}
+          descripcion={t('Administrá tus preferencias')}
           onPress={() => router.push('/configuracion/notificaciones')}
         />
         <FilaConfig
           icono={<DollarSign size={18} color={colores.primary} />}
-          titulo={t('settings.currency')}
-          descripcion={t('settings.currencyDescription')}
+          titulo={t('Moneda preferida')}
+          descripcion={t('Sugerencia al crear nuevos grupos')}
           onPress={() => router.push('/configuracion/moneda')}
         />
       </TarjetaSeccion>
 
-      <SeccionTitulo texto={t('settings.privacySecurity')} />
+      <SeccionTitulo texto={t('Información y protección')} />
       <TarjetaSeccion>
         <FilaConfig
           icono={<Shield size={18} color={colores.primary} />}
-          titulo={t('settings.privacy')}
-          descripcion={t('settings.privacyDescription')}
+          titulo={t('Privacidad')}
+          descripcion={t('Datos, visibilidad y consentimientos')}
           onPress={() => router.push('/configuracion/privacidad')}
         />
         <FilaConfig
           icono={<ShieldCheck size={18} color={colores.primary} />}
-          titulo={t('settings.security')}
-          descripcion={t('settings.securityDescription')}
+          titulo={t('Seguridad')}
+          descripcion={t('Sesión, contraseña y acceso a la cuenta')}
           onPress={() => router.push('/configuracion/seguridad')}
         />
         <FilaConfig
           icono={<Info size={18} color={colores.textMuted} />}
-          titulo={t('settings.about')}
-          descripcion={t('settings.aboutDescription')}
+          titulo={t('Acerca de Junti')}
+          descripcion={t('Versión, documentos e información')}
           onPress={() => router.push('/configuracion/acerca')}
         />
         <FilaConfig
           icono={<Accessibility size={18} color={colores.primary} />}
-          titulo={t('accessibility.title')}
-          descripcion={t('settings.accessibilityDescription')}
+          titulo={t('Accesibilidad')}
+          descripcion={t('Contraste, animaciones y legibilidad')}
           onPress={() => router.push('/configuracion/accesibilidad')}
         />
       </TarjetaSeccion>
 
       {MODO_SEEDS && (
         <>
-          <SeccionTitulo texto={t('demo.section')} />
+          <SeccionTitulo texto={t('Modo demo')} />
           <View className="gap-3 rounded-2xl border border-slate-100 bg-surface p-4">
             <Text className="text-sm leading-5 text-textMuted">
-              {t('settings.demo')}
+              {t('Estás usando el modo demo. Tus preferencias se guardan en este dispositivo.')}
             </Text>
             <Boton
-              texto={t('demo.resetButton')}
+              texto={t('Restablecer datos de ejemplo')}
               peligro
               disabled={restableciendo}
               cargando={restableciendo}
               onPress={() =>
                 confirmar({
-                  titulo: t('demo.resetTitle'),
-                  mensaje: t('demo.resetPrompt'),
-                  textoConfirmar: t('demo.resetConfirm'),
-                  textoCancelar: t('security.cancel'),
+                  titulo: t('Restablecer datos'),
+                  mensaje: t('Se borrarán los cambios realizados en el modo demo de este dispositivo. ¿Continuar?'),
+                  textoConfirmar: t('Restablecer'),
+                  textoCancelar: t('Cancelar'),
                   destructivo: true,
                   alConfirmar: () => {
                     void reiniciarDemo()

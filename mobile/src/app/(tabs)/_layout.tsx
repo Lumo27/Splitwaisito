@@ -3,7 +3,7 @@ import { Receipt, Settings, User, UserPlus } from 'lucide-react-native'
 
 import { colores } from '@/theme/colores'
 import { useAppStore } from '@/store/useAppStore'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 import { useColorScheme } from 'nativewind'
 import { FACTORES_TAMANO_TEXTO } from '@/theme/paleta'
 
@@ -40,20 +40,20 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="grupos"
-        options={{ title: t('nav.groups'), tabBarIcon: ({ color }) => <Receipt color={color} size={22} /> }}
+        options={{ title: t('Gastos'), tabBarIcon: ({ color }) => <Receipt color={color} size={22} /> }}
       />
       <Tabs.Screen
         name="actividad"
-        options={{ title: t('nav.activity'), tabBarIcon: ({ color }) => <UserPlus color={color} size={22} /> }}
+        options={{ title: t('Amigos'), tabBarIcon: ({ color }) => <UserPlus color={color} size={22} /> }}
       />
       <Tabs.Screen
         name="perfil"
-        options={{ title: t('nav.profile'), tabBarIcon: ({ color }) => <User color={color} size={22} /> }}
+        options={{ title: t('Perfil'), tabBarIcon: ({ color }) => <User color={color} size={22} /> }}
       />
       <Tabs.Screen
         name="configuracion"
         options={{
-          title: t('nav.settings'),
+          title: t('Configuración'),
           tabBarIcon: ({ color }) => <Settings color={color} size={22} />,
         }}
       />

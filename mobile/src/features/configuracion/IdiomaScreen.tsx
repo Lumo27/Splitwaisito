@@ -1,13 +1,13 @@
 import { ScrollView, View } from 'react-native'
 import { Opcion } from '@/components/Formulario'
 import { Texto } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 import { useAppStore, type Preferencias } from '@/store/useAppStore'
 
 const IDIOMAS: { valor: Preferencias['language']; clave: string }[] = [
-  { valor: 'es', clave: 'language.es' },
-  { valor: 'en', clave: 'language.en' },
-  { valor: 'pt', clave: 'language.pt' },
+  { valor: 'es', clave: 'Español' },
+  { valor: 'en', clave: 'English' },
+  { valor: 'pt', clave: 'Português' },
 ]
 
 export function IdiomaScreen() {
@@ -33,7 +33,7 @@ export function IdiomaScreen() {
         ))}
       </View>
       <Texto className="px-1 text-xs leading-5 text-textMuted">
-        {t('language.fallback')}
+        {t('Los textos sin traducción disponible se muestran en español.')}
       </Texto>
     </ScrollView>
   )

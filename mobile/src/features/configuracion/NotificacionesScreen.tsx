@@ -5,7 +5,7 @@ import { cancelarRecordatoriosDeuda, recordatoriosDisponibles } from '@/services
 import { useAppStore, type Preferencias } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { Texto as Text } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 
 type ClaveNotificacion =
@@ -24,38 +24,38 @@ const OPCIONES: {
 }[] = [
   {
     clave: 'notificacionesGenerales',
-    titulo: 'notifications.general',
-    descripcion: 'notifications.saved',
+    titulo: 'Notificaciones generales',
+    descripcion: 'Preferencia guardada para futuras notificaciones.',
   },
   {
     clave: 'notificacionesCuenta',
-    titulo: 'notifications.account',
-    descripcion: 'notifications.accountSaved',
+    titulo: 'Actividad de la cuenta',
+    descripcion: 'Preferencia guardada para futuras alertas de cuenta.',
   },
   {
     clave: 'notificacionesRecordatorios',
-    titulo: 'notifications.reminders',
-    descripcion: 'notifications.remindersDescription',
+    titulo: 'Recordatorios',
+    descripcion: 'Permite programar recordatorios de pago en este dispositivo.',
   },
   {
     clave: 'notificacionesActividad',
-    titulo: 'notifications.group',
-    descripcion: 'notifications.groupSaved',
+    titulo: 'Actividad del grupo',
+    descripcion: 'Preferencia guardada para futuras alertas de grupos.',
   },
   {
     clave: 'notificacionesNovedades',
-    titulo: 'notifications.news',
-    descripcion: 'notifications.newsSaved',
+    titulo: 'Novedades',
+    descripcion: 'Preferencia guardada para futuras novedades.',
   },
   {
     clave: 'notificacionesActualizaciones',
-    titulo: 'notifications.updates',
-    descripcion: 'notifications.updatesSaved',
+    titulo: 'Actualizaciones',
+    descripcion: 'Preferencia guardada para futuras actualizaciones.',
   },
   {
     clave: 'notificacionesAlertas',
-    titulo: 'notifications.alerts',
-    descripcion: 'notifications.alertsSaved',
+    titulo: 'Alertas importantes',
+    descripcion: 'Preferencia guardada para futuras alertas.',
   },
 ]
 
@@ -131,7 +131,7 @@ export function NotificacionesScreen() {
         await cancelarRecordatoriosDeuda()
         actualizarPreferencias(CAMBIOS_PREFERENCIA[clave](valor))
       } catch {
-        setError(t('notifications.cancelError'))
+        setError(t('No pudimos cancelar los recordatorios programados. Volvé a intentar.'))
       } finally {
         setOcupada(false)
       }
@@ -165,14 +165,14 @@ export function NotificacionesScreen() {
 
       <Text className="mt-4 px-1 text-xs leading-5 text-textMuted">
         {recordatoriosDisponibles
-          ? t('notifications.local')
-          : t('notifications.web')}
+          ? t('Los recordatorios se programan localmente cuando elegís “Recordarme pagar más tarde”. Al desactivarlos se cancelan los recordatorios pendientes de la app.')
+          : t('La programación de notificaciones no está disponible en la versión web.')}
         {' '}
-        {t('notifications.localOnly')} {t('notifications.noService')}
+        {t('Todas las opciones se guardan en este dispositivo.')} {t('Solo Recordatorios está conectado a una función de programación; no hay un servicio de envío para las demás alertas.')}
       </Text>
       {Platform.OS === 'web' && (
         <Text className="mt-2 px-1 text-xs leading-5 text-textMuted">
-          {t('notifications.notSynced')}
+          {t('Estas preferencias no se sincronizan con otros dispositivos.')}
         </Text>
       )}
     </ScrollView>

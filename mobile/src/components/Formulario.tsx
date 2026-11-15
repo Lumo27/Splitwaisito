@@ -13,7 +13,7 @@ import { ChevronRight } from 'lucide-react-native'
 import { Texto as Text } from '@/components/Texto'
 import { useAppStore } from '@/store/useAppStore'
 import { FACTORES_TAMANO_TEXTO, obtenerFuente } from '@/theme/paleta'
-import { traducirTexto } from '@/i18n/translations'
+import { traducirTexto } from '@/i18n/textos'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 
 export function Pantalla({ children }: { children: ReactNode }) {

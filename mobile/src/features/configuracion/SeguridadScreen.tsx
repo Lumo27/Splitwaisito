@@ -10,7 +10,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { confirmar } from '@/utils/alerta'
 import { Texto as Text } from '@/components/Texto'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 
 export function SeguridadScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
@@ -35,9 +35,13 @@ export function SeguridadScreen() {
     setMensaje('')
     try {
       await sendPasswordResetEmail(auth, email)
-      setMensaje(t('security.resetSent').replace('{email}', email))
+      setMensaje(
+        t('Enviamos un enlace para restablecer la contraseña a {email}.', {
+          email,
+        }),
+      )
     } catch {
-      setError(t('security.resetError'))
+      setError(t('No pudimos enviar el enlace. Revisá tu conexión e intentá otra vez.'))
     } finally {
       mutacion.current = false
       setOcupado(false)
@@ -54,7 +58,7 @@ export function SeguridadScreen() {
       useAppStore.getState().cerrarSesion()
       router.replace('/login')
     } catch {
-      setError(t('security.logoutError'))
+      setError(t('No pudimos cerrar la sesión. Volvé a intentar.'))
     } finally {
       mutacion.current = false
       setOcupado(false)
@@ -72,17 +76,17 @@ export function SeguridadScreen() {
       <View className="overflow-hidden rounded-2xl border border-slate-100 bg-surface">
         <FilaConfig
           icono={<ShieldCheck size={18} color={colores.primary} />}
-          titulo={t(MODO_SEEDS ? 'security.demo' : 'security.current')}
-          descripcion={email || t('security.noEmail')}
+          titulo={t(MODO_SEEDS ? 'Sesión de demostración' : 'Sesión actual')}
+          descripcion={email || t('Sin correo disponible')}
           derecha={<View />}
         />
         <FilaConfig
           icono={<Mail size={18} color={colores.primary} />}
-          titulo={t('security.password')}
+          titulo={t('Restablecer contraseña')}
           descripcion={
             puedeRestablecer
-              ? t('security.passwordAvailable')
-              : t('security.passwordUnavailable')
+              ? t('Enviaremos un enlace a tu correo')
+              : t('Disponible para cuentas con e-mail y contraseña')
           }
           onPress={() => {
             void restablecerContrasena()
@@ -93,23 +97,23 @@ export function SeguridadScreen() {
 
       <View className="gap-2 rounded-2xl border border-slate-100 bg-surface p-4">
         <Text className="text-base font-semibold text-text">
-          {t('security.methods')}
+          {t('Sesiones y métodos de acceso')}
         </Text>
         <Text className="text-sm leading-6 text-textMuted">
-          {t('security.methodsDescription')}
+          {t('La app muestra y cierra la sesión de este dispositivo. La administración de sesiones remotas no está disponible. Si ingresaste con Google, la contraseña se administra desde tu cuenta de Google.')}
         </Text>
       </View>
 
       <Boton
-        texto={t('security.logout')}
+        texto={t('Cerrar sesión')}
         peligro
         disabled={ocupado}
         onPress={() =>
           confirmar({
-            titulo: t('security.logoutTitle'),
-            mensaje: t('security.logoutConfirm'),
-            textoConfirmar: t('security.confirm'),
-            textoCancelar: t('security.cancel'),
+            titulo: t('Cerrar sesión'),
+            mensaje: t('¿Querés salir de tu cuenta en este dispositivo?'),
+            textoConfirmar: t('Salir'),
+            textoCancelar: t('Cancelar'),
             destructivo: false,
             alConfirmar: () => {
               void cerrarSesion()

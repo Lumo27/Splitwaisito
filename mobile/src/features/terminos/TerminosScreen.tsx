@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTerminosAcceptance } from '@/features/auth/AuthBootstrap'
 import { TERMINOS_DOCUMENTO } from './terminos'
 import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
-import { useTraduccion } from '@/i18n/translations'
+import { useTraduccion } from '@/i18n/textos'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 
 function textoEnriquecido(texto: string) {
@@ -113,7 +113,7 @@ export function TerminosScreen() {
       await aceptar()
     } catch {
       setErrorAceptacion(
-        t('terms.acceptError'),
+        t('No pudimos registrar tu aceptación. Revisá tu conexión e intentá nuevamente.'),
       )
     } finally {
       setOcupado(false)
