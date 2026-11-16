@@ -66,6 +66,17 @@ Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -
 
 El inicio de sesión con Google usa `@react-native-google-signin/google-signin` y solo funciona en el APK (compilación propia); en Expo Go se usan demo o e-mail/contraseña.
 
+## Versión web publicada
+
+La app está publicada en **https://splitwaisito-a5879.web.app** (Firebase Hosting, plan Spark, contra Firebase real). Se exporta como una sola página (`"output": "single"` en `app.json`) y `firebase.json` envía todas las rutas a `index.html`. Para publicar una versión nueva, desde la raíz del repo y con sesión iniciada en Firebase (`npx firebase-tools login`):
+
+```bash
+cd mobile && npx expo export --platform web && cd ..
+npx firebase-tools deploy --only hosting
+```
+
+Exportar sin `EXPO_PUBLIC_MODO_SEEDS`, para que la versión publicada use Firebase real. En web no hay notificaciones ni inicio con Google; el resto funciona igual que en el celular.
+
 ## Verificaciones
 
 ```powershell
