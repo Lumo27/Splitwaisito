@@ -47,7 +47,9 @@ Estas consultas no generaron código por sí mismas; sirvieron para tomar decisi
 
 ## 5. Uso de IA del resto del equipo
 
-Cada integrante suma sus propias filas a `planilla-uso-ia.xlsx` (herramienta, finalidad, prompt clave y qué se usó), tal como indica la hoja "Cómo completar". Tarjeta de Trello: #21.
+> Desde el 16/11/2026 todos los registros de este informe están cargados en `docs/planilla-uso-ia.xlsx`. Los usos nuevos se agregan directamente en la planilla.
+
+Cada integrante suma sus propias filas a `docs/planilla-uso-ia.xlsx` (herramienta, finalidad, prompt clave y qué se usó), tal como indica la hoja "Cómo completar". Tarjeta de Trello: #21.
 
 | Integrante | Estado del registro |
 |---|---|
