@@ -237,7 +237,7 @@ export function GruposScreen() {
               casa o una salida.
             </Text>
           </View>
-        ) : null
+        ) : undefined
       }
       renderItem={({ item: grupo }) => (
         <View className="flex-row items-center rounded-2xl border border-slate-100 bg-surface p-2">

@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentRef,
+  type ReactNode,
+} from 'react'
 import {
   ActivityIndicator,
   Animated,
@@ -85,8 +91,8 @@ export function LoginScreen() {
   const [transicionando, setTransicionando] = useState(false)
   const operacion = useRef(false)
   const cambiandoModo = useRef(false)
-  const emailRef = useRef<TextInput>(null)
-  const claveRef = useRef<TextInput>(null)
+  const emailRef = useRef<ComponentRef<typeof TextInput>>(null)
+  const claveRef = useRef<ComponentRef<typeof TextInput>>(null)
   const [entradaCabecera] = useState(() => new Animated.Value(0))
   const [entradaFormulario] = useState(() => new Animated.Value(0))
   const [desplazamientoFormulario] = useState(() => new Animated.Value(12))

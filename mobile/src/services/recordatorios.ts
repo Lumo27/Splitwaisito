@@ -1,5 +1,6 @@
 import { Platform } from 'react-native'
 import * as Notifications from 'expo-notifications'
+import { AndroidImportance } from 'expo-notifications'
 import { MODO_SEEDS } from './firebase'
 
 // En modo demo el recordatorio llega a los pocos segundos para poder
@@ -29,7 +30,7 @@ async function prepararNotificaciones(): Promise<boolean> {
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('recordatorios', {
       name: 'Recordatorios de deudas',
-      importance: Notifications.AndroidImportance.HIGH,
+      importance: AndroidImportance.HIGH,
     })
   }
   return true
