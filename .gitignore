@@ -46,3 +46,6 @@ Descargar-APK.html
 
 Descargar-APK.bat
 Descargar-APK.js
+
+# Caché local de Firebase CLI
+.firebase/
