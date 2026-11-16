@@ -1,4 +1,4 @@
-# Splitwaisito en Expo Go
+# Junti en Expo Go
 
 ## Inicio con doble clic en Windows
 
@@ -33,11 +33,49 @@ Los datos mockeados existen solo en modo demo (`npm run start:seeds`); con `npm 
 
 Además: una solicitud de amistad pendiente (Sofi) y cuatro amigos.
 
+## Inicio de sesión
+
+La pantalla de acceso mantiene la paleta verde y celeste de la app, con cabecera curva, campos con opción para mostrar la contraseña y animaciones de entrada y cambio entre acceso y registro. El correo se valida antes de enviar las credenciales; “¿Olvidaste tu contraseña?” usa el restablecimiento por correo de Firebase Authentication. El enlace “Leer Términos y Condiciones” abre el documento completo sin iniciar sesión. Google solo se muestra en builds nativos configurados; Expo Go ofrece demo y correo/contraseña. La pantalla se adapta al área segura y al teclado en iOS y Android.
+
+## Centro de configuración
+
+Configuración agrupa apariencia, accesibilidad, idioma, notificaciones, privacidad, seguridad e información de la app, además de la moneda preferida y el restablecimiento del modo demo. Tema (claro, oscuro o automático), fuente, tamaño de texto, idioma, contraste y opciones de accesibilidad se aplican globalmente y se guardan en AsyncStorage. En cuentas autenticadas también se leen y escriben en `usuarios/{uid}.preferencias` de Firestore; las reglas existentes limitan el documento al titular. Una cuenta sin preferencias guardadas empieza con los valores predeterminados, sin importar preferencias de otra cuenta del dispositivo. En modo demo solo se conservan localmente y Configuración permite restaurar los datos de ejemplo. Si no hay conexión, los cambios locales siguen disponibles y los fallos de sincronización se registran en la consola.
+
+Notificaciones (locales, en Android/iOS; en web no se muestran):
+
+- **Recordatorios:** se programan desde «Saldar deuda» cuando están activos los recordatorios y las notificaciones generales. Apagarlos cancela los recordatorios pendientes.
+- **Pagos para revisar:** al abrir la app, si alguien subió un comprobante que te toca aprobar, aparece un aviso arriba de «Mis grupos» (también en web) y una notificación, una sola vez por pago. No es push: el aviso llega cuando quien recibe el dinero abre la app. Avisar al instante a otro teléfono requiere push remoto (Expo Push), que solo funciona en el APK, no en Expo Go.
+
+La apariencia ofrece cinco tamaños de texto, tres familias disponibles en el sistema (sin descargar fuentes), alto contraste, legibilidad mejorada, reducción de movimiento, preferencia de movimiento del sistema, resaltado de controles y objetivos táctiles grandes. El selector de idioma ofrece español, inglés y portugués. Hay un solo diccionario (`src/i18n/textos.ts`): la frase en español es la clave y las partes variables se escriben como `{nombre}`; en las pantallas se usa `t('Pagó {nombre}', { nombre })` (hook `useTraduccion`), y el componente `Texto` traduce solo los textos fijos. Los tests verifican que inglés y portugués tengan las mismas frases y conserven las variables. Quedan en español los términos legales, los mensajes que se envían por WhatsApp o e-mail a otra persona y algunos motivos de la verificación de comprobantes que incluyen datos. No se agregaron tablas: las preferencias viven en el documento de perfil existente. Seguridad permite cerrar la sesión de este dispositivo y solicitar un enlace para restablecer la contraseña de cuentas con e-mail y contraseña; no administra sesiones remotas. Privacidad indica que no hay controles de visibilidad, exportación o eliminación de datos.
+
+## Términos y Condiciones
+
+Las rutas de la app móvil y de la PWA web requieren aceptar los términos una sola vez por cuenta. La aceptación se guarda en `aceptacionesTerminos/{uid}` de Firestore con el UID, la versión aceptada, el estado y la fecha del servidor; las reglas de `firestore.rules` limitan lectura y escritura al titular y bloquean el acceso a grupos y amistades hasta aceptar. Una aceptación registrada no se invalida al cambiar la versión de los términos ni al cerrar sesión. La pantalla queda bloqueada si no se puede verificar el registro. En modo demo, sin autenticación ni backend, la aceptación se guarda solo para el usuario de ejemplo en el almacenamiento local.
+
+El contenido aceptado compartido por ambas plataformas está en `shared/features/terminos/terminos.ts`. La versión 1.0.3 está fechada el 15 de noviembre de 2026 y no tiene datos por completar; el contacto se define una sola vez en `TERMINOS_CONTACTO`. Si cambian las cláusulas, actualizar `TERMINOS_VERSION` en ese archivo y agregar la nueva versión a la lista de versiones válidas de `firestore.rules` (sin quitar las anteriores, para no bloquear a quien use una versión previa de la app); esto registra la versión aceptada por nuevas cuentas, pero no vuelve a pedir aceptación a cuentas que ya aceptaron. Publicar las reglas actualizadas en Firebase para que acepte la nueva versión.
+
+## Ayuda interactiva
+
+El botón `?` aparece en las pantallas autenticadas de móvil y web, y abre un tutorial por contexto con pasos navegables. Los textos compartidos están en `shared/features/ayuda/tutoriales.ts`. El contexto se deriva de la ruta para cubrir grupos, gastos, detalle y comprobantes, saldos, amistades, perfil y configuración.
+
+Los módulos compartidos se mantienen fuera de `web/` y `mobile/` para que el build web no lea la configuración TypeScript de Expo. Metro incluye `shared/` como watch folder para poder empaquetar esos módulos en la app móvil.
+
 ## Acceso real
 
-Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso por e-mail/contraseña requiere habilitar ese proveedor en Firebase y un usuario existente. Las reglas de Firestore deben permitir las operaciones autorizadas. Para la verificación de comprobantes hay que habilitar Firebase AI Logic con la Gemini Developer API en la consola (Build > AI Logic); funciona en el plan Spark. No se verificó el flujo real con credenciales en esta migración.
+Copiar `.env.example` a `.env.local`, completar Firebase y ejecutar `npm start -- --go` sin la variable de modo demo. El acceso y el restablecimiento por e-mail requieren habilitar ese proveedor en Firebase Authentication; para crear una cuenta, el alta genera el usuario y su perfil. Las reglas de Firestore deben permitir las operaciones autorizadas. Para la verificación de comprobantes hay que habilitar Firebase AI Logic con la Gemini Developer API en la consola (Build > AI Logic); funciona en el plan Spark. No se verificó el flujo real con credenciales en esta migración.
 
 El inicio de sesión con Google usa `@react-native-google-signin/google-signin` y solo funciona en el APK (compilación propia); en Expo Go se usan demo o e-mail/contraseña.
+
+## Versión web publicada
+
+La app está publicada en **https://splitwaisito-a5879.web.app** (Firebase Hosting, plan Spark, contra Firebase real). Se exporta como una sola página (`"output": "single"` en `app.json`) y `firebase.json` envía todas las rutas a `index.html`. Para publicar una versión nueva, desde la raíz del repo y con sesión iniciada en Firebase (`npx firebase-tools login`):
+
+```bash
+cd mobile && npx expo export --platform web && cd ..
+npx firebase-tools deploy --only hosting
+```
+
+Exportar sin `EXPO_PUBLIC_MODO_SEEDS`, para que la versión publicada use Firebase real. En web no hay notificaciones ni inicio con Google; el resto funciona igual que en el celular.
 
 ## Verificaciones
 

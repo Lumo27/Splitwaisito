@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { router } from 'expo-router'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import {
   Boton,
   Campo,
@@ -18,7 +19,11 @@ export function CrearGrupoScreen() {
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
   const [nombre, setNombre] = useState('')
-  const [moneda, setMoneda] = useState<MonedaCodigo>('ARS')
+  // Arranca con la moneda elegida en Configuración > Moneda preferida.
+  const monedaPreferida = useAppStore(
+    (state) => state.preferencias.monedaPreferida,
+  )
+  const [moneda, setMoneda] = useState<MonedaCodigo>(monedaPreferida)
   const [elegidos, setElegidos] = useState<string[]>([])
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)

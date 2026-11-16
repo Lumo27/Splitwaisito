@@ -1,6 +1,6 @@
 @echo off
 setlocal
- title Splitwaisito - Expo Go
+ title Junti - Expo Go
 cd /d "%~dp0mobile"
 if errorlevel 1 goto carpeta_error
 
@@ -23,12 +23,12 @@ if errorlevel 1 goto instalar_error
  echo Para detenerla, presiona Ctrl+C.
  echo.
 if exist ".env.local" goto iniciar_firebase
- echo Iniciando Splitwaisito en modo demo sin credenciales...
+ echo Iniciando Junti en modo demo sin credenciales...
  call npm run start:seeds -- --go --lan
  goto verificar_salida
 
 :iniciar_firebase
- echo Iniciando Splitwaisito conectado a Firebase real...
+ echo Iniciando Junti conectado a Firebase real...
  call npx expo start --clear --go --lan
 
 :verificar_salida

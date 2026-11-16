@@ -1,4 +1,4 @@
-import { Text } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import type { MonedaCodigo } from '@/theme/moneda'
 import { useAppStore } from '@/store/useAppStore'
 import {
@@ -6,6 +6,7 @@ import {
   cotizacionValida,
 } from '@/services/equivalenciaPesos'
 import { formatearMoneda } from '@/theme/moneda'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function EquivalenciaPesos({
   monto,
@@ -14,6 +15,7 @@ export function EquivalenciaPesos({
   monto: number
   moneda: MonedaCodigo
 }) {
+  const t = useTraduccion()
   const cotizacion = useAppStore((state) =>
     moneda === 'ARS' ? undefined : state.cotizacionesPesos[moneda],
   )
@@ -32,7 +34,7 @@ export function EquivalenciaPesos({
 
   return (
     <Text className="text-xs text-text-muted">
-      ≈ {formatearMoneda(valorEnPesos, 'ARS')} · {referencia}
+      ≈ {formatearMoneda(valorEnPesos, 'ARS')} · {t(referencia)}
     </Text>
   )
 }

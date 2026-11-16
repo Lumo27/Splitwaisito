@@ -5,6 +5,62 @@ import { MODO_SEEDS } from '@/services/firebase'
 import type { MonedaCodigo } from '@/theme/moneda'
 import type { CotizacionesPesos } from '@/services/equivalenciaPesos'
 
+export interface Preferencias {
+  theme: 'light' | 'dark' | 'system'
+  fontFamily: 'system' | 'serif' | 'monospace'
+  fontSize: 'verySmall' | 'small' | 'normal' | 'large' | 'veryLarge'
+  language: 'es' | 'en' | 'pt'
+  highContrast: boolean
+  reducedMotion: boolean
+  accessibilityOptions: {
+    respectSystemMotion: boolean
+    improveReadability: boolean
+    highlightInteractive: boolean
+    largeTouchTargets: boolean
+  }
+  notificacionesGenerales: boolean
+  notificacionesRecordatorios: boolean
+  /** Avisar cuando alguien sube un comprobante que me toca aprobar. */
+  notificacionesPagos: boolean
+  monedaPreferida: 'ARS' | 'USD' | 'BRL'
+}
+
+export const PREFERENCIAS_PREDETERMINADAS: Preferencias = {
+  theme: 'light',
+  fontFamily: 'system',
+  fontSize: 'normal',
+  language: 'es',
+  highContrast: false,
+  reducedMotion: false,
+  accessibilityOptions: {
+    respectSystemMotion: true,
+    improveReadability: false,
+    highlightInteractive: true,
+    largeTouchTargets: false,
+  },
+  notificacionesGenerales: true,
+  notificacionesRecordatorios: true,
+  notificacionesPagos: true,
+  monedaPreferida: 'ARS',
+}
+
+type PreferenciasParciales = Omit<Partial<Preferencias>, 'accessibilityOptions'> & {
+  accessibilityOptions?: Partial<Preferencias['accessibilityOptions']>
+}
+
+export function crearPreferenciasPredeterminadas(
+  cambios: PreferenciasParciales = {},
+): Preferencias {
+  return {
+    ...PREFERENCIAS_PREDETERMINADAS,
+    ...cambios,
+    accessibilityOptions: {
+      ...PREFERENCIAS_PREDETERMINADAS.accessibilityOptions,
+      ...cambios.accessibilityOptions,
+    },
+  }
+}
+
 export interface Usuario {
   id: string
   nombre: string
@@ -33,6 +89,8 @@ interface AppState {
   amigos: Usuario[]
   gastos: Gasto[]
   cotizacionesPesos: CotizacionesPesos
+  preferencias: Preferencias
+  actualizarPreferencias: (cambios: Partial<Preferencias>) => void
   iniciarSesion: (
     nombre: string,
     email: string,
@@ -68,6 +126,12 @@ export const useAppStore = create<AppState>()(
       amigos: [],
       gastos: [],
       cotizacionesPesos: {},
+      preferencias: crearPreferenciasPredeterminadas(),
+
+      actualizarPreferencias: (cambios) =>
+        set((state) => ({
+          preferencias: { ...state.preferencias, ...cambios },
+        })),
 
       iniciarSesion: (nombre, email, alias, id = 'user-me', fotoUrl, descripcion, moneda) =>
         set((state) => ({
@@ -195,6 +259,22 @@ export const useAppStore = create<AppState>()(
       // En web el persist usa localStorage por defecto; en React Native no
       // existe, así que se guarda en AsyncStorage.
       storage: createJSONStorage(() => AsyncStorage),
+      merge: (persistedState, currentState) => {
+        const guardado = persistedState as Partial<AppState> | undefined
+
+        return {
+          ...currentState,
+          ...guardado,
+          preferencias: {
+            ...currentState.preferencias,
+            ...guardado?.preferencias,
+            accessibilityOptions: {
+              ...currentState.preferencias.accessibilityOptions,
+              ...guardado?.preferencias?.accessibilityOptions,
+            },
+          },
+        }
+      },
     },
   ),
 )

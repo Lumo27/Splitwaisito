@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Plus,
@@ -67,10 +67,7 @@ export function GruposScreen() {
   )
 
   useEffect(() => {
-    if (!usuarioActual) {
-      setGrupos([])
-      return
-    }
+    if (!usuarioActual) return
 
     obtenerGruposDelUsuario(usuarioActual.id)
       .then((gruposDelUsuario) => {
@@ -106,33 +103,22 @@ export function GruposScreen() {
     (amigo) => !grupoSeleccionado?.miembros.includes(amigo.id),
   )
 
-  const participantes = useMemo(
-    () =>
-      participantesDelGrupo(
-        grupoSeleccionado?.miembros,
-        usuarioActual,
-        amigos,
-      ),
-    [amigos, grupoSeleccionado, usuarioActual],
+  const participantes = participantesDelGrupo(
+    grupoSeleccionado?.miembros,
+    usuarioActual,
+    amigos,
   )
 
-  const balances = useMemo(
-    () =>
-      calcularBalances(
-        participantes,
-        gastos.map((gasto) => ({
-          id: gasto.id,
-          monto: gasto.monto,
-          pagadoPorId: gasto.pagadoPorId,
-        })),
-      ),
-    [gastos, participantes],
+  const balances = calcularBalances(
+    participantes,
+    gastos.map((gasto) => ({
+      id: gasto.id,
+      monto: gasto.monto,
+      pagadoPorId: gasto.pagadoPorId,
+    })),
   )
 
-  const deudasSimplificadas = useMemo(
-    () => simplificarDeudas(balances),
-    [balances],
-  )
+  const deudasSimplificadas = simplificarDeudas(balances)
 
   const pagadores = participantes.map((participante) => ({
     id: participante.id,

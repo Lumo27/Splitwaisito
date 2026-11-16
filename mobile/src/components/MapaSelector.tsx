@@ -1,8 +1,11 @@
 import { useState } from 'react'
-import { Modal, Pressable, Text, View } from 'react-native'
+import { Modal, Pressable, View } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { MapPin, X } from 'lucide-react-native'
-import { colores } from '@/theme/colores'
 import { MapaLeaflet, type Coordenadas } from './MapaLeaflet'
+import { useReducirAnimaciones } from '@/hooks/useMovimientoReducido'
+import { usePaletaActual } from '@/theme/usePaletaActual'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 interface Props {
   visible: boolean
@@ -17,16 +20,23 @@ export function MapaSelector({
   coordenadasIniciales,
   onSeleccionar,
 }: Props) {
+  const t = useTraduccion()
   const [seleccion, setSeleccion] = useState<Coordenadas | null>(
     coordenadasIniciales ?? null,
   )
+  const paleta = usePaletaActual()
+  const reducirAnimaciones = useReducirAnimaciones()
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onCerrar}>
-      <View className="flex-1 bg-white">
+    <Modal
+      visible={visible}
+      animationType={reducirAnimaciones ? 'none' : 'slide'}
+      onRequestClose={onCerrar}
+    >
+      <View className="flex-1 bg-background">
         <View className="flex-row items-center justify-between border-b border-slate-200 px-4 py-3">
           <View className="flex-row items-center gap-2">
-            <MapPin size={20} color={colores.primaryDark} />
+            <MapPin size={20} color={paleta.primaryDark} />
             <Text className="text-base font-bold text-text">
               Marcar ubicación en el mapa
             </Text>
@@ -37,7 +47,7 @@ export function MapaSelector({
             onPress={onCerrar}
             className="p-1"
           >
-            <X size={24} color="#64748B" />
+            <X size={24} color={paleta.textMuted} />
           </Pressable>
         </View>
 
@@ -51,7 +61,10 @@ export function MapaSelector({
           </Text>
           {seleccion ? (
             <Text className="mb-3 text-sm font-semibold text-primary-dark">
-              Coordenadas: {seleccion.lat.toFixed(5)}, {seleccion.lng.toFixed(5)}
+              {t('Coordenadas: {lat}, {lng}', {
+                lat: seleccion.lat.toFixed(5),
+                lng: seleccion.lng.toFixed(5),
+              })}
             </Text>
           ) : (
             <Text className="mb-3 text-sm text-text-muted">

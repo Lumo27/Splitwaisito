@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Avatar } from '../../components/Avatar'
 import { Card } from '../../components/Card'
 import { Input } from '../../components/Input'
@@ -11,11 +11,6 @@ export function PerfilScreen() {
   const [alias, setAlias] = useState(usuarioActual?.alias || '')
   const [descripcion, setDescripcion] = useState(usuarioActual?.descripcion || '')
   const [guardado, setGuardado] = useState(false)
-
-  useEffect(() => {
-    setAlias(usuarioActual?.alias || '')
-    setDescripcion(usuarioActual?.descripcion || '')
-  }, [usuarioActual])
 
   async function handleGuardarPerfil(e: React.FormEvent) {
     e.preventDefault()

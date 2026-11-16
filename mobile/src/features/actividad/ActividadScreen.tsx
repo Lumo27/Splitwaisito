@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useFocusEffect } from 'expo-router'
-import { ActivityIndicator, Text } from 'react-native'
+import { ActivityIndicator } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import {
   Boton,
   Campo,
@@ -21,8 +22,10 @@ import { guardarAmigosDelUsuario } from '@/services/firestore'
 import { useAppStore } from '@/store/useAppStore'
 import { colores } from '@/theme/colores'
 import { confirmar } from '@/utils/alerta'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 export function ActividadScreen() {
+  const t = useTraduccion()
   const usuario = useAppStore((state) => state.usuarioActual)
   const amigos = useAppStore((state) => state.amigos)
   const reemplazarAmigos = useAppStore((state) => state.reemplazarAmigos)
@@ -156,7 +159,9 @@ export function ActividadScreen() {
       />
       {cargando && <ActivityIndicator color={colores.primary} />}
       <Text accessibilityRole="header" className="text-lg font-bold text-text">
-        Solicitudes pendientes ({solicitudes.length})
+        {t('Solicitudes pendientes ({cantidad})', {
+          cantidad: solicitudes.length,
+        })}
       </Text>
       {!solicitudes.length && !cargando && (
         <Text className="text-sm text-text-muted">
@@ -193,7 +198,7 @@ export function ActividadScreen() {
         </Tarjeta>
       ))}
       <Text accessibilityRole="header" className="text-lg font-bold text-text">
-        Tus amigos ({amigos.length})
+        {t('Tus amigos ({cantidad})', { cantidad: amigos.length })}
       </Text>
       {!amigos.length && !cargando && (
         <Text className="text-sm text-text-muted">
@@ -205,13 +210,15 @@ export function ActividadScreen() {
           <Text className="font-bold text-text">{amigo.nombre}</Text>
           <Text className="text-sm text-text-muted">{amigo.email}</Text>
           <Boton
-            texto={`Eliminar a ${amigo.nombre}`}
+            texto={t('Eliminar a {nombre}', { nombre: amigo.nombre })}
             peligro
             disabled={ocupado}
             onPress={() =>
               confirmar({
                 titulo: 'Eliminar amigo',
-                mensaje: `¿Eliminar a ${amigo.nombre} de tus amigos?`,
+                mensaje: t('¿Eliminar a {nombre} de tus amigos?', {
+                  nombre: amigo.nombre,
+                }),
                 textoConfirmar: 'Eliminar',
                 textoCancelar: 'Cancelar',
                 destructivo: true,

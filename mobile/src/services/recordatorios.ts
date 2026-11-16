@@ -20,14 +20,8 @@ if (recordatoriosDisponibles) {
   })
 }
 
-/**
- * Programa una notificación local en este teléfono para acordarse de pagar.
- * Devuelve false si el usuario no dio permiso.
- */
-export async function programarRecordatorioDePago(
-  titulo: string,
-  cuerpo: string,
-): Promise<boolean> {
+/** Pide permiso y prepara el canal de Android. false si no se puede notificar. */
+async function prepararNotificaciones(): Promise<boolean> {
   if (!recordatoriosDisponibles) return false
   const permiso = await Notifications.requestPermissionsAsync()
   if (!permiso.granted) return false
@@ -38,14 +32,64 @@ export async function programarRecordatorioDePago(
       importance: Notifications.AndroidImportance.HIGH,
     })
   }
+  return true
+}
+
+/**
+ * Programa una notificación local en este teléfono para acordarse de pagar.
+ * Devuelve false si el usuario no dio permiso.
+ */
+export async function programarRecordatorioDePago(
+  titulo: string,
+  cuerpo: string,
+): Promise<boolean> {
+  if (!(await prepararNotificaciones())) return false
 
   await Notifications.scheduleNotificationAsync({
-    content: { title: titulo, body: cuerpo },
+    content: {
+      title: titulo,
+      body: cuerpo,
+      data: { tipo: 'recordatorio-deuda' },
+    },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: DEMORA_RECORDATORIO_SEGUNDOS,
       channelId: 'recordatorios',
     },
+  })
+  return true
+}
+
+export async function cancelarRecordatoriosDeuda(): Promise<void> {
+  if (!recordatoriosDisponibles) return
+
+  const programadas = await Notifications.getAllScheduledNotificationsAsync()
+  const recordatorios = programadas.filter(
+    ({ content }) =>
+      content.data?.tipo === 'recordatorio-deuda' ||
+      content.title === 'Tenés una deuda pendiente',
+  )
+
+  await Promise.all(
+    recordatorios.map(({ identifier }) =>
+      Notifications.cancelScheduledNotificationAsync(identifier),
+    ),
+  )
+}
+
+/** Muestra en el momento una notificación local, por ejemplo de un pago a revisar. */
+export async function notificarAhora(
+  titulo: string,
+  cuerpo: string,
+): Promise<boolean> {
+  if (!(await prepararNotificaciones())) return false
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: titulo,
+      body: cuerpo,
+      data: { tipo: 'pago-para-revisar' },
+    },
+    trigger: null,
   })
   return true
 }

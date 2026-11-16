@@ -1,6 +1,6 @@
 # Guía de migración a React Native (Expo) — paso a paso
 
-Fecha: 23/09/2026. El docente pidió volver a Expo/React Native, revirtiendo el cambio a PWA que el equipo había consultado y que se aprobó el 01/09 (ver [`../CLAUDE.md`](../CLAUDE.md) y la [ficha técnica](./ficha-tecnica-splitwaisito.pdf)). Este archivo es un runbook para que **Lucas lo siga paso a paso, comando por comando, usando Claude Code y supervisando cada paso** — no para delegar toda la migración de una.
+Fecha: 23/09/2026. El docente pidió volver a Expo/React Native, revirtiendo el cambio a PWA que el equipo había consultado y que se aprobó el 01/09 (ver [`../CLAUDE.md`](../CLAUDE.md) y la [ficha técnica](./ficha-tecnica-junti.pdf)). Este archivo es un runbook para que **Lucas lo siga paso a paso, comando por comando, usando Claude Code y supervisando cada paso** — no para delegar toda la migración de una.
 
 Lo que hoy existe en `/web` (Vite + React + TS + Tailwind + Firebase + PWA) está documentado en [`DOCUMENTACION.md`](./DOCUMENTACION.md). Esta guía asume ese estado como punto de partida.
 
@@ -84,7 +84,7 @@ Modelo: no importa.
 Cada paso (o grupo de pasos) tiene su propia rama corta y su PR a `develop`; ver la tabla de "Antes de arrancar". Para el esqueleto:
 
 ```bash
-cd ~/splitwaisito/FF-Friend-Fly
+cd ~/junti/FF-Friend-Fly
 git checkout develop
 git pull
 git checkout -b feature/rn-esqueleto
@@ -102,7 +102,7 @@ cd mobile
 Prompt:
 
 ```
-Estoy migrando Splitwaisito (hoy en /web, Vite+React+PWA) a React Native con Expo, en /mobile, en la rama feature/rn-esqueleto. Ya generé la base con `create-expo-app --template tabs` (Expo Router).
+Estoy migrando Junti (hoy en /web, Vite+React+PWA) a React Native con Expo, en /mobile, en la rama feature/rn-esqueleto. Ya generé la base con `create-expo-app --template tabs` (Expo Router).
 
 Leé CLAUDE.md y docs/DOCUMENTACION.md primero. Después:
 1. Revisá la estructura que generó el template (carpeta app/(tabs)/).

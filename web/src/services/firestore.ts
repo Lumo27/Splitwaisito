@@ -217,7 +217,6 @@ export async function guardarGasto(
 export async function actualizarGasto(grupoId: string, gastoId: string, data: Partial<Omit<GastoFirestore, 'id'>>) {
   if (MODO_SEEDS) return;
   if (!db) throw new Error('Firebase no configurado aún.');
-  const { updateDoc, doc } = await import('firebase/firestore');
   const ref = doc(db, 'grupos', grupoId, 'gastos', gastoId);
   await updateDoc(ref, data as any);
 }

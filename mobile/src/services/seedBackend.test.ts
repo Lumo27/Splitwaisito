@@ -76,4 +76,26 @@ describe('seedBackend en React Native', () => {
     const gasto = seed.seedGastosDelGrupo('grupo-asado').find((g) => g.id === 'g-a1')
     expect(gasto?.monto).toBe(35000)
   })
+
+  it('restablece los grupos, gastos y amistades del modo demo', async () => {
+    const seed = await abrirApp()
+    seed.seedCrearGrupo('Grupo temporal', seed.SEED_USUARIO_ID)
+    seed.seedActualizarGasto('grupo-asado', 'g-a1', { monto: 99999 })
+    seed.seedEliminarAmistad(seed.SEED_USUARIO_ID, 'seed-cande')
+
+    seed.restablecerSeeds()
+
+    expect(seed.seedGruposDelUsuario(seed.SEED_USUARIO_ID)).toHaveLength(4)
+    expect(
+      seed.seedGruposDelUsuario(seed.SEED_USUARIO_ID).some(
+        (grupo) => grupo.nombre === 'Grupo temporal',
+      ),
+    ).toBe(false)
+    expect(
+      seed
+        .seedGastosDelGrupo('grupo-asado')
+        .find((gasto) => gasto.id === 'g-a1')?.monto,
+    ).toBe(32000)
+    expect(seed.seedAmigosAceptados(seed.SEED_USUARIO_ID)).toHaveLength(4)
+  })
 })

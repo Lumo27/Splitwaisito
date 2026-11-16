@@ -5,9 +5,9 @@ import {
   Image,
   Linking,
   Pressable,
-  Text,
   View,
 } from 'react-native'
+import { Texto as Text } from '@/components/Texto'
 import { MapPin } from 'lucide-react-native'
 import {
   Boton,
@@ -41,6 +41,7 @@ import { formatearMoneda } from '@/theme/moneda'
 import { participantesDelGrupo } from '../grupos/deudas'
 import { deudasDelGrupo } from '../grupos/deudasDelGrupo'
 import { formatearFecha } from '../grupos/formatearFecha'
+import { useTraduccion } from '@/i18n/useTraduccion'
 
 const SITUACIONES: Record<
   SituacionEnGasto['tipo'],
@@ -60,6 +61,7 @@ const SITUACIONES: Record<
 }
 
 export function DetalleGastoScreen() {
+  const t = useTraduccion()
   const { id, gastoId } = useLocalSearchParams<{
     id: string
     gastoId: string
@@ -190,7 +192,9 @@ export function DetalleGastoScreen() {
           <Text className="font-bold text-text">
             {gasto.aprobacion === 'automatica'
               ? 'Verificado automáticamente'
-              : `Aprobado por ${nombre(receptorDelPago(gasto))}`}
+              : t('Aprobado por {nombre}', {
+                  nombre: nombre(receptorDelPago(gasto)),
+                })}
           </Text>
           <Text className="text-sm text-text-muted">
             {gasto.aprobacion === 'automatica'
@@ -209,7 +213,7 @@ export function DetalleGastoScreen() {
           </Text>
           {gasto.motivos?.map((motivo) => (
             <Text key={motivo} className="text-sm text-text-muted">
-              • {motivo}
+              • {t(motivo)}
             </Text>
           ))}
           {puedeResolver && (
@@ -239,7 +243,7 @@ export function DetalleGastoScreen() {
       {!pago && reparto.length > 0 && (
         <Tarjeta>
           <Text className="font-bold text-text">
-            Dividido entre {reparto.length}
+            {t('Dividido entre {cantidad}', { cantidad: reparto.length })}
           </Text>
           {reparto.map((persona) => {
             const situacion = situacionEnGasto(
@@ -274,8 +278,8 @@ export function DetalleGastoScreen() {
                   className="text-xs font-semibold"
                   style={{ color: SITUACIONES[situacion.tipo].color }}
                 >
-                  {SITUACIONES[situacion.tipo].texto}
-                  {pagoRelacionado ? ' · Ver comprobante' : ''}
+                  {t(SITUACIONES[situacion.tipo].texto)}
+                  {pagoRelacionado ? ` · ${t('Ver comprobante')}` : ''}
                 </Text>
               </Pressable>
             )

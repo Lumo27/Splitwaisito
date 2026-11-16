@@ -67,3 +67,26 @@ export function situacionEnGasto(
     ? { tipo: 'debe' }
     : { tipo: 'al-dia' }
 }
+
+export interface PagoParaRevisar {
+  grupoId: string
+  grupoNombre: string
+  pago: GastoFirestore
+}
+
+/** Pagos pendientes en los que el usuario es quien recibe el dinero. */
+export function pagosParaRevisar(
+  usuarioId: string,
+  grupos: { id: string; nombre: string; movimientos: GastoFirestore[] }[],
+): PagoParaRevisar[] {
+  return grupos.flatMap((grupo) =>
+    grupo.movimientos
+      .filter(
+        (movimiento) =>
+          esPago(movimiento) &&
+          movimiento.estado === 'pendiente' &&
+          receptorDelPago(movimiento) === usuarioId,
+      )
+      .map((pago) => ({ grupoId: grupo.id, grupoNombre: grupo.nombre, pago })),
+  )
+}
