@@ -749,6 +749,10 @@ const textosEn: Record<string, string> = {
   'Grupo': 'Group',
   'Los pagos para revisar se avisan cuando abrís la app.':
     'We let you know about payments to review when you open the app.',
+  // Saldo en la lista de grupos
+  'Estás al día': 'You are all settled',
+  'Te deben {monto}': 'You are owed {monto}',
+  'Debés {monto}': 'You owe {monto}',
 }
 const textosPt: Record<string, string> = {
   'Compartí los planes, organizá los gastos.': 'Compartilhe planos e organize despesas.',
@@ -1518,6 +1522,10 @@ const textosPt: Record<string, string> = {
   'Grupo': 'Grupo',
   'Los pagos para revisar se avisan cuando abrís la app.':
     'Os pagamentos para revisar são avisados quando você abre o app.',
+  // Saldo en la lista de grupos
+  'Estás al día': 'Você está em dia',
+  'Te deben {monto}': 'Devem a você {monto}',
+  'Debés {monto}': 'Você deve {monto}',
 }
 
 const textosAyudaEn: Record<string, string> = {

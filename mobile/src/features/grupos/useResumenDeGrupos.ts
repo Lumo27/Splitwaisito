@@ -9,6 +9,7 @@ import {
 import { notificarAhora } from '@/services/recordatorios'
 import { useAppStore } from '@/store/useAppStore'
 import { formatearMoneda } from '@/theme/moneda'
+import { saldoDelUsuario } from './deudasDelGrupo'
 import { pagosParaRevisar, type PagoParaRevisar } from './pagos'
 
 // Pagos ya notificados en este dispositivo, para avisar una sola vez por pago.
@@ -24,12 +25,12 @@ async function leerAvisados(): Promise<string[]> {
 }
 
 /**
- * Busca, cada vez que la pantalla toma foco, los comprobantes que el usuario
- * tiene que aprobar. Si hay alguno nuevo y las notificaciones de pagos están
+ * Resume los grupos del usuario cada vez que la pantalla toma foco: su saldo
+ * en cada grupo y los comprobantes que tiene que aprobar. Si hay alguno nuevo y las notificaciones de pagos están
  * activas, lo avisa con una notificación local. No es push: el aviso llega
  * cuando quien recibe el dinero abre la app.
  */
-export function usePagosParaRevisar() {
+export function useResumenDeGrupos() {
   const usuarioId = useAppStore((state) => state.usuarioActual?.id)
   const generales = useAppStore(
     (state) => state.preferencias.notificacionesGenerales,
@@ -37,6 +38,7 @@ export function usePagosParaRevisar() {
   const pagos = useAppStore((state) => state.preferencias.notificacionesPagos)
   const t = useTraduccion()
   const [pendientes, setPendientes] = useState<PagoParaRevisar[]>([])
+  const [saldos, setSaldos] = useState<Record<string, number>>({})
 
   const buscar = useCallback(async () => {
     if (!usuarioId) return
@@ -47,8 +49,17 @@ export function usePagosParaRevisar() {
           id: grupo.id,
           nombre: grupo.nombre,
           moneda: grupo.moneda ?? 'ARS',
+          miembros: grupo.miembros,
           movimientos: await obtenerGastosDelGrupo(grupo.id),
         })),
+      )
+      setSaldos(
+        Object.fromEntries(
+          conMovimientos.map((grupo) => [
+            grupo.id,
+            saldoDelUsuario(usuarioId, grupo.miembros, grupo.movimientos),
+          ]),
+        ),
       )
       const encontrados = pagosParaRevisar(usuarioId, conMovimientos)
       setPendientes(encontrados)
@@ -93,5 +104,5 @@ export function usePagosParaRevisar() {
     }, [buscar]),
   )
 
-  return pendientes
+  return { pendientes, saldos }
 }
