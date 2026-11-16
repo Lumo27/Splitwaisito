@@ -55,3 +55,24 @@ export function deudasDelGrupo(
   })
   return simplificarDeudas(balances)
 }
+
+/**
+ * Saldo del usuario en un grupo: positivo si le deben, negativo si debe y 0
+ * si está al día. Sale de las mismas deudas simplificadas del detalle.
+ */
+export function saldoDelUsuario(
+  usuarioId: string,
+  miembros: string[],
+  gastos: GastoFirestore[],
+): number {
+  const participantes = miembros.map((id) => ({ id, nombre: id }))
+  return deudasDelGrupo(participantes, gastos).reduce(
+    (saldo, deuda) =>
+      deuda.a === usuarioId
+        ? saldo + deuda.monto
+        : deuda.de === usuarioId
+          ? saldo - deuda.monto
+          : saldo,
+    0,
+  )
+}
