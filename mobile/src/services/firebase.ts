@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { initializeApp } from 'firebase/app'
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { getAuth, getReactNativePersistence, initializeAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { Platform } from 'react-native'
@@ -22,6 +23,19 @@ export const MODO_SEEDS = process.env.EXPO_PUBLIC_MODO_SEEDS === 'true'
 const isConfigured = !MODO_SEEDS && hasFirebaseConfig(firebaseConfig)
 
 export const app = isConfigured ? initializeApp(firebaseConfig as Required<FirebaseConfig>) : null
+
+// App Check prueba que los pedidos a Firestore y a Gemini (AI Logic) vienen de
+// la app y no de un script con las claves públicas. Solo en web: en Android e
+// iOS el SDK de JavaScript no soporta Play Integrity ni App Attest. La clave
+// del sitio de reCAPTCHA v3 es pública (la secreta está en la consola de
+// Firebase). Mientras App Check no esté en modo "Aplicar", nada se bloquea.
+const RECAPTCHA_SITE_KEY = '6LeTVCMuAAAAAOEMm-nOPcQCxPvWkP5UPrAbZ1XC'
+if (app && Platform.OS === 'web' && typeof window !== 'undefined') {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),
+    isTokenAutoRefreshEnabled: true,
+  })
+}
 
 // firebase 12.x: en React Native, getAuth() guarda la sesión solo en memoria y
 // se pierde al cerrar la app. initializeAuth con getReactNativePersistence la
