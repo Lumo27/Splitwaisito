@@ -14,11 +14,41 @@ import { colores } from '@/theme/colores'
 import { usePaletaActual } from '@/theme/usePaletaActual'
 import { avisar, confirmar } from '@/utils/alerta'
 import { useTraduccion } from '@/i18n/useTraduccion'
-import { usePagosParaRevisar } from './usePagosParaRevisar'
+import { formatearMoneda, type MonedaCodigo } from '@/theme/moneda'
+import { useResumenDeGrupos } from './useResumenDeGrupos'
+
+/** «Te deben», «Debés» o «Estás al día» según el saldo del usuario en el grupo. */
+function SaldoDelGrupo({
+  saldo,
+  moneda,
+}: {
+  saldo: number | undefined
+  moneda: MonedaCodigo
+}) {
+  const t = useTraduccion()
+  // Sin datos todavía (se están cargando) no se muestra nada.
+  if (saldo === undefined) return null
+  // Menos de un centavo cuenta como saldado (redondeos del reparto).
+  if (Math.abs(saldo) < 0.01)
+    return (
+      <Text className="text-xs font-semibold text-text-muted">
+        {t('Estás al día')}
+      </Text>
+    )
+  return (
+    <Text
+      className={`text-xs font-bold ${saldo > 0 ? 'text-primary-dark' : 'text-red-700'}`}
+    >
+      {saldo > 0
+        ? t('Te deben {monto}', { monto: formatearMoneda(saldo, moneda) })
+        : t('Debés {monto}', { monto: formatearMoneda(-saldo, moneda) })}
+    </Text>
+  )
+}
 
 export function GruposScreen() {
   const t = useTraduccion()
-  const pendientes = usePagosParaRevisar()
+  const { pendientes, saldos } = useResumenDeGrupos()
   const paleta = usePaletaActual()
   const usuarioId = useAppStore((state) => state.usuarioActual?.id)
   const [grupos, setGrupos] = useState<GrupoFirestore[]>([])
@@ -244,6 +274,10 @@ export function GruposScreen() {
                   {grupo.descripcion}
                 </Text>
               ) : null}
+              <SaldoDelGrupo
+                saldo={saldos[grupo.id]}
+                moneda={grupo.moneda ?? 'ARS'}
+              />
             </View>
             <ChevronRight size={18} color={paleta.textMuted} />
           </Pressable>

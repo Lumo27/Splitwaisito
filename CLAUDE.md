@@ -65,7 +65,7 @@ Tablero Trello del equipo: https://trello.com/b/KnB9B2kP/splitwaisito (espacio "
 
 ## Documentación de proceso (pedido explícito de la consigna)
 
-La consigna exige documentar y justificar el proceso de creación, incluyendo **todo uso de IA con su motivo** — no alcanza con "usamos IA". Hay una ficha técnica (`docs/ficha-tecnica-junti.pdf`) y un informe de uso de IA; la planilla `planilla-uso-ia.xlsx` todavía no está en el repositorio. **Cada vez que uses IA para algo no trivial — generar código, resolver un error, decidir un enfoque — registralo** (herramienta, finalidad, prompt clave, qué se usó). No hace falta registrar cada mensaje suelto, sí cada tarea concreta.
+La consigna exige documentar y justificar el proceso de creación, incluyendo **todo uso de IA con su motivo** — no alcanza con "usamos IA". Hay una ficha técnica (`docs/ficha-tecnica-junti.pdf`) y un informe de uso de IA; la planilla está en `docs/planilla-uso-ia.xlsx` (hoja «Registro»; el «Resumen» se calcula solo). **Cada vez que uses IA para algo no trivial — generar código, resolver un error, decidir un enfoque — registralo** (herramienta, finalidad, prompt clave, qué se usó). No hace falta registrar cada mensaje suelto, sí cada tarea concreta.
 
 ## Primer paso
 

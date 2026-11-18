@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { deudasDelGrupo, estadoDeudasGrupo } from './deudasDelGrupo'
+import {
+  deudasDelGrupo,
+  estadoDeudasGrupo,
+  saldoDelUsuario,
+} from './deudasDelGrupo'
 
 const personas = ['a', 'b', 'c'].map((id) => ({ id, nombre: id }))
 const gasto = {
@@ -84,5 +88,27 @@ describe('estadoDeudasGrupo', () => {
     expect(
       estadoDeudasGrupo([gasto], [{ de: 'b', a: 'a', monto: 120 }]),
     ).toBe('pendiente')
+  })
+})
+
+describe('saldoDelUsuario', () => {
+  const miembros = ['a', 'b', 'c']
+
+  it('es positivo para quien pagó y negativo para quien debe', () => {
+    expect(saldoDelUsuario('a', miembros, [gasto])).toBe(80)
+    expect(saldoDelUsuario('b', miembros, [gasto])).toBe(-40)
+  })
+
+  it('es cero sin gastos o cuando el pago aprobado salda la deuda', () => {
+    expect(saldoDelUsuario('b', miembros, [])).toBe(0)
+    const pago = {
+      ...gasto,
+      tipo: 'pago' as const,
+      estado: 'aprobado' as const,
+      monto: 40,
+      pagadoPorId: 'b',
+      participantes: ['a'],
+    }
+    expect(saldoDelUsuario('b', miembros, [gasto, pago])).toBe(0)
   })
 })
