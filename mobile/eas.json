@@ -5,7 +5,10 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_MODO_SEEDS": "false"
+      }
     },
     "preview": {
       "distribution": "internal",
@@ -13,6 +16,7 @@
         "buildType": "apk"
       },
       "env": {
+        "EXPO_PUBLIC_MODO_SEEDS": "false",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyBxodN8Pg-d8iDg0t0Mq4bNUSkIcsH8PUU",
         "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "splitwaisito-a5879.firebaseapp.com",
         "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "splitwaisito-a5879",
@@ -28,6 +32,7 @@
         "buildType": "apk"
       },
       "env": {
+        "EXPO_PUBLIC_MODO_SEEDS": "false",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyBxodN8Pg-d8iDg0t0Mq4bNUSkIcsH8PUU",
         "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "splitwaisito-a5879.firebaseapp.com",
         "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "splitwaisito-a5879",
